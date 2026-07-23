@@ -1,0 +1,20 @@
+# intelligence-engine: baseline drop-zone + derived registries — local only (copyright)
+skills/intelligence-engine/knowledge/*
+!skills/intelligence-engine/knowledge/README.md
+skills/intelligence-engine/registries/*
+!skills/intelligence-engine/registries/README.md
+
+# Superseded material kept for history — never publish
+_archive/
+
+# PMI volunteer copyrighted material — never publish, never build on
+stakeholder/
+
+# Common
+reports/
+.vs/
+_dump.txt
+_stats.txt
+*.tmp
+.DS_Store
+Thumbs.db
