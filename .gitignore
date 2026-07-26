@@ -3,6 +3,16 @@ skills/intelligence-engine/knowledge/*
 !skills/intelligence-engine/knowledge/README.md
 skills/intelligence-engine/registries/*
 !skills/intelligence-engine/registries/README.md
+skills/intelligence-engine/knowledge_index.json
+
+# intelligence-engine: generated test-run output (reproducible from test_manifest.md)
+skills/intelligence-engine/scripts/report.html
+skills/intelligence-engine/scripts/report.txt
+skills/intelligence-engine/scripts/test_output.json
+
+# Python
+__pycache__/
+*.pyc
 
 # Superseded material kept for history — never publish
 _archive/
