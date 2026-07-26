@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IEM-PM — User Guide</title>
+<style>
+  :root {
+    --paper: #f8f4f3;
+    --paper-raised: #ffffff;
+    --ink: #221e1d;
+    --muted: #746a67;
+    --line: #e4dad8;
+    --accent: #c41e3a;
+    --accent-ink: #8f1728;
+    --accent-tint: #f5dee0;
+    --gold: #8a6d1d;
+    --gold-tint: #f1e7cb;
+    --shadow: 0 1px 2px rgba(34, 30, 29, 0.06), 0 8px 24px rgba(34, 30, 29, 0.05);
+
+    --font-display: "Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #18130f;
+      --paper-raised: #241e1a;
+      --ink: #f3ece9;
+      --muted: #b9ada9;
+      --line: #3a322e;
+      --accent: #e8556c;
+      --accent-ink: #f4a3af;
+      --accent-tint: #3a1b20;
+      --gold: #d9b65b;
+      --gold-tint: #362b13;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #18130f;
+    --paper-raised: #241e1a;
+    --ink: #f3ece9;
+    --muted: #b9ada9;
+    --line: #3a322e;
+    --accent: #e8556c;
+    --accent-ink: #f4a3af;
+    --accent-tint: #3a1b20;
+    --gold: #d9b65b;
+    --gold-tint: #362b13;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+  :root[data-theme="light"] {
+    --paper: #f8f4f3;
+    --paper-raised: #ffffff;
+    --ink: #221e1d;
+    --muted: #746a67;
+    --line: #e4dad8;
+    --accent: #c41e3a;
+    --accent-ink: #8f1728;
+    --accent-tint: #f5dee0;
+    --gold: #8a6d1d;
+    --gold-tint: #f1e7cb;
+    --shadow: 0 1px 2px rgba(34, 30, 29, 0.06), 0 8px 24px rgba(34, 30, 29, 0.05);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .shell {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+  }
+
+  /* ── Masthead ───────────────────────────────────────── */
+  .masthead {
+    padding: 3.2rem 0 2.2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-tint);
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+    line-height: 1.18;
+    margin: 0 0 0.9rem;
+    text-wrap: balance;
+    max-width: 20ch;
+  }
+  .masthead p.lede {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 56ch;
+    margin: 0;
+  }
+
+  /* ── Two-column body: rail + content ───────────────── */
+  .layout {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 3rem;
+    padding-top: 2.5rem;
+  }
+  @media (max-width: 780px) {
+    .layout { grid-template-columns: 1fr; gap: 1.5rem; }
+    .rail { position: static !important; order: -1; }
+  }
+
+  .rail {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+  }
+  .rail-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .rail nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  @media (max-width: 780px) {
+    .rail nav {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 1.2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+  .rail a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-left: 2px solid transparent;
+    padding-left: 0.6rem;
+  }
+  @media (max-width: 780px) {
+    .rail a { border-left: none; border-bottom: 2px solid transparent; padding-left: 0; padding-bottom: 0.3rem; }
+  }
+  .rail a:hover { color: var(--ink); border-color: var(--accent); }
+
+  main { min-width: 0; }
+
+  section { margin-bottom: 3.6rem; scroll-margin-top: 1.5rem; }
+  section > .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.6rem;
+    margin: 0 0 0.9rem;
+    text-wrap: balance;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 0 0 0.4rem;
+  }
+  p { max-width: 68ch; }
+  p.intro { color: var(--muted); font-size: 1.02rem; max-width: 62ch; margin-top: -0.3rem; }
+
+  /* ── Callout ────────────────────────────────────────── */
+  .callout {
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    border-radius: 4px;
+    padding: 1.1rem 1.3rem;
+    box-shadow: var(--shadow);
+    max-width: 68ch;
+  }
+  .callout.gold { border-left: 3px solid var(--gold); }
+  .callout.accent { border-left: 3px solid var(--accent); }
+  .callout p { margin: 0; }
+  .callout p + p { margin-top: 0.6rem; }
+
+  /* ── Checklist ──────────────────────────────────────── */
+  .checklist { list-style: none; margin: 1.2rem 0 0; padding: 0; max-width: 62ch; }
+  .checklist li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .box {
+    flex: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.2rem;
+    border: 1.5px solid var(--muted);
+    border-radius: 2px;
+  }
+  .checklist strong { font-weight: 600; }
+  .checklist span.note { display: block; color: var(--muted); font-size: 0.92rem; margin-top: 0.15rem; }
+
+  /* ── Stage list (the 6 steps — order carries meaning) ─ */
+  .stages { position: relative; margin-top: 1.6rem; max-width: 62ch; }
+  .stage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.6rem 1fr;
+    gap: 1.1rem;
+    padding-bottom: 2.1rem;
+  }
+  .stage:last-child { padding-bottom: 0; }
+  .stage::before {
+    content: "";
+    position: absolute;
+    left: 1.25rem;
+    top: 2.6rem;
+    bottom: -0.2rem;
+    width: 1px;
+    background: var(--line);
+  }
+  .stage:last-child::before { display: none; }
+  .stage .num {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 4px;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--accent);
+    box-shadow: var(--shadow);
+    z-index: 1;
+  }
+  .stage h3 { margin-bottom: 0.3rem; }
+  .stage .who {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+  .stage p { font-size: 0.97rem; margin: 0.3rem 0; }
+  .stage code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.05rem 0.35rem;
+  }
+  .aside {
+    margin-top: 0.6rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    border-left: 2px solid var(--line);
+    padding-left: 0.7rem;
+  }
+  .aside code { display: block; margin-top: 0.35rem; white-space: pre-wrap; word-break: break-word; }
+
+  /* ── Report map table ───────────────────────────────── */
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  table.report-map {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 560px;
+    margin-top: 1.4rem;
+    font-size: 0.94rem;
+  }
+  table.report-map th, table.report-map td {
+    text-align: left;
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.report-map th {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  table.report-map td.section-name { font-weight: 600; white-space: nowrap; }
+  .pill {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+    background: var(--gold-tint);
+    color: var(--gold);
+  }
+
+  /* ── Role panels ────────────────────────────────────── */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.1rem;
+    margin-top: 1.4rem;
+  }
+  @media (max-width: 720px) { .roles { grid-template-columns: 1fr; } }
+  .role-card {
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.2rem 1.3rem 1.4rem;
+    box-shadow: var(--shadow);
+  }
+  .role-card .role-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .role-card h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
+  .role-card ul { margin: 0.6rem 0 0; padding-left: 1.05rem; font-size: 0.92rem; }
+  .role-card li { margin-bottom: 0.45rem; }
+  .role-card li:last-child { margin-bottom: 0; }
+
+  /* ── FAQ ────────────────────────────────────────────── */
+  .faq { max-width: 68ch; margin-top: 1.2rem; }
+  .faq-item { padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
+  .faq-item:first-child { padding-top: 0; }
+  .faq-item dt {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    margin-bottom: 0.4rem;
+  }
+  .faq-item dd { margin: 0; color: var(--ink); }
+  .faq-item dd, .faq-item p { font-size: 0.96rem; }
+
+  footer {
+    margin-top: 3.5rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer code { font-family: var(--font-mono); }
+
+  a { color: var(--accent-ink); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .role-card, .callout { transition: box-shadow 0.15s ease; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <div class="masthead">
+    <span class="eyebrow">IEM-PM · User Guide</span>
+    <h1>Turn your project data into an evidence-based gap audit</h1>
+    <p class="lede">
+      No dashboard, no login, no server. IEM-PM runs inside Claude Code, reads what you point it at,
+      and hands back one report you open in a browser. This page is the whole manual — for
+      Project Managers, Program Managers, and PMO leads who want to run an audit without touching Python.
+    </p>
+  </div>
+
+  <div class="layout">
+
+    <div class="rail">
+      <div class="rail-label">On this page</div>
+      <nav>
+        <a href="#before">Before you start</a>
+        <a href="#workflow">The audit workflow</a>
+        <a href="#report">Reading your report</a>
+        <a href="#roles">By role</a>
+        <a href="#faq">Good to know</a>
+      </nav>
+    </div>
+
+    <main>
+
+      <section id="before">
+        <div class="kicker">Prerequisites</div>
+        <h2>Before you start</h2>
+        <p class="intro">
+          IEM-PM's one rule is <strong>no baseline, no audit</strong> — it will not guess at a
+          standard you haven't given it. Everything below has to exist before you ask for an audit.
+        </p>
+        <ul class="checklist">
+          <li>
+            <span class="box"></span>
+            <div>
+              <strong>Standards in <code>knowledge/</code></strong>
+              <span class="note">PMBOK, PRINCE2, ISO 21502, or your own internal methodology — whatever your organization actually follows.</span>
+            </div>
+          </li>
+          <li>
+            <span class="box"></span>
+            <div>
+              <strong>A completed PMO Data Charter</strong>
+              <span class="note">Start from <code>assets/PMO_DATA_CHARTER_template.md</code>. This is the step that tells IEM-PM what your fields mean — skip it and it will still run, but every finding gets flagged as provisional.</span>
+            </div>
+          </li>
+          <li>
+            <span class="box"></span>
+            <div>
+              <strong>Delivery evidence gathered</strong>
+              <span class="note">Schedules, RAID logs, status reports, steering packs — whatever you have on hand for the project, program, or portfolio in scope.</span>
+            </div>
+          </li>
+          <li>
+            <span class="box"></span>
+            <div>
+              <strong>Claude Code, open in this repository</strong>
+              <span class="note">This is how you actually run the audit — there's no separate app to install.</span>
+            </div>
+          </li>
+        </ul>
+        <div class="callout accent" style="margin-top:1.4rem;">
+          <p><strong>Nothing you hand it gets changed.</strong> IEM-PM only reads your standards, your Charter, and your evidence. The only thing it ever writes is inside <code>reports/</code> — your source data is never touched.</p>
+        </div>
+      </section>
+
+      <section id="workflow">
+        <div class="kicker">Step by step</div>
+        <h2>The audit workflow</h2>
+        <p class="intro">Six stages, always in this order. You only type anything in Steps 2 and 3 — the rest is instructions to Claude Code.</p>
+
+        <div class="stages">
+
+          <div class="stage">
+            <div class="num">1</div>
+            <div>
+              <span class="who">You confirm</span>
+              <h3>Standards are in place</h3>
+              <p>Check that <code>knowledge/</code> actually contains the standards you're auditing against. If it's empty, the audit stops before it starts — that's intentional, not a bug.</p>
+            </div>
+          </div>
+
+          <div class="stage">
+            <div class="num">2</div>
+            <div>
+              <span class="who">You write</span>
+              <h3>Complete the Data Charter</h3>
+              <p>Fill in the template: which artifacts count as evidence, what your fields mean (what does "on track" mean in your steering pack?), and what's in scope. This is the only step where your judgment, not the engine's, sets the rules.</p>
+            </div>
+          </div>
+
+          <div class="stage">
+            <div class="num">3</div>
+            <div>
+              <span class="who">You gather</span>
+              <h3>Assemble delivery evidence</h3>
+              <p>Put the schedules, logs, and reports somewhere Claude Code can read them. Real files, not summaries — the audit cites exact locations, so it needs the originals.</p>
+            </div>
+          </div>
+
+          <div class="stage">
+            <div class="num">4</div>
+            <div>
+              <span class="who">Claude Code runs</span>
+              <h3>The audit itself</h3>
+              <p>Ask Claude Code to run the <code>intelligence-engine</code> skill against your Charter and evidence. It reads everything, compares it to your standards, and writes exactly one file: <code>reports/audit_manifest.md</code>.</p>
+            </div>
+          </div>
+
+          <div class="stage">
+            <div class="num">5</div>
+            <div>
+              <span class="who">Claude Code runs</span>
+              <h3>Convert and validate</h3>
+              <p>Ask Claude Code to turn the Manifest into your report — it runs the two conversion steps for you. If you'd rather do it yourself, the commands are underneath.</p>
+              <div class="aside">
+                For reference — two commands, run from <code>skills/intelligence-engine/scripts/</code>:
+                <code>python manifest_to_findings.py --manifest ../../../reports/audit_manifest.md --output ../../../reports/findings.json
+python render.py --canonical ../../../reports/findings.json --template ../assets/report_template.html --output-html ../../../reports/report.html --output-txt ../../../reports/report.txt</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="stage">
+            <div class="num">6</div>
+            <div>
+              <span class="who">You read</span>
+              <h3>Open the report</h3>
+              <p><code>reports/report.html</code> — double-click it, or open it in any browser. That file is the entire interface. Nothing to log into, nothing to configure.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="report">
+        <div class="kicker">Interpreting the output</div>
+        <h2>Reading your report</h2>
+        <p class="intro">The report has eleven sections. Most people only need four of them on a first pass — here's what each one is actually telling you.</p>
+
+        <div class="table-wrap">
+          <table class="report-map">
+            <tr>
+              <th>Section</th>
+              <th>What it tells you</th>
+              <th>Read it when</th>
+            </tr>
+            <tr>
+              <td class="section-name">Executive Summary</td>
+              <td>Total findings, and the Reporting Integrity Score out of 100 — a deterministic score, not an opinion.</td>
+              <td>Always, first</td>
+            </tr>
+            <tr>
+              <td class="section-name">Gap Register</td>
+              <td>Every individual finding: what's wrong, which of the seven gap types it is, and the evidence behind it.</td>
+              <td>Before a gate review</td>
+            </tr>
+            <tr>
+              <td class="section-name">Root Cause Analysis</td>
+              <td>Where each gap actually started — one of seven origins (Capture, Ownership, Tooling, and so on). The cause, not the symptom.</td>
+              <td>When the same issue keeps recurring</td>
+            </tr>
+            <tr>
+              <td class="section-name">Maturity Assessment</td>
+              <td>Your position on PMI's OPM3 model. <span class="pill">PENDING_BRIDGE</span> right now means this specific calibration isn't done yet — expected, not broken.</td>
+              <td>Once the bridge is ratified org-wide</td>
+            </tr>
+            <tr>
+              <td class="section-name">Recommended Actions / Roadmap</td>
+              <td>What to fix, grouped by root cause and ordered by severity.</td>
+              <td>Right after the Gap Register</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <section id="roles">
+        <div class="kicker">Who's asking</div>
+        <h2>By role</h2>
+        <p class="intro">The workflow above doesn't change. What you do with the result does.</p>
+
+        <div class="roles">
+          <div class="role-card">
+            <span class="role-tag">Project Manager</span>
+            <h3>Before your next gate</h3>
+            <ul>
+              <li>Run it on your own project a few days ahead of a steering committee or stage gate.</li>
+              <li>Use the Gap Register to fix data problems <em>before</em> the meeting, not explain them during it.</li>
+              <li>Treat Recommended Actions as your punch list, not the auditor's opinion of you.</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <span class="role-tag">Program Manager</span>
+            <h3>Patterns across projects</h3>
+            <ul>
+              <li>Run one audit per project in the program, using the same Charter for all of them.</li>
+              <li>Compare Root Cause Analysis across projects — a root origin repeating in most of them is a program-level fix, not five separate ones.</li>
+              <li>Escalate root causes, not individual findings, to your PMO.</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <span class="role-tag">PMO</span>
+            <h3>Governance, standardized</h3>
+            <ul>
+              <li>Own the Charter — write it once, ratify it, and require every audit in the portfolio to use it.</li>
+              <li>Own the standards in <code>knowledge/</code> so every project is measured against the same baseline.</li>
+              <li>Track the Reporting Integrity Score over time as a governance health metric, not a one-off grade.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq">
+        <div class="kicker">Before you ask</div>
+        <h2>Good to know</h2>
+
+        <dl class="faq">
+          <div class="faq-item">
+            <dt>It stopped and said "no baseline, no audit" — is that broken?</dt>
+            <dd>No. It means <code>knowledge/</code> doesn't have any standards in it yet. Add the PDF or document you actually follow and run it again.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>I didn't ratify a Charter — can I still run it?</dt>
+            <dd>Yes, but it runs <strong>PROVISIONAL</strong>: every single finding carries a caveat that it rests on an assumed, not agreed, interpretation of your data. Fine for a first look, not for a governance decision.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>Will it change or move any of my files?</dt>
+            <dd>No. It only reads your standards, Charter, and evidence, and only ever writes inside <code>reports/</code>.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>Do I need to learn Python or the terminal?</dt>
+            <dd>No — ask Claude Code to run Step 5 for you. The commands exist for anyone who wants to run them by hand, not as a requirement.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>Is there a live dashboard I should be looking for?</dt>
+            <dd>No, and there isn't meant to be. <code>report.html</code> is the whole interface — open it, read it, share the file itself with whoever needs it.</dd>
+          </div>
+        </dl>
+      </section>
+
+    </main>
+  </div>
+
+  <footer>
+    IEM-PM — Intelligence Engineering for Project, Program, Portfolio &amp; PMO.
+    Read-only. Local-first. No baseline, no audit.
+  </footer>
+
+</div>
+</body>
+</html>
