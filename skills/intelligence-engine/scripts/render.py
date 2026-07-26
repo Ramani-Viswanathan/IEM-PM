@@ -93,7 +93,8 @@ def render_txt(canonical: dict) -> str:
     ])
     for dim, text in canonical.get("intelligence_indicators", {}).items():
         lines.append(f"  {dim.replace('_', ' ').title()}:")
-        lines.append(f"    {text[:180]}...")
+        suffix = "..." if len(text) > 180 else ""
+        lines.append(f"    {text[:180]}{suffix}")
         lines.append("")
 
     lines.extend([

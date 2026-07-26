@@ -263,6 +263,7 @@
         "opm3_position": {
           "type": "string",
           "enum": [
+            "PENDING_BRIDGE",
             "Level 1 - Initial",
             "Level 2 - Managed",
             "Level 3 - Defined",

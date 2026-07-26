@@ -717,11 +717,21 @@ In the Synthesis section of your Audit Manifest, provide qualitative diagnostics
 
 IEM-PM maps the gap profile to **PMI's OPM3 model**. The bridge rubric is an open design item.
 
-Until the bridge is defined, your Synthesis section must include this exact statement:
+**Until the bridge is ratified:**
+
+- Your Synthesis section must include the exact `PENDING_BRIDGE` statement.
+- Software will emit `PENDING_BRIDGE` in the JSON.
+- No heuristic, estimation, or guesswork is permitted.
+
+**After ratification:**
+
+- The bridge rubric lives in `registries/opm3_bridge.json`.
+- Software applies the ratified rubric to compute the position.
+- You still do not calculate it — software does, from the rubric.
+
+Your exact statement:
 
 > **OPM3 Maturity Position:** PENDING_BRIDGE — The gap profile has been recorded. The OPM3 bridge rubric is not yet calibrated. Maturity assessment deferred to software once bridge is ratified.
-
-You do not guess a maturity level. You do not estimate "Level 2" or "Level 3." Software will compute this from the canonical findings once the bridge exists.
 
 ---
 
@@ -781,6 +791,7 @@ For every artifact declared in the Charter, write:
 
 ## ARTIFACT: [ART-XXX]
 
+**Artifact Name:** [Human-readable name]
 **Path:** [file path]
 **Checksum:** [SHA-256 or "computed"]
 **Status:** [Examined / Partial / Corrupted / Empty]

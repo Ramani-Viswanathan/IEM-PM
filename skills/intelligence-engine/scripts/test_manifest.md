@@ -10,6 +10,7 @@
 
 ## ARTIFACT: ART-001
 
+**Artifact Name:** Project Schedule
 **Path:** /data/schedules/schedule.mpp
 **Checksum:** a1b2c3d4e5f6
 **Status:** Examined
@@ -18,6 +19,7 @@
 
 ## ARTIFACT: ART-002
 
+**Artifact Name:** RAID Log
 **Path:** /data/raid/raid.xlsx
 **Checksum:** b2c3d4e5f6g7
 **Status:** Examined
@@ -26,6 +28,7 @@
 
 ## ARTIFACT: ART-003
 
+**Artifact Name:** Governance Pack
 **Path:** /data/governance/pack.pdf
 **Checksum:** c3d4e5f6g7h8
 **Status:** Examined
