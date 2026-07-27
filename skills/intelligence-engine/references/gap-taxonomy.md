@@ -178,7 +178,7 @@ The PMBOK 8 standard expects a full Project Management Plan. The org's PMO Polic
 | --- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | 1   | PMBOK 8 §2.5 (Tailoring) — deviation must be deliberate and documented        | Undocumented deviation = Ignored. Documented tailoring = not a finding. |
 | 2   | Standard for Project Management §4 (Governance) — mandatory reviews and gates | When a governance rule exists and the review doesn't happen → Ignored.  |
-| 3   | OPM3 capability assessment — practices must be PERFORMED, not just documented | Policy without practice = the OPM3 basis for Ignored.                   |
+| 3   | Standard for Organizational Project Management (OPM) — practices must be consistently performed, not merely documented, to be institutionalized | Policy without practice is the basis for Ignored.       |
 
 ---
 
@@ -428,7 +428,7 @@ The standard requires monthly steering committees. The project has a documented,
 | --- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | 1   | PMBOK 8 §2.5 (Tailoring) — deviation must be deliberate, justified, and documented | Undocumented deviation = Divergent. Documented = not a finding.            |
 | 2   | Standard for Governance §5 — governance framework must be applied consistently     | Portfolio-wide divergence without approval = systemic Divergent gap.       |
-| 3   | OPM3 — maturity requires standardized, institutionalized practices                 | Divergent practices indicate low maturity in process institutionalization. |
+| 3   | Standard for Organizational Project Management (OPM) — practices should be standardized and institutionalized | Divergent practices indicate the practice has not been consistently institutionalized. |
 
 ---
 

@@ -23,9 +23,6 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage
 
-# ─── Path Resolution ───
-ENGINE_DIR = Path(__file__).parent.parent  # scripts/ → intelligence-engine/
-
 # ─── Closed Taxonomies (must match schema and SKILL.md) ───
 GAP_TYPES = {
     "Missing", "Ignored", "Disconnected", "Untrusted",
@@ -65,7 +62,7 @@ class ManifestParser:
         # Build canonical structure
         canonical = {
             "audit_id": header.get("audit_id", self._generate_audit_id()),
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "charter_version": header.get("charter_version", "unknown"),
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "baseline": {
@@ -76,8 +73,7 @@ class ManifestParser:
             "evidence_summary": self._compute_evidence_summary(artifacts),
             "findings": findings,
             "intelligence_indicators": synthesis["indicators"],
-            "reporting_integrity_score": self._compute_ris(findings),
-            "maturity_assessment": self._compute_maturity(findings, artifacts)
+            "reporting_integrity_score": self._compute_ris(findings)
         }
 
         return canonical
@@ -221,13 +217,13 @@ class ManifestParser:
     # ─── Synthesis Parsing ───
 
     def _parse_synthesis(self) -> Dict[str, Any]:
-        """Extract intelligence indicators and OPM3 statement from ## SYNTHESIS."""
+        """Extract intelligence indicators from ## SYNTHESIS."""
         indicators = {}
 
         match = re.search(r'## SYNTHESIS(.*?)(?=## APPENDIX|$)', self.raw, re.DOTALL | re.IGNORECASE)
         if not match:
             self.warnings.append("No SYNTHESIS section found")
-            return {"indicators": indicators, "opm3": "PENDING_BRIDGE"}
+            return {"indicators": indicators}
 
         synth_text = match.group(1)
 
@@ -239,11 +235,7 @@ class ManifestParser:
             if dim_match:
                 indicators[dim_key] = dim_match.group(1).strip()
 
-        # Extract OPM3 statement
-        opm3_match = re.search(r'###\s*OPM3.*?Position.*?\n(.*?)(?=###|##|$)', synth_text, re.DOTALL | re.IGNORECASE)
-        opm3 = opm3_match.group(1).strip() if opm3_match else "PENDING_BRIDGE"
-
-        return {"indicators": indicators, "opm3": opm3}
+        return {"indicators": indicators}
 
     # ─── Scoring (Deterministic) ───
 
@@ -281,92 +273,6 @@ class ManifestParser:
             "methodology": "Weighted Gap Profile v1.0.0",
             "version": "1.0.0"
         }
-
-    def _compute_maturity(self, findings: List[Dict], artifacts: List[Dict]) -> Dict[str, Any]:
-        """
-        OPM3 Maturity Assessment.
-        
-        Rule: No bridge rubric → PENDING_BRIDGE.
-        The bridge is loaded from registries/opm3_bridge.json.
-        If absent or empty, we do not guess maturity.
-        """
-        bridge_path = ENGINE_DIR / "registries" / "opm3_bridge.json"
-        ris = self._compute_ris(findings)["score"]
-        art_count = max(len(artifacts), 1)
-        gap_density = len(findings) / art_count
-        severity_dist = {str(i): sum(1 for f in findings if f["severity"] == i) for i in range(1, 6)}
-
-        # Try to load ratified bridge rubric
-        if bridge_path.exists():
-            try:
-                bridge = json.loads(bridge_path.read_text(encoding="utf-8"))
-                if bridge.get("status") == "RATIFIED" and bridge.get("rubric"):
-                    position = self._apply_opm3_bridge(findings, bridge["rubric"])
-                    return {
-                        "opm3_position": position,
-                        "evidence_summary": f"Bridge: {bridge.get('version', 'unknown')}. "
-                                            f"{len(findings)} findings, {gap_density:.2f} gaps/artifact, RIS {ris}",
-                        "bridge_version": bridge.get("version", "unknown"),
-                        "gap_density": round(gap_density, 4),
-                        "gap_severity_distribution": severity_dist
-                    }
-            except Exception as e:
-                self.warnings.append(f"OPM3 bridge found but unreadable: {e}")
-
-        # Default: PENDING_BRIDGE — we do not invent maturity
-        return {
-            "opm3_position": "PENDING_BRIDGE",
-            "evidence_summary": f"Gap profile recorded: {len(findings)} findings, "
-                                f"{gap_density:.2f} gaps/artifact, RIS {ris}. "
-                                f"OPM3 bridge rubric not yet calibrated.",
-            "bridge_version": "OPM3-Bridge-PENDING",
-            "gap_density": round(gap_density, 4),
-            "gap_severity_distribution": severity_dist
-        }
-
-    def _apply_opm3_bridge(self, findings: List[Dict], rubric: List[Dict]) -> str:
-        """
-        Apply a ratified OPM3 bridge rubric to the gap profile.
-        Each rubric item defines a maturity level and the gap conditions that indicate it.
-        """
-        # Sort rubric by level priority (highest maturity first, or as defined)
-        for rule in sorted(rubric, key=lambda r: r.get("priority", 0), reverse=True):
-            if self._matches_rubric_rule(findings, rule):
-                return rule["opm3_position"]
-        return "Undetermined"
-
-    def _matches_rubric_rule(self, findings: List[Dict], rule: Dict) -> bool:
-        """
-        Check if the current gap profile matches a rubric rule.
-        Rules define thresholds for gap density, severity distribution, root origin patterns, etc.
-        """
-        # This is a placeholder for the actual rubric logic.
-        # The rubric structure is defined in the bridge file.
-        # Example rule: {"max_gap_density": 0.5, "max_severity_5": 0, "min_ris": 85, "opm3_position": "Level 3 - Defined"}
-        gap_count = len(findings)
-        art_count = max(len(self._parse_artifacts()), 1)
-        density = gap_count / art_count
-        ris = self._compute_ris(findings)["score"]
-        
-        checks = []
-        if "max_gap_density" in rule:
-            checks.append(density <= rule["max_gap_density"])
-        if "min_gap_density" in rule:
-            checks.append(density >= rule["min_gap_density"])
-        if "max_severity_5" in rule:
-            checks.append(sum(1 for f in findings if f["severity"] == 5) <= rule["max_severity_5"])
-        if "min_ris" in rule:
-            checks.append(ris >= rule["min_ris"])
-        if "max_ris" in rule:
-            checks.append(ris <= rule["max_ris"])
-        if "required_origins" in rule:
-            origins = {f["root_origin"] for f in findings}
-            checks.append(all(o in origins for o in rule["required_origins"]))
-        if "forbidden_gap_types" in rule:
-            gap_types = {f["gap_type"] for f in findings}
-            checks.append(not any(g in gap_types for g in rule["forbidden_gap_types"]))
-        
-        return all(checks) if checks else False
 
     def _compute_evidence_summary(self, artifacts: List[Dict]) -> Dict[str, Any]:
         """
@@ -446,7 +352,6 @@ def main():
     print(f"Canonical findings written to {args.output}")
     print(f"Total findings: {len(canonical['findings'])}")
     print(f"Reporting Integrity Score: {canonical['reporting_integrity_score']['score']}")
-    print(f"OPM3 Position: {canonical['maturity_assessment']['opm3_position']}")
 
     if parser_engine.warnings:
         print("\nWarnings:")

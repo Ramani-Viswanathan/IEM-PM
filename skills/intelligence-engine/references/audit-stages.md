@@ -315,7 +315,7 @@ TODO(you)
 
 ### Purpose
 
-Engineer the fix-at-source for every finding, assign severity, compute the Reporting Integrity Score, and state the OPM3 maturity position (⚠️ STUB — bridge TBD, §9).
+Engineer the fix-at-source for every finding, assign severity, and compute the Reporting Integrity Score. IEM-PM does not model organizational maturity (scrapped, not deferred — see §9.4).
 
 ### Preconditions
 
@@ -347,7 +347,7 @@ TODO(you)
 
 ### Transition
 
-→ `SCORED` (or `PENDING_BRIDGE` for the OPM3 portion)
+→ `SCORED`
 
 ---
 
@@ -471,7 +471,7 @@ TODO(you)
 
 ### Outputs
 
-Console summary: evidence count · finding count · gap summary · Integrity Score · OPM3 position · file paths.
+Console summary: evidence count · finding count · gap summary · Integrity Score · file paths.
 
 ### Completion Criteria
 

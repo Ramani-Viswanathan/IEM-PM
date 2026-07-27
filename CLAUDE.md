@@ -26,8 +26,10 @@ Portfolio 4e, EVM, Risk, etc. — plus any org standard). It ships **no bundled 
 folder is empty it stops and asks for a baseline. At runtime it scans the standards, derives local
 **registries** (paraphrased checkable criteria + stable citation anchors, never verbatim; gitignored),
 then each failed criterion becomes a finding classified into one of the **7 gaps**, traced to one of
-**7 root origins**, cited to the held document, scored for **Reporting Integrity**, and used as
-evidence of the org's maturity on **PMI's OPM3 model** (the gaps→OPM3 bridge is the open design item).
+**7 root origins**, cited to the held document, and scored for **Reporting Integrity**. IEM-PM
+measures and traces gaps; it does not model organizational maturity (e.g., PMI's OPM3) — that is a
+distinct discipline requiring cross-project calibration and a licensed instrument, neither of which
+this tool provides. Scrapped 2026-07-27, not deferred.
 
 ## Canonical documents (read in this order)
 

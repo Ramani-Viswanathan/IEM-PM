@@ -4,28 +4,30 @@ description: >
   Intelligence Engineering engine for Project, Program, Portfolio and PMO
   audits. Compares an organization's delivery evidence (projects, schedules,
   RAID logs, governance packs, dashboards, boards) against its declared
-  project management standards (PMBOK, OPM3, PRINCE2, or internal methodology),
-  classifies every gap into 7 types, traces each to its root origin, scores
-  severity, and produces an evidence-based OPM3 maturity assessment with
-  HTML + JSON + TXT reports. Use this skill whenever the user mentions PMO
-  audits, project delivery gaps, governance assessments, maturity evaluations,
-  data integrity reviews, standards compliance checks, delivery evidence
-  analysis, or wants to understand why their project data doesn't match their
-  methodology — even if they don't explicitly say "IEM-PM" or "intelligence
-  engineering." Also trigger when the user uploads or references project
-  artifacts (RAID logs, schedules, status reports, governance packs, Jira
-  exports, Primavera files) and asks for analysis, review, assessment, or
-  gap identification. If the user asks "where is our data breaking down,"
-  "are we following our methodology," "what's our maturity level," or
-  "audit our PMO," use this skill.
-version: 1.0.0
+  project management standards (PMBOK, PRINCE2, ISO 21502, or internal
+  methodology), classifies every gap into 7 types, traces each to its root
+  origin, scores severity, and produces a Reporting Integrity Score with
+  HTML + JSON + TXT reports. IEM-PM measures and traces gaps; it does not
+  model organizational maturity. Use this skill whenever the user mentions
+  PMO audits, project delivery gaps, governance assessments, data integrity
+  reviews, standards compliance checks, delivery evidence analysis, or wants
+  to understand why their project data doesn't match their methodology —
+  even if they don't explicitly say "IEM-PM" or "intelligence engineering."
+  Also trigger when the user uploads or references project artifacts (RAID
+  logs, schedules, status reports, governance packs, Jira exports, Primavera
+  files) and asks for analysis, review, assessment, or gap identification.
+  If the user asks "where is our data breaking down," "are we following our
+  methodology," or "audit our PMO," use this skill.
+version: 1.1.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
 
 # IEM-PM — Intelligence Engineering Skill
 
-> **No baseline, no audit. Find the gap. Trace it to the root. Measure maturity from evidence.**
+> **No baseline, no audit. Find the gap. Trace it to the root. Fix it at the source.**
+>
+> IEM-PM measures and traces gaps; it does not model organizational maturity. Maturity modeling (e.g., PMI's OPM3) is a distinct discipline requiring cross-project calibration and a licensed instrument, neither of which this tool provides.
 >
 > Governing question: **Does the organization's delivery data match what its standards require — and where it doesn't, why?**
 
@@ -106,7 +108,7 @@ No baseline → no audit. The engine cannot judge without knowing the standard.
 
 You cannot judge delivery without knowing the standard. Before you classify any gap, you must know:
 
-- Which standards the organization claims to follow (PMBOK, OPM3, PRINCE2, ISO21502, internal methodology).
+- Which standards the organization claims to follow (PMBOK, PRINCE2, ISO21502, internal methodology).
 - Which governance rules apply.
 - Which processes are mandatory.
 
@@ -226,9 +228,6 @@ You do not hand-write JSON or HTML.
 | **Seven Root Origins**        | Capture · Integration · Definition / Taxonomy · Ownership · Process / Cadence · Tooling · Behavior.                                                                        |
 | **Intelligence Indicators**   | Narrative diagnostic labels for seven dimensions: Visibility, Integrity, Connectivity, Governance, Predictability, Decision Quality, Continuous Improvement. Never scored. |
 | **Reporting Integrity Score** | A deterministic 0–100 score computed by software from gap density, severity, and root cause diversity. You do not calculate this.                                          |
-| **OPM3**                      | PMI's Organizational Project Management Maturity Model. The gap profile maps to OPM3 position via a bridge rubric.                                                         |
-
-                       |
 
 ---
 
@@ -313,7 +312,7 @@ By defining field semantics before analysis begins, IEM-PM can interpret deliver
 
 The charter defines the scope and materiality of the audit.
 
-Scope determines **which parts of the organization and which delivery artifacts will be evaluated**, while materiality defines **what is significant enough to influence audit findings and maturity assessments**.
+Scope determines **which parts of the organization and which delivery artifacts will be evaluated**, while materiality defines **what is significant enough to influence audit findings**.
 
 Examples include:
 
@@ -713,39 +712,26 @@ In the Synthesis section of your Audit Manifest, provide qualitative diagnostics
 
 ---
 
-## 9.4 OPM3 Maturity Position — You do NOT calculate this
+## 9.4 Scope Boundary: No Maturity Modeling
 
-IEM-PM maps the gap profile to **PMI's OPM3 model**. The bridge rubric is an open design item.
+IEM-PM measures and traces gaps. It does not model organizational maturity — not PMI's OPM3, not any other maturity scale.
 
-**Until the bridge is ratified:**
+Maturity modeling is a distinct discipline from gap auditing: it requires calibration across many audits and a licensed assessment instrument, neither of which IEM-PM provides. Extrapolating a maturity level from one audit's gap profile would be exactly the kind of unearned inference Principle 2 (Evidence First) forbids — it isn't a finding, it's a guess dressed up as a score.
 
-- Your Synthesis section must include the exact `PENDING_BRIDGE` statement.
-- Software will emit `PENDING_BRIDGE` in the JSON.
-- No heuristic, estimation, or guesswork is permitted.
-
-**After ratification:**
-
-- The bridge rubric lives in `registries/opm3_bridge.json`.
-- Software applies the ratified rubric to compute the position.
-- You still do not calculate it — software does, from the rubric.
-
-Your exact statement:
-
-> **OPM3 Maturity Position:** PENDING_BRIDGE — The gap profile has been recorded. The OPM3 bridge rubric is not yet calibrated. Maturity assessment deferred to software once bridge is ratified.
+Your Synthesis section ends at the seven Intelligence Indicators (§9.3). Do not add a maturity statement, an OPM3 position, or any other capability-level claim.
 
 ---
 
 ## 9.5 What You Write vs. What Software Writes
 
-| Element                             | You Write | Software Computes                   |
-| ----------------------------------- | --------- | ----------------------------------- |
-| Severity per finding                | ✓         |                                     |
-| Reporting Integrity Score           |           | ✓                                   |
-| Intelligence Indicators narrative   | ✓         |                                     |
-| Intelligence Indicators score/grade |           | ✗ (never scored)                    |
-| OPM3 position                       |           | ✓ (PENDING_BRIDGE until calibrated) |
-| Gap density                         |           | ✓                                   |
-| Severity distribution               |           | ✓                                   |
+| Element                             | You Write | Software Computes |
+| ----------------------------------- | --------- | ------------------ |
+| Severity per finding                | ✓         |                    |
+| Reporting Integrity Score           |           | ✓                  |
+| Intelligence Indicators narrative   | ✓         |                    |
+| Intelligence Indicators score/grade |           | ✗ (never scored)   |
+| Gap density                         |           | ✓                  |
+| Severity distribution               |           | ✓                  |
 
 ---
 
@@ -763,7 +749,7 @@ The Manifest must contain these sections in this order:
 1. **Header Block** — metadata about the audit run.
 2. **Per-Artifact Evidence Log** — what you observed in each artifact (before findings).
 3. **Gap Register** — one `### FINDING:` block per gap.
-4. **Synthesis** — narrative intelligence indicators + OPM3 position statement.
+4. **Synthesis** — narrative intelligence indicators.
 5. **Appendix** — charter version, standards list, artifact checksums.
 
 ---
@@ -862,10 +848,6 @@ Rules for Finding Blocks:
 
 [Narrative diagnostic only. No scores, percentages, or grades.]
 
-### OPM3 Maturity Position
-
-PENDING_BRIDGE — The gap profile has been recorded. The OPM3 bridge rubric is not yet calibrated. Maturity assessment deferred to software once bridge is ratified.
-
 ### 10.2.5 Appendix Template
 
 ## APPENDIX
@@ -931,11 +913,11 @@ This is your only write target. Everything else is software's job.
 
 You do **not** generate the final report. Software renders it from your Audit Manifest.
 
-However, your Manifest is the **source material** for the report. If a section is missing from your Manifest, the report cannot produce it. Write your Manifest knowing it will become these 11 sections.
+However, your Manifest is the **source material** for the report. If a section is missing from your Manifest, the report cannot produce it. Write your Manifest knowing it will become these 10 sections.
 
 ---
 
-## The 11 Report Sections
+## The 10 Report Sections
 
 Software produces the report in this order:
 
@@ -948,10 +930,9 @@ Software produces the report in this order:
 | 5   | **Gap Register**                                        | Finding Blocks (all `### FINDING:`)         | Every finding with gap type, root origin, severity, evidence, and recommended action. This is the core of the report.              |
 | 6   | **Root Cause Analysis**                                 | Finding Blocks                              | Software aggregates your root origins into a frequency table. You do not write the table — you assign the origins in each finding. |
 | 7   | **Intelligence Indicators + Reporting Integrity Score** | Synthesis Section                           | Your narrative for all 7 dimensions. Software computes the score and places it alongside your text.                                |
-| 8   | **Maturity Assessment (OPM3)**                          | Synthesis Section — OPM3 statement          | Your `PENDING_BRIDGE` statement. Software will replace this with the computed position once the bridge is calibrated.              |
-| 9   | **Recommended Actions**                                 | Finding Blocks — `Recommended Action` field | Software extracts all recommended actions and groups them by root origin for prioritization.                                       |
-| 10  | **Roadmap**                                             | Finding Blocks — severity + root origin     | Software generates a remediation roadmap from your severity scores and root origin distribution.                                   |
-| 11  | **Appendix**                                            | Appendix section of Manifest                | Schema version, artifact checksums, file references.                                                                               |
+| 8   | **Recommended Actions**                                 | Finding Blocks — `Recommended Action` field | Software extracts all recommended actions and groups them by root origin for prioritization.                                       |
+| 9   | **Roadmap**                                             | Finding Blocks — severity + root origin     | Software generates a remediation roadmap from your severity scores and root origin distribution.                                   |
+| 10  | **Appendix**                                            | Appendix section of Manifest                | Schema version, artifact checksums, file references.                                                                               |
 
 ---
 
@@ -993,11 +974,7 @@ Write one paragraph per dimension in the Synthesis section. Each paragraph shoul
 - Explain the pattern, not just list gaps
 - Stay qualitative — no "score: 7/10" language
 
-### Section 8: Maturity Assessment
-
-Use the exact `PENDING_BRIDGE` text from Section 9.4. Nothing else.
-
-### Section 9–10: Recommended Actions & Roadmap
+### Section 8–9: Recommended Actions & Roadmap
 
 Software builds these from your findings. Make your `Recommended Action` field in each finding:
 
@@ -1005,7 +982,7 @@ Software builds these from your findings. Make your `Recommended Action` field i
 - Tied to the root origin (fix the cause, not the symptom)
 - Prioritizable by severity
 
-### Section 11: Appendix
+### Section 10: Appendix
 
 Keep it minimal. Software may add computed fields (gap density, checksums, timestamps).
 
@@ -1015,7 +992,7 @@ Keep it minimal. Software may add computed fields (gap density, checksums, times
 
 - **Never write HTML, CSS, or markdown tables for findings** — software renders these. Your Finding blocks are the source.
 - **Never write an "Executive Summary" in your Manifest** — software generates this from your Header and Gap Register.
-- **Never write "Section 1: Executive Summary" headers in your Manifest** — your Manifest has its own structure (Header, Evidence Log, Findings, Synthesis, Appendix). Software maps this to the 11 report sections.
+- **Never write "Section 1: Executive Summary" headers in your Manifest** — your Manifest has its own structure (Header, Evidence Log, Findings, Synthesis, Appendix). Software maps this to the 10 report sections.
 - **Never attempt to format for print** — page breaks, fonts, and layout are renderer concerns.
 
 ---
@@ -1028,7 +1005,6 @@ Before you finish writing, verify your Manifest contains:
 - [ ] Per-Artifact Evidence Log for every artifact in scope
 - [ ] One `### FINDING:` block per gap (minimum one evidence bullet each)
 - [ ] Synthesis section with all 7 Intelligence Indicators
-- [ ] OPM3 `PENDING_BRIDGE` statement
 - [ ] Appendix with schema version and artifact list
 
 If all are present, software can render the full report. If any are missing, the report will have gaps.
@@ -1048,9 +1024,8 @@ Before you declare the audit complete, verify your Manifest against these checks
 5. **Severity is 1–5 integer.** No blanks, no decimals, no text.
 6. **No standard text reproduced.** Every `Requirement Summary` is one sentence, paraphrased.
 7. **Synthesis is complete.** All seven Intelligence Indicators have a narrative paragraph.
-8. **OPM3 statement is present.** Exact `PENDING_BRIDGE` text from Section 9.4.
-9. **Header Block is complete.** Audit ID, Charter Version, Standards, Scope, Date, Status.
-10. **No software instructions in Manifest.** No "run Python," no JSON blocks, no HTML.
+8. **Header Block is complete.** Audit ID, Charter Version, Standards, Scope, Date, Status.
+9. **No software instructions in Manifest.** No "run Python," no JSON blocks, no HTML.
 
 If any check fails, fix the Manifest before finishing. Do not hand over a broken Manifest to software.
 
@@ -1107,7 +1082,6 @@ Standards live in `knowledge/`. Read only what applies to this audit.
 | --------------------------- | --------------------------------------- | ------------------------------------------------ |
 | `knowledge/Organizational/` | **First** — before any generic standard | Highest — overrides generics where they conflict |
 | `knowledge/PMBOK/`          | If org declares PMBOK                   | Standard                                         |
-| `knowledge/OPM3/`           | Stage 6 (maturity context) only         | Standard                                         |
 | `knowledge/PRINCE2/`        | If org declares PRINCE2                 | Standard                                         |
 | `knowledge/PMI/`            | If org declares PMI practice guides     | Standard                                         |
 | `knowledge/Agile/`          | If org declares Agile/hybrid            | Standard                                         |
@@ -1142,6 +1116,6 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.0.0**
-Schema version: **1.0.0**
-Manifest format version: **1.0.0**
+This skill file version: **1.1.0** — 2026-07-27: removed OPM3/organizational-maturity modeling (scope boundary, not deferred). See BLUEPRINT-1.md §10 and STATUS.md locked decision #2.
+Schema version: **1.1.0**
+Manifest format version: **1.1.0**

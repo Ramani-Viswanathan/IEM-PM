@@ -13,5 +13,4 @@
 | Likely Root Origin(s) | string | Candidate root origin(s) as a hint — Stage 5 decides the actual origin per finding.                 |
 | Confidence Rules      | string | Specifies the confidence level rules associated with the registry item.                             |
 | Severity Guidelines   | string | Specifies the severity guidelines associated with the registry item.                                |
-| OPM3 Mapping          | string | Specifies the OPM3 process area or maturity level associated with the registry item (bridge — TBD). |
 | Reference             | string | Reference to the relevant standard, policy, or guideline that defines the registry item.            |

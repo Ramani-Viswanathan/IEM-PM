@@ -1,6 +1,6 @@
 {
   "audit_id": "IEM-20260726-ABC123",
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "charter_version": "v1.0.0",
   "generated_at": "2026-07-26T11:19:00-05:00",
   "baseline": {
@@ -64,18 +64,5 @@
     "score": 72.5,
     "methodology": "Weighted Gap Profile v1.0.0",
     "version": "1.0.0"
-  },
-  "maturity_assessment": {
-    "opm3_position": "Level 2 - Managed",
-    "evidence_summary": "Based on 1 finding across 2 artifacts. RIS: 72.5",
-    "bridge_version": "OPM3-Bridge-v0.1-TBD",
-    "gap_density": 0.5,
-    "gap_severity_distribution": {
-      "1": 0,
-      "2": 0,
-      "3": 0,
-      "4": 1,
-      "5": 0
-    }
   }
 }

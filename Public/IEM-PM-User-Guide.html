@@ -115,6 +115,13 @@
     max-width: 56ch;
     margin: 0;
   }
+  .time-note {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 0.9rem 0 0;
+  }
+  .time-note strong { color: var(--ink); font-weight: 600; }
 
   /* ── Two-column body: rail + content ───────────────── */
   .layout {
@@ -294,6 +301,91 @@
   }
   .aside code { display: block; margin-top: 0.35rem; white-space: pre-wrap; word-break: break-word; }
 
+  /* ── Evidence tiers (minimum viable vs. ideal set) ──── */
+  .tiers { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.6rem; max-width: 62ch; }
+  @media (max-width: 560px) { .tiers { grid-template-columns: 1fr; } }
+  .tier {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.8rem 1rem;
+    background: var(--paper-raised);
+  }
+  .tier .tier-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .tier.min .tier-label { color: var(--accent); }
+  .tier ul { margin: 0; padding-left: 1.1rem; font-size: 0.88rem; }
+  .tier li { margin-bottom: 0.3rem; }
+  .tier li:last-child { margin-bottom: 0; }
+
+  /* ── Prompt disclosure (Step 4 exact wording) ───────── */
+  details.prompts {
+    margin-top: 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--paper-raised);
+  }
+  details.prompts summary {
+    cursor: pointer;
+    padding: 0.65rem 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--accent-ink);
+    list-style: none;
+  }
+  details.prompts summary::-webkit-details-marker { display: none; }
+  details.prompts summary::before { content: "▸ "; color: var(--accent); }
+  details.prompts[open] summary::before { content: "▾ "; }
+  details.prompts .prompt-set { padding: 0 1rem 1rem; }
+  .prompt {
+    margin-top: 0.8rem;
+    border-top: 1px solid var(--line);
+    padding-top: 0.8rem;
+  }
+  .prompt:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+  .prompt .prompt-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+  .prompt pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.6rem 0.75rem;
+    color: var(--ink);
+  }
+
+  /* ── Golden rules capstone ──────────────────────────── */
+  .rules-box {
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    background: var(--paper-raised);
+    border-radius: 4px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--shadow);
+    max-width: 68ch;
+  }
+  .rules-box ol { margin: 0; padding-left: 1.2rem; }
+  .rules-box li { margin-bottom: 0.6rem; font-size: 0.97rem; }
+  .rules-box li:last-child { margin-bottom: 0; }
+  .rules-box li strong { font-weight: 600; }
+
   /* ── Report map table ───────────────────────────────── */
   .table-wrap { overflow-x: auto; max-width: 100%; }
   table.report-map {
@@ -399,6 +491,7 @@
       and hands back one report you open in a browser. This page is the whole manual — for
       Project Managers, Program Managers, and PMO leads who want to run an audit without touching Python.
     </p>
+    <p class="time-note"><strong>First audit:</strong> roughly 2–4 hours, most of it Claude reading and reasoning. <strong>Repeat audits:</strong> about 30 minutes.</p>
   </div>
 
   <div class="layout">
@@ -409,8 +502,10 @@
         <a href="#before">Before you start</a>
         <a href="#workflow">The audit workflow</a>
         <a href="#report">Reading your report</a>
+        <a href="#remediate">Remediate &amp; re-audit</a>
         <a href="#roles">By role</a>
         <a href="#faq">Good to know</a>
+        <a href="#rules">The 5 rules</a>
       </nav>
     </div>
 
@@ -479,7 +574,8 @@
             <div>
               <span class="who">You write</span>
               <h3>Complete the Data Charter</h3>
-              <p>Fill in the template: which artifacts count as evidence, what your fields mean (what does "on track" mean in your steering pack?), and what's in scope. This is the only step where your judgment, not the engine's, sets the rules.</p>
+              <p>Fill in the template: give each artifact an ID (<code>ART-001</code>, <code>ART-002</code>...), define what your fields mean (what does "on track" mean in your steering pack?), and set materiality — what's big enough to matter. This is the only step where your judgment, not the engine's, sets the rules.</p>
+              <p><strong>Then ratify it</strong> — literally type a name, role, and date at the bottom, and save it as <code>reports/PMO_DATA_CHARTER_ratified.md</code>. That filename is what makes it real rather than a draft.</p>
             </div>
           </div>
 
@@ -488,7 +584,26 @@
             <div>
               <span class="who">You gather</span>
               <h3>Assemble delivery evidence</h3>
-              <p>Put the schedules, logs, and reports somewhere Claude Code can read them. Real files, not summaries — the audit cites exact locations, so it needs the originals.</p>
+              <p>Put the schedules, logs, and reports somewhere Claude Code can read them. Real files, not summaries — the audit cites exact locations, so it needs the originals. Export first if your data lives in Jira, ADO, or Primavera — the engine doesn't log into tools.</p>
+              <div class="tiers">
+                <div class="tier min">
+                  <span class="tier-label">Minimum viable</span>
+                  <ul>
+                    <li>1 project schedule</li>
+                    <li>1 RAID log</li>
+                    <li>1 status or governance pack</li>
+                    <li>1 budget report</li>
+                  </ul>
+                </div>
+                <div class="tier">
+                  <span class="tier-label">Ideal set</span>
+                  <ul>
+                    <li>Project charter, risk register, issue log</li>
+                    <li>Change log, decision log, lessons learned</li>
+                    <li>Steering pack, dashboard export</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -498,6 +613,45 @@
               <span class="who">Claude Code runs</span>
               <h3>The audit itself</h3>
               <p>Ask Claude Code to run the <code>intelligence-engine</code> skill against your Charter and evidence. It reads everything, compares it to your standards, and writes exactly one file: <code>reports/audit_manifest.md</code>.</p>
+              <details class="prompts">
+                <summary>Exact wording, if you'd rather paste than describe</summary>
+                <div class="prompt-set">
+                  <div class="prompt">
+                    <span class="prompt-label">1 · Load the baseline</span>
+                    <pre>Read the standards in knowledge/. Build your understanding of
+what is required. Confirm: which standards govern this audit?</pre>
+                  </div>
+                  <div class="prompt">
+                    <span class="prompt-label">2 · Load the Charter</span>
+                    <pre>Read the ratified PMO Data Charter at reports/PMO_DATA_CHARTER_ratified.md.
+Confirm which artifacts are in scope and what the fields mean.
+Do not proceed until you confirm the Charter is ratified.</pre>
+                  </div>
+                  <div class="prompt">
+                    <span class="prompt-label">3 · Read the evidence</span>
+                    <pre>Read the following delivery artifacts: [list your file paths].
+For each one, record what you observe — field completeness,
+anomalies, anything that stands out.</pre>
+                  </div>
+                  <div class="prompt">
+                    <span class="prompt-label">4 · Find and classify gaps</span>
+                    <pre>Compare the evidence against the standards baseline. For every
+variance: cite the evidence, classify the gap type, trace the
+root origin, assign severity, and recommend an action that
+fixes the root cause, not the symptom. Write each finding into
+the Audit Manifest as you go.</pre>
+                  </div>
+                  <div class="prompt">
+                    <span class="prompt-label">5 · Synthesize</span>
+                    <pre>Write the SYNTHESIS section with narrative diagnostics for all
+7 Intelligence Indicators, then print the handover message.</pre>
+                  </div>
+                  <div class="prompt">
+                    <span class="prompt-label">6 · Save</span>
+                    <pre>Save the complete Audit Manifest to reports/audit_manifest.md.</pre>
+                  </div>
+                </div>
+              </details>
             </div>
           </div>
 
@@ -530,7 +684,7 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
       <section id="report">
         <div class="kicker">Interpreting the output</div>
         <h2>Reading your report</h2>
-        <p class="intro">The report has eleven sections. Most people only need four of them on a first pass — here's what each one is actually telling you.</p>
+        <p class="intro">The report has ten sections. Most people only need four of them on a first pass — here's what each one is actually telling you.</p>
 
         <div class="table-wrap">
           <table class="report-map">
@@ -555,16 +709,52 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
               <td>When the same issue keeps recurring</td>
             </tr>
             <tr>
-              <td class="section-name">Maturity Assessment</td>
-              <td>Your position on PMI's OPM3 model. <span class="pill">PENDING_BRIDGE</span> right now means this specific calibration isn't done yet — expected, not broken.</td>
-              <td>Once the bridge is ratified org-wide</td>
-            </tr>
-            <tr>
               <td class="section-name">Recommended Actions / Roadmap</td>
               <td>What to fix, grouped by root cause and ordered by severity.</td>
               <td>Right after the Gap Register</td>
             </tr>
           </table>
+        </div>
+      </section>
+
+      <section id="remediate">
+        <div class="kicker">After the report</div>
+        <h2>Remediate, then re-audit</h2>
+        <p class="intro">The report is a starting point, not a verdict. A 30-day rhythm that works:</p>
+
+        <div class="stages">
+          <div class="stage">
+            <div class="num">W1</div>
+            <div>
+              <h3>Fix what's Critical or Major</h3>
+              <p>Close every Severity 5 and 4 finding first. These are the ones that threaten delivery outcomes, not just tidiness.</p>
+            </div>
+          </div>
+          <div class="stage">
+            <div class="num">W2</div>
+            <div>
+              <h3>Fix the loudest root origin</h3>
+              <p>Look at Root Cause Analysis. If most gaps trace to <em>Ownership</em>, assign owners. If it's <em>Capture</em>, fix the templates. Treat the cause, not each symptom individually.</p>
+            </div>
+          </div>
+          <div class="stage">
+            <div class="num">W3</div>
+            <div>
+              <h3>Close the Missing gaps</h3>
+              <p>Either establish the process the standard actually requires, or update the Charter if it turns out the artifact was never really in scope.</p>
+            </div>
+          </div>
+          <div class="stage">
+            <div class="num">W4</div>
+            <div>
+              <h3>Re-audit with the same Charter</h3>
+              <p>Same Charter, same standards, fresh evidence. Save the new run as <code>audit_manifest_v2.md</code> → <code>findings_v2.json</code> → <code>report_v2.html</code>, so nothing overwrites the baseline you're measuring against.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout gold" style="margin-top:1.2rem;">
+          <p><strong>Measure the delta, not just the score.</strong> Did the Reporting Integrity Score improve? Did gap density drop? Did the root-origin distribution actually shift, or did the same cause just move to a new artifact?</p>
         </div>
       </section>
 
@@ -630,6 +820,51 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
             <dd>No, and there isn't meant to be. <code>report.html</code> is the whole interface — open it, read it, share the file itself with whoever needs it.</dd>
           </div>
         </dl>
+
+        <h3 style="margin-top:1.8rem;">If something fails</h3>
+        <div class="table-wrap">
+          <table class="report-map">
+            <tr>
+              <th>Symptom</th>
+              <th>Likely cause</th>
+              <th>Fix</th>
+            </tr>
+            <tr>
+              <td class="section-name"><code>BASELINE_ABSENT</code></td>
+              <td>No standards in <code>knowledge/</code></td>
+              <td>Drop your methodology files in and run it again.</td>
+            </tr>
+            <tr>
+              <td class="section-name">Invalid gap_type</td>
+              <td>The Manifest used wording that doesn't match one of the seven gap types exactly</td>
+              <td>Ask Claude to correct the wording — it must match exactly.</td>
+            </tr>
+            <tr>
+              <td class="section-name">Unknown artifact</td>
+              <td>An evidence bullet cites an artifact ID that was never declared in the Charter</td>
+              <td>Add the artifact to the Charter, or remove the bullet.</td>
+            </tr>
+            <tr>
+              <td class="section-name">Claude offers to run the scripts itself</td>
+              <td>A reminder got missed — judgment and execution are meant to stay separate</td>
+              <td>Tell it: "You write the Manifest. I run the scripts."</td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <section id="rules" style="margin-bottom: 0;">
+        <div class="kicker">Never break these</div>
+        <h2>The 5 rules</h2>
+        <div class="rules-box">
+          <ol>
+            <li><strong>No ratified Charter, no audit.</strong> Never let it guess what your data means.</li>
+            <li><strong>Every finding needs evidence.</strong> No quote, no absence, no finding.</li>
+            <li><strong>It judges, you run the software.</strong> Claude writes the Manifest; you (or Claude, on request) run the two scripts.</li>
+            <li><strong>Read-only, always.</strong> Only the Manifest and <code>reports/</code> ever get written.</li>
+            <li><strong>Local-first.</strong> No cloud calls, no databases — everything stays on your machine.</li>
+          </ol>
+        </div>
       </section>
 
     </main>

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "IEM-PM Canonical Findings v1.0.0",
+  "title": "IEM-PM Canonical Findings v1.1.0",
   "description": "Machine-readable single source of truth for PMO Data Gap Audit",
   "type": "object",
   "required": [
@@ -12,8 +12,7 @@
     "evidence_summary",
     "findings",
     "intelligence_indicators",
-    "reporting_integrity_score",
-    "maturity_assessment"
+    "reporting_integrity_score"
   ],
   "properties": {
     "audit_id": {
@@ -23,7 +22,7 @@
     },
     "schema_version": {
       "type": "string",
-      "enum": ["1.0.0"]
+      "enum": ["1.1.0"]
     },
     "charter_version": {
       "type": "string",
@@ -166,7 +165,7 @@
             "properties": {
               "standard": {
                 "type": "string",
-                "description": "e.g., PMBOK7, OPM3, Internal-PMM-v2"
+                "description": "e.g., PMBOK7, PRINCE2, Internal-PMM-v2"
               },
               "clause": {
                 "type": "string",
@@ -248,46 +247,6 @@
         },
         "methodology": { "type": "string" },
         "version": { "type": "string" }
-      }
-    },
-    "maturity_assessment": {
-      "type": "object",
-      "required": [
-        "opm3_position",
-        "evidence_summary",
-        "bridge_version",
-        "gap_density",
-        "gap_severity_distribution"
-      ],
-      "properties": {
-        "opm3_position": {
-          "type": "string",
-          "enum": [
-            "PENDING_BRIDGE",
-            "Level 1 - Initial",
-            "Level 2 - Managed",
-            "Level 3 - Defined",
-            "Level 4 - Quantitative",
-            "Level 5 - Optimizing",
-            "Undetermined"
-          ]
-        },
-        "evidence_summary": { "type": "string" },
-        "bridge_version": { "type": "string" },
-        "gap_density": {
-          "type": "number",
-          "description": "Findings per artifact examined"
-        },
-        "gap_severity_distribution": {
-          "type": "object",
-          "properties": {
-            "1": { "type": "integer" },
-            "2": { "type": "integer" },
-            "3": { "type": "integer" },
-            "4": { "type": "integer" },
-            "5": { "type": "integer" }
-          }
-        }
       }
     }
   }

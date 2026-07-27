@@ -179,8 +179,8 @@
             <div class="metric-label">Artifacts Examined</div>
         </div>
         <div class="metric">
-            <div class="metric-value">{{ audit.maturity_assessment.opm3_position }}</div>
-            <div class="metric-label">OPM3 Position</div>
+            <div class="metric-value">{{ audit.baseline.standards_declared | length }}</div>
+            <div class="metric-label">Standards Declared</div>
         </div>
     </div>
     <p>This audit compared observed delivery evidence against the declared baseline of
@@ -303,15 +303,6 @@
     ({{ audit.reporting_integrity_score.version }})</p>
     <p>This score is computed deterministically from gap density, severity distribution,
     root cause diversity, and Missing gap penalties. It is not subjective.</p>
-</div>
-
-<!-- 8. Maturity Assessment -->
-<div class="section">
-    <h2>8. Maturity Assessment (OPM3)</h2>
-    <p><strong>Position:</strong> {{ audit.maturity_assessment.opm3_position }}</p>
-    <p><strong>Bridge Version:</strong> {{ audit.maturity_assessment.bridge_version }}</p>
-    <p><strong>Evidence Summary:</strong> {{ audit.maturity_assessment.evidence_summary }}</p>
-    <p><strong>Gap Density:</strong> {{ audit.maturity_assessment.gap_density }} findings per artifact</p>
 
     <h4>Severity Distribution</h4>
     <table>
@@ -323,18 +314,18 @@
             <th>Severity 5</th>
         </tr>
         <tr>
-            <td>{{ audit.maturity_assessment.gap_severity_distribution["1"] }}</td>
-            <td>{{ audit.maturity_assessment.gap_severity_distribution["2"] }}</td>
-            <td>{{ audit.maturity_assessment.gap_severity_distribution["3"] }}</td>
-            <td>{{ audit.maturity_assessment.gap_severity_distribution["4"] }}</td>
-            <td>{{ audit.maturity_assessment.gap_severity_distribution["5"] }}</td>
+            <td>{{ severity_counts.get(1, 0) }}</td>
+            <td>{{ severity_counts.get(2, 0) }}</td>
+            <td>{{ severity_counts.get(3, 0) }}</td>
+            <td>{{ severity_counts.get(4, 0) }}</td>
+            <td>{{ severity_counts.get(5, 0) }}</td>
         </tr>
     </table>
 </div>
 
-<!-- 9. Recommended Actions -->
+<!-- 8. Recommended Actions -->
 <div class="section">
-    <h2>9. Recommended Actions</h2>
+    <h2>8. Recommended Actions</h2>
     <ol class="action-list">
         {% for f in audit.findings %}
         <li>
@@ -345,9 +336,9 @@
     </ol>
 </div>
 
-<!-- 10. Roadmap -->
+<!-- 9. Roadmap -->
 <div class="section">
-    <h2>10. Roadmap</h2>
+    <h2>9. Roadmap</h2>
     <p>Prioritize remediation by root origin frequency and severity concentration:</p>
     <ol class="action-list">
         <li>Address highest-frequency root origin first</li>
@@ -357,9 +348,9 @@
     </ol>
 </div>
 
-<!-- 11. Appendix -->
+<!-- 10. Appendix -->
 <div class="section">
-    <h2>11. Appendix</h2>
+    <h2>10. Appendix</h2>
     <table>
         <tr><th>Item</th><th>Value</th></tr>
         <tr><td>Schema Version</td><td>{{ audit.schema_version }}</td></tr>

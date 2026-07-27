@@ -21,16 +21,9 @@ if hasattr(sys.stdout, "reconfigure"):
 ENGINE_DIR = Path(__file__).parent.parent  # skills/intelligence-engine/
 SCRIPTS_DIR = ENGINE_DIR / "scripts"
 ASSETS_DIR = ENGINE_DIR / "assets"
-BRIDGE_PATH = ENGINE_DIR / "registries" / "opm3_bridge.json"
 
 # The project's real regression fixture -- "actual data", not an inline stub.
 REAL_MANIFEST_PATH = SCRIPTS_DIR / "test_manifest.md"
-
-VALID_OPM3_POSITIONS = {
-    "PENDING_BRIDGE",
-    "Level 1 - Initial", "Level 2 - Managed", "Level 3 - Defined",
-    "Level 4 - Quantitative", "Level 5 - Optimizing", "Undetermined",
-}
 
 CANONICAL_INDICATOR_ORDER = [
     "visibility", "integrity", "connectivity", "governance",
@@ -72,11 +65,11 @@ def test_manifest_to_findings():
     with tempfile.TemporaryDirectory() as tmp:
         data = _generate_findings(REAL_MANIFEST_PATH, Path(tmp))
 
-        assert data["schema_version"] == "1.0.0"
+        assert data["schema_version"] == "1.1.0"
         assert len(data["findings"]) == 2
         assert {f["id"] for f in data["findings"]} == {"FIND-0001", "FIND-0002"}
         assert data["reporting_integrity_score"]["score"] > 0
-        assert data["maturity_assessment"]["opm3_position"] in VALID_OPM3_POSITIONS
+        assert "maturity_assessment" not in data, "OPM3/maturity modeling was scrapped -- must not reappear"
 
         # Artifact Name resolution (regression: used to fall back to the ID)
         names = {a["artifact_id"]: a["artifact_name"] for a in data["baseline"]["artifacts_examined"]}
@@ -96,7 +89,7 @@ def test_manifest_to_findings():
 
         print(f"  PASS: {len(data['findings'])} finding(s) parsed from real fixture")
         print(f"  PASS: RIS = {data['reporting_integrity_score']['score']}")
-        print(f"  PASS: OPM3 = {data['maturity_assessment']['opm3_position']}")
+        print(f"  PASS: no maturity_assessment in output (scrapped, not scored)")
         print(f"  PASS: artifact names resolved: {names}")
         print(f"  PASS: coverage_percentage = {data['evidence_summary']['coverage_percentage']}")
         print(f"  PASS: indicator order is canonical")
@@ -219,46 +212,6 @@ def test_duplicate_detection():
         print("  PASS: duplicate signature (Underutilized/Behavior/ART-002/Process 11.7) correctly rejected")
 
 
-def test_opm3_bridge_ratified():
-    """
-    Test 6: with a RATIFIED bridge rubric in place, the pipeline applies it
-    instead of emitting PENDING_BRIDGE. Backs up and restores the real
-    registries/opm3_bridge.json so this test never mutates real project state,
-    even if an assertion fails.
-    """
-    backup = BRIDGE_PATH.read_text(encoding="utf-8") if BRIDGE_PATH.exists() else None
-
-    test_rubric = {
-        "bridge_name": "IEM-PM OPM3 Bridge",
-        "version": "0.1.0-TEST",
-        "status": "RATIFIED",
-        "rubric": [
-            {"opm3_position": "Level 3 - Defined", "priority": 30,
-             "max_gap_density": 0.5, "max_severity_5": 0, "min_ris": 85,
-             "forbidden_gap_types": ["Missing"]},
-            {"opm3_position": "Level 2 - Managed", "priority": 20,
-             "max_severity_5": 2, "min_ris": 70},
-            {"opm3_position": "Level 1 - Initial", "priority": 10, "min_ris": 50},
-        ],
-    }
-
-    try:
-        BRIDGE_PATH.parent.mkdir(exist_ok=True)
-        BRIDGE_PATH.write_text(json.dumps(test_rubric, indent=2), encoding="utf-8")
-
-        with tempfile.TemporaryDirectory() as tmp:
-            data = _generate_findings(REAL_MANIFEST_PATH, Path(tmp))
-            position = data["maturity_assessment"]["opm3_position"]
-            assert position != "PENDING_BRIDGE", "ratified bridge was not applied"
-            assert position in VALID_OPM3_POSITIONS
-            print(f"  PASS: ratified bridge applied -> {position}")
-    finally:
-        if backup is not None:
-            BRIDGE_PATH.write_text(backup, encoding="utf-8")
-        else:
-            BRIDGE_PATH.unlink(missing_ok=True)
-
-
 def main():
     print("=" * 60)
     print("IEM-PM Regression Test Suite")
@@ -270,7 +223,6 @@ def main():
         ("JSON -> Reports", test_rendering),
         ("Knowledge Index", test_knowledge_index),
         ("Duplicate Detection", test_duplicate_detection),
-        ("OPM3 Bridge (Ratified)", test_opm3_bridge_ratified),
     ]
 
     passed = 0

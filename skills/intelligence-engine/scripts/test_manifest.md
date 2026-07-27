@@ -99,10 +99,6 @@ Decisions are made without earned value data and without risk visibility, reduci
 
 No evidence of lessons learned feeding into schedule planning or risk process improvement.
 
-### OPM3 Maturity Position
-
-PENDING_BRIDGE — The gap profile has been recorded. The OPM3 bridge rubric is not yet calibrated. Maturity assessment deferred to software once bridge is ratified.
-
 ## APPENDIX
 
 **Schema Version:** 1.0.0

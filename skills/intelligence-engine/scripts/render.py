@@ -44,7 +44,6 @@ def render_txt(canonical: dict) -> str:
         "-" * 40,
         f"Total Findings: {len(canonical.get('findings', []))}",
         f"Reporting Integrity Score: {canonical['reporting_integrity_score']['score']}/100",
-        f"OPM3 Position: {canonical['maturity_assessment']['opm3_position']}",
         "",
         "2. AUDIT SCOPE & BASELINE",
         "-" * 40,
@@ -103,13 +102,7 @@ def render_txt(canonical: dict) -> str:
         f"  Score: {canonical['reporting_integrity_score']['score']}/100",
         f"  Methodology: {canonical['reporting_integrity_score']['methodology']}",
         "",
-        "8. MATURITY ASSESSMENT (OPM3)",
-        "-" * 40,
-        f"  Position: {canonical['maturity_assessment']['opm3_position']}",
-        f"  Bridge: {canonical['maturity_assessment']['bridge_version']}",
-        f"  Gap Density: {canonical['maturity_assessment']['gap_density']} findings/artifact",
-        "",
-        "9. RECOMMENDED ACTIONS",
+        "8. RECOMMENDED ACTIONS",
         "-" * 40,
     ])
     for i, f in enumerate(canonical.get("findings", []), 1):
@@ -118,7 +111,7 @@ def render_txt(canonical: dict) -> str:
 
     lines.extend([
         "",
-        "10. ROADMAP",
+        "9. ROADMAP",
         "-" * 40,
         "  Prioritize by root origin frequency and severity concentration:",
         "  1. Address highest-frequency root origin first",
@@ -126,7 +119,7 @@ def render_txt(canonical: dict) -> str:
         "  3. Close Missing gaps by updating Charter or capturing data",
         "  4. Re-run audit after remediation to measure delta",
         "",
-        "11. APPENDIX",
+        "10. APPENDIX",
         "-" * 40,
         f"  Schema Version: {canonical['schema_version']}",
         "  Canonical JSON: (see separate file)",

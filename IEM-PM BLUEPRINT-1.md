@@ -4,18 +4,20 @@
 
 > Purpose: document **how IEM-PM should be built**, using the proven architectural pattern adapted for Project Management Intelligence.
 >
-> IEM-PM is the reference implementation of **Intelligence Engineering for Project Management**—an LLM-native audit engine that measures an organization's actual project delivery capability against its declared project management standards and produces evidence-based maturity assessments.
+> IEM-PM is the reference implementation of **Intelligence Engineering for Project Management**—an LLM-native audit engine that measures an organization's actual project delivery capability against its declared project management standards, traces every gap to its root origin, and engineers the correction at the source.
 
 ---
 
 # 0. The one-sentence shape
 
-IEM-PM is a **Claude Code skill** that compares an organization's **delivery evidence** (projects, programs, portfolios, PMO artifacts, schedules, RAID logs, governance packs, dashboards, boards and operational data) against the **project management standards** it claims to follow (PMI, PMBOK, OPM3 or organizational methodology), and produces a **PMO Data Gap Audit Report** (HTML + JSON + TXT) that classifies every delivery gap into one of **7 intelligence gap types**, traces each gap back to its **root origin**, and uses that evidence to expose the organization's **Project Management Intelligence Maturity** based on PMI's OPM3 model.
+IEM-PM is a **Claude Code skill** that compares an organization's **delivery evidence** (projects, programs, portfolios, PMO artifacts, schedules, RAID logs, governance packs, dashboards, boards and operational data) against the **project management standards** it claims to follow (PMI, PMBOK, PRINCE2 or organizational methodology), and produces a **PMO Data Gap Audit Report** (HTML + JSON + TXT) that classifies every delivery gap into one of **7 intelligence gap types** and traces each gap back to its **root origin**, so the organization can engineer the correction at the source.
+>
+> **Scope boundary:** IEM-PM measures and traces gaps; it does not model organizational maturity. Maturity modeling (e.g., PMI's OPM3) is a distinct discipline requiring cross-project calibration and a licensed instrument, neither of which this tool provides.
 
 > **No baseline, no audit.
 > Find the gap.
 > Trace it to the root.
-> Measure maturity from evidence.**
+> Fix it at the source.**
 
 Everything else is plumbing around that comparison.
 
@@ -47,7 +49,6 @@ iem-pm/
 │       │
 │       │   ├── PMI/
 │       │   ├── PMBOK/
-│       │   ├── OPM3/
 │       │   ├── PRINCE2/
 │       │   ├── Agile/
 │       │   ├── MSP/
@@ -57,9 +58,7 @@ iem-pm/
 │       ├── registries/ (Gitignore — derived at runtime from the org's standards, never shipped)
 │       │
 │       │   ├── pmi_registry.json
-│       │   ├── opm3_registry.json
-│       │   ├── governance_registry.json
-│       │   └── maturity_registry.json
+│       │   └── governance_registry.json
 │       │
 │       ├── manifest_to_findings.py
 │       ├── render.py
@@ -236,7 +235,7 @@ No baseline.
 
 No audit.
 
-The engine cannot determine maturity without knowing the standard.
+The engine cannot judge delivery without knowing the standard.
 
 ---
 
@@ -507,13 +506,15 @@ Decision Quality
 Continuous Improvement
 ```
 
-These are **narrative diagnostic labels only** — they are never scored or weighted. Scoring lives in the Reporting Integrity Score and the OPM3 bridge.
+These are **narrative diagnostic labels only** — they are never scored or weighted. Scoring lives in the Reporting Integrity Score.
 
 ---
 
-# 10. Maturity Model
+# 10. Scope Boundary: No Maturity Modeling
 
-Evidence determines maturity.
+IEM-PM measures and traces gaps. It does not model organizational maturity.
+
+Evidence determines the Reporting Integrity Score.
 
 Not interviews.
 
@@ -538,14 +539,10 @@ Root Causes
 
 ↓
 
-Weighted Score
-
-↓
-
-OPM3 Maturity Position (via the bridge — TBD)
+Reporting Integrity Score
 ```
 
-IEM-PM does not invent a maturity scale. The gap profile maps to **PMI's OPM3 model** — the bridge rubric is the open design item.
+Organizational maturity modeling (e.g., PMI's OPM3) is a **distinct discipline** — it requires calibration across many audits and a licensed assessment instrument, neither of which IEM-PM provides. IEM-PM deliberately stops at the evidence: the gap, its root cause, and its severity. It does not extrapolate from that evidence to a claim about the organization's maturity level.
 
 ---
 
@@ -709,8 +706,6 @@ Gap Type
 
 Root Cause Mapping
 
-OPM3 Mapping (bridge — TBD)
-
 Reference
 
 This allows deterministic scoring.
@@ -737,13 +732,11 @@ The generated report contains
 
 7 Intelligence Indicators (narrative) + Reporting Integrity Score
 
-8 Maturity Assessment (OPM3 position)
+8 Recommended Actions
 
-9 Recommended Actions
+9 Roadmap
 
-10 Roadmap
-
-11 Appendix
+10 Appendix
 
 ---
 
@@ -852,7 +845,7 @@ Weighted Scoring
 
 =
 
-Organizational Maturity via OPM3 maturity position
+Reporting Integrity Score
 ```
 
 ---
@@ -865,10 +858,10 @@ It is an **Intelligence Engineering platform** that transforms fragmented delive
 
 Its purpose is not to report projects.
 
-Its purpose is to explain **why projects perform the way they do**, identify the systemic causes of delivery gaps, and provide a repeatable, evidence-driven path toward higher organizational maturity.
+Its purpose is to explain **why projects perform the way they do**, identify the systemic causes of delivery gaps, and provide a repeatable, evidence-driven path toward closing them at the source.
 
 IEM-PM entire architecture is governed by a single, relentless comparison:
 
 > **Does observed delivery match declared standards?**
 
-If the answer is no, IEM-PM finds the gap, traces it to its root, measures its impact, and converts that evidence into actionable intelligence.
+If the answer is no, IEM-PM finds the gap, traces it to its root, measures its impact, and converts that evidence into actionable intelligence. IEM-PM stops there — it does not extrapolate that evidence into an organizational maturity claim.
