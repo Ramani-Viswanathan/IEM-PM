@@ -14,7 +14,7 @@ import json
 import sys
 from pathlib import Path
 
-ENGINE_DIR = Path(__file__).parent
+ENGINE_DIR = Path(__file__).parent.parent
 KNOWLEDGE_DIR = ENGINE_DIR / "knowledge"
 REGISTRIES_DIR = ENGINE_DIR / "registries"
 MANIFEST_PATH = REGISTRIES_DIR / "derivation_manifest.json"
@@ -68,7 +68,7 @@ def skeleton_for(path: Path) -> list[dict]:
 
 def main() -> int:
     sources = sorted(
-        p for p in KNOWLEDGE_DIR.iterdir()
+        p for p in KNOWLEDGE_DIR.rglob("*")
         if p.is_file() and p.name != "README.md"
     )
     if not sources:
