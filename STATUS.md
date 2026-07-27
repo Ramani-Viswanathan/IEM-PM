@@ -23,7 +23,7 @@
 | `skills/intelligence-engine/scripts/baseline.py`     | ✅ Built (Stage 0 mechanics) — fingerprints `knowledge/`, extracts PDF/MD skeletons, diffs against prior run. |
 | `skills/intelligence-engine/scripts/derive_knowledge_index.py` | ✅ Built — catalogs `knowledge/` (filenames/sizes only, no content) into `knowledge_index.json`.    |
 | `skills/intelligence-engine/knowledge/`             | Baseline drop-zone (gitignored) — **29 real PMI standards now present** in `knowledge/PMI/` (PMBOK 8th Ed., Practice Standard for Scheduling 3rd Ed., Standard for Risk Management, Governance of Portfolios/Programs/Projects Practice Guide, and others). Used for the real pilot audit in `examples/pilot-audit/`. |
-| `skills/intelligence-engine/registries/`            | Derived-at-runtime registry output (gitignored except README). `skeleton_map.json` / `derivation_manifest.json` exist for the current 29-document baseline; deeper criteria-derivation (the Stage 0 LLM job, per Appendix E) not yet exercised. |
+| `skills/intelligence-engine/registries/`            | Derived-at-runtime registry output (gitignored except README). Mechanism complete and specified in SKILL.md Phase 0b; `skeleton_map.json` fixed (25/29 real skeletons, up from 2/29 — see §2 locked decisions / §4 build order item 7). One real registry derived as proof (`ps_scheduling_3rd.json`, 3 items); the other 28 standards are not yet derived — deliberately deferred, not blocked. |
 | `_archive/`                                          | Superseded: old `pmo-data-gap-audit` skill, old `IEM-PM_BLUEPRINT.md`, `remit/` — history only            |
 | `stakeholder/`                                       | PMI volunteer copyrighted material — **never touch, never publish, never build on**                       |
 
@@ -52,7 +52,17 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
 4. ⚠️ Build the Audit Manifest template — the parser-grade format is fully specified inline in SKILL.md §10; the standalone `assets/AUDIT_MANIFEST_template.md` file is still empty.
 5. ✅ Write SKILL.md — complete, all 13 sections, no TODO markers remain.
 6. ✅ Knowledge Base derivation — scan tooling built and fixed (`baseline.py`, `derive_knowledge_index.py`); 29 real PMI standards now live in `knowledge/PMI/`, `baseline.py` correctly recurses into subfolders (`BASELINE_READY — 29 document(s)`).
-7. ⚠️ Registry derivation — skeleton/TOC extraction works (`skeleton_map.json`) against the real 29-document baseline; the deeper criteria-derivation step (Stage 0's LLM job, turning skeletons into checkable registry items per Appendix E) has not yet been run against real content.
+7. ✅ Registry derivation — mechanism complete. Found and fixed a real Stage 0 bug: `baseline.py`'s
+   "reuse if fingerprint unchanged" cache trusted an *empty* skeleton as valid, so 27 of 29 real
+   standards were silently stuck with zero TOC entries from an earlier failed extraction and never
+   retried. Fixed (skills/intelligence-engine/scripts/baseline.py) — 25 of 29 now extract real
+   skeletons; the remaining 4 genuinely carry no PDF bookmarks (verified, not a bug). SKILL.md
+   Phase 0 now specifies the derivation procedure (file naming, reuse-by-fingerprint, when to
+   re-derive — see §Phase 0b), and `references/registry-format.md` documents the file-wrapper
+   schema with a real worked example. One real registry derived end-to-end as proof
+   (`registries/ps_scheduling_3rd.json`, 3 items from PS_Scheduling_3rd.pdf) — gitignored,
+   local-only, not committed by design. Bulk derivation across the other 28 standards is
+   intentionally deferred as a separate, deliberately-run job, not part of this fix.
 8. ✅ Renderer — `scripts/render.py` written and verified.
 9. ✅ Report template — `assets/report_template.html` written (377 lines).
 10. ✅ Regression tests — `scripts/test_pipeline.py` rebuilt against real fixtures (5 tests: Manifest→JSON, Schema Validation, JSON→Reports, Knowledge Index, Duplicate Detection), 5/5 passing, committed. Not pytest-based (stdlib only, by design), but no longer manual/informal.
@@ -61,6 +71,10 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
 ## 5. Open design items
 
 - ~~The gaps→OPM3 bridge~~ — **scrapped 2026-07-27**, not an open item anymore. See locked decision #2.
+- ~~Registry derivation mechanism~~ — **complete 2026-07-27**. Procedure specified in SKILL.md
+  Phase 0b, file format in `references/registry-format.md`, and a real `baseline.py` bug fixed
+  (25/29 skeletons were silently stuck empty). Proven on one standard. Bulk derivation across the
+  remaining 28 standards is the next open item, not this one.
 - **Severity bands (Appendix D)** — done: `references/severity-matrix.md` (153 lines) + SKILL.md §9.1.
 - **Error codes (Appendix H)** — still `TODO(you)` (`references/error-codes.md`, 3 lines).
 - **File naming (Appendix G)** — still `TODO(you)` (`references/file-naming.md`, 3 lines).
@@ -103,13 +117,18 @@ Data".** The OPM3 bridge was never built out — it was scrapped outright on 202
 decision #2), so there is nothing left to design. What actually happened this week instead:
 - Real pilot audit run against real PMI standards (29 documents) — 4 genuine findings, Reporting
   Integrity Score 50.67/100 — Done (pulled forward three weeks from its original Week 7 slot)
-- Two real `baseline.py` bugs found and fixed during the pilot (Stage 0 path resolution;
-  non-recursive knowledge-folder scan that hid subfolders) — Done
-- Registry derivation from the licensed standards — skeleton/TOC extraction works; the deeper
-  criteria-derivation step has not yet been run against real content — In progress
+- Three real `baseline.py` bugs found and fixed during the pilot and the Stage 0 follow-up
+  (path resolution; non-recursive knowledge-folder scan that hid subfolders; a stale-cache bug
+  that froze 27 of 29 real standards at an empty skeleton from an earlier failed extraction) — Done
+- Registry derivation mechanism — now fully specified (SKILL.md Phase 0b, file format in
+  `references/registry-format.md`) and proven on one real standard
+  (`registries/ps_scheduling_3rd.json`) — Done. Bulk derivation across the other 28 standards —
+  Upcoming
 
 **Week 6 (Aug 3–9) — Registry & Renderer — In progress.**
-- Registry complete ("no baseline, no audit") — only skeleton-level derivation exists so far — Upcoming
+- ⚠️ "Registry complete ('no baseline, no audit') — only skeleton-level derivation exists so far" →
+  the *mechanism* is complete and proven on 1 of 29 standards (see Week 5); full derivation across
+  all 29 remains — In progress, not Upcoming
 - Deterministic renderer & report template — LLM judges, code renders — Done
 - Regression tests across the audit state machine — Done (`test_pipeline.py`, 5/5 passing, committed
   in `1c68116`)
@@ -137,8 +156,9 @@ domains."
 **Corrections the portfolio site needs (summary):**
 1. Week 2 — drop "OPM3 as the maturity lens" from the Reporting Integrity Score item.
 2. Week 5 — retitle off the OPM3 bridge; replace its items with the real pilot-audit work above.
-3. Week 7 — mark "End-to-end pilot audit against a real baseline" as Done.
-4. Longer Arc, 12–24 months — drop "maturity model" from the description.
+3. Week 6 — "Registry complete" is In progress (mechanism proven), not Upcoming.
+4. Week 7 — mark "End-to-end pilot audit against a real baseline" as Done.
+5. Longer Arc, 12–24 months — drop "maturity model" from the description.
 
 # Status update : Table
 
@@ -162,9 +182,10 @@ domains."
 | done   | Built a real regression suite (scripts/test_pipeline.py) against real fixtures — 5 tests, 5/5 passing.                                | STATUS.md             |
 | done   | Published a role-based user guide for PMs, program managers, and PMO leads (Public/IEM-PM-User-Guide.html).                            | STATUS.md             |
 | done   | Ran a real end-to-end pilot audit against the real PMI baseline (examples/pilot-audit/) — 4 findings, Reporting Integrity Score 50.67/100. | STATUS.md             |
+| done   | Fixed a real Stage 0 bug (baseline.py stale-skeleton cache) that had silently frozen 27 of 29 real standards at zero TOC entries; specified the registry-derivation procedure in SKILL.md Phase 0b and the file format in registry-format.md; derived one real registry as proof. | STATUS.md             |
 | next   | Build the Audit Manifest standalone template file (assets/AUDIT_MANIFEST_template.md — currently empty).                             | STATUS.md             |
 | next   | Populate references/charter-spec.md, error-codes.md, file-naming.md (currently empty/TODO stubs).                                    | STATUS.md             |
-| next   | Run Stage 0 criteria-derivation (skeleton → registry items per Appendix E) against real standards content.                            | STATUS.md             |
+| next   | Run bulk Stage 0 criteria-derivation across the remaining 28 real standards (mechanism proven on 1 of 29).                             | STATUS.md             |
 | next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json).                                                          | STATUS.md             |
 | open   | Define error codes and finalize file naming conventions (Appendices G–H).                                                             | STATUS.md             |
 

@@ -99,7 +99,13 @@ def main() -> int:
             continue
         fingerprints[doc_id] = fp
 
-        if prev_fingerprints.get(doc_id) == fp and doc_id in prev_skeletons:
+        # Only trust a cached skeleton if it's non-empty -- an empty list can mean
+        # "no bookmarks" or "extraction failed last time"; retry rather than
+        # freeze a stale failure in place until the source file itself changes.
+        if (
+            prev_fingerprints.get(doc_id) == fp
+            and prev_skeletons.get(doc_id)
+        ):
             skeleton_map[doc_id] = prev_skeletons[doc_id]
             reused_docs.append(doc_id)
             continue

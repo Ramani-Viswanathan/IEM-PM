@@ -446,12 +446,39 @@ Repeat (next artifact, next standard, next criterion)
 
 ## Phase 0 — Baseline
 
-**What you do:** Read and understand the ruler.
+**What you do:** Read and understand the ruler, then turn it into a registry.
 
-Read every standard in `knowledge/` that applies to this audit. Read the ratified PMO Data Charter. Build a mental map of what the organization claims it does.
+### 0a. Mechanics (scripted)
 
-**Inputs:** `knowledge/` standards, ratified Charter.
-**Output:** Your understanding of Expected Delivery.
+Run `python scripts/baseline.py`. It fingerprints every file in `knowledge/`, extracts a
+TOC/bookmark skeleton per document, and writes `registries/skeleton_map.json` +
+`registries/derivation_manifest.json`. It never reads body text and never derives criteria —
+that stays with you (Principle 7). Exit code 1 (`BASELINE_ABSENT`) is a hard stop.
+
+### 0b. Derivation (you)
+
+For each standard actually declared in scope by the ratified Charter (not the whole `knowledge/`
+folder indiscriminately — derive what this audit needs):
+
+1. Check `registries/<slug>.json`, where `<slug>` is the source filename, lowercased, with any
+   run of non-alphanumeric characters collapsed to a single underscore (e.g.
+   `PS_Scheduling_3rd.pdf` → `registries/ps_scheduling_3rd.json`).
+2. **Skip derivation and reuse the file as-is** if it already exists **and** its
+   `source_fingerprint` matches this document's entry in `derivation_manifest.json`.
+3. **Otherwise derive it.** Read the standard (using `skeleton_map.json`'s section anchors to
+   navigate; read body text directly for any document with an empty skeleton — some source PDFs
+   genuinely carry no bookmarks). For each checkable expectation you find — a requirement, a key
+   success factor, a mandatory practice — write one registry item using the 13 attributes in
+   Appendix E (`references/registry-format.md`), paraphrased per Principle 3, never verbatim.
+4. Write `registries/<slug>.json` in the wrapper format specified in Appendix E. This file is
+   standard-derived content: local-only, gitignored, never committed.
+
+Registry items are reused across audits; re-derive only when a standard's fingerprint changes.
+Nothing here replaces your own reading — the registry is a checkable index of what you already
+read, not a substitute for reading it.
+
+**Inputs:** `knowledge/` standards, `skeleton_map.json`, `derivation_manifest.json`, ratified Charter.
+**Output:** Your understanding of Expected Delivery, plus one `registries/<slug>.json` per in-scope standard.
 
 **Hard stop if:** No standards in `knowledge/`, or Charter is unratified and the user has not authorized a PROVISIONAL run.
 
