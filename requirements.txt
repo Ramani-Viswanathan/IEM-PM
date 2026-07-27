@@ -1,0 +1,8 @@
+# IEM-PM intelligence engine — deterministic pipeline dependencies.
+# Install with: pip install -r requirements.txt
+
+jsonschema==4.26.0      # scripts/schema.py — Contract 5 validator
+jinja2==3.1.6           # scripts/render.py — HTML report rendering
+pypdf==6.14.2           # scripts/baseline.py — PDF outline/skeleton extraction
+cryptography==49.0.0    # scripts/baseline.py — required by pypdf for AES-encrypted PDFs
+openpyxl==3.1.5         # reading .xlsx evidence artifacts during an audit (ad hoc, not yet in scripts/)

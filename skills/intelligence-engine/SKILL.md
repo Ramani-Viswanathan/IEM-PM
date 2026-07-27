@@ -407,14 +407,15 @@ If validation fails, the Manifest is rejected. You may be asked to fix it.
 
 ## 4.6 Outputs
 
-Software writes to `reports/` only:
+Software writes to `reports/` only. Every file for one audit shares a single name stem — see
+Appendix G (`references/file-naming.md`) for the exact pattern.
 
-| File              | Producer | Description                             |
-| ----------------- | -------- | --------------------------------------- |
-| `findings.json`   | Software | Canonical JSON — single source of truth |
-| `report.html`     | Software | Human-readable executive report         |
-| `report.txt`      | Software | Plain-text version                      |
-| `raw_manifest.md` | You      | The Audit Manifest you wrote            |
+| File     | Producer | Description                             |
+| -------- | -------- | ---------------------------------------- |
+| `*.json` | Software | Canonical JSON — single source of truth |
+| `*.html` | Software | Human-readable executive report         |
+| `*.txt`  | Software | Plain-text version                      |
+| `*.md`   | You      | The Audit Manifest you wrote            |
 
 You write only the Manifest. Software writes everything else.
 
@@ -931,7 +932,9 @@ Do not put these in the Manifest:
 
 ## 10.6 Output Location
 
-Write the Manifest to the file path provided by the user, or to reports/audit_manifest.md if no path is specified.
+Write the Manifest to `reports/`, named per Appendix G (`references/file-naming.md`):
+`IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, where the date/time is this audit's own Date — the same
+value you put in the header's `**Date:**` field, not an arbitrary filename.
 This is your only write target. Everything else is software's job.
 
 ---
@@ -1058,17 +1061,18 @@ If any check fails, fix the Manifest before finishing. Do not hand over a broken
 
 ## 12.2 Output Checklist
 
-You produce exactly one file:
+You produce exactly one file, named per Appendix G:
 
-| File                        | You Write | Software Reads |
-| --------------------------- | --------- | -------------- |
-| `reports/audit_manifest.md` | ✓         | ✓              |
+| File                                              | You Write | Software Reads |
+| ---------------------------------------------------- | --------- | -------------- |
+| `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`     | ✓         | ✓              |
 
-That is all. Software produces:
+That is all. Software produces the matching `.json`, `.html`, and `.txt` files using the same
+name stem:
 
-- `reports/findings.json`
-- `reports/report.html`
-- `reports/report.txt`
+- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json`
+- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`
+- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt`
 
 You do not touch these.
 

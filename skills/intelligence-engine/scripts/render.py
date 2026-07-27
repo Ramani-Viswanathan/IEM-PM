@@ -8,8 +8,30 @@ Deterministic: same JSON in → byte-identical out.
 import json
 import argparse
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Optional
 from jinja2 import Template
+
+# ─── Output naming (Appendix G, references/file-naming.md) ───
+REPO_ROOT = Path(__file__).resolve().parents[3]
+REPORTS_DIR = REPO_ROOT / "reports"
+DEFAULT_TEMPLATE = REPO_ROOT / "skills" / "intelligence-engine" / "assets" / "report_template.html"
+
+
+def _to_utc(dt: datetime) -> datetime:
+    return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
+
+
+def _iempm_filename(dt: datetime, ext: str) -> str:
+    """IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext> -- see references/file-naming.md."""
+    return f"IEMPM_AuditGap_Report_{_to_utc(dt).strftime('%d%m%y_%H%M')}.{ext}"
+
+
+def _parse_iso(iso_string: str) -> Optional[datetime]:
+    try:
+        return datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
+    except Exception:
+        return None
 
 
 def load_template(template_path: Path) -> Template:
@@ -141,39 +163,54 @@ def _count_by(findings: list, key: str) -> dict:
 
 
 def _format_timestamp(iso_string: str) -> str:
-    try:
-        dt = datetime.fromisoformat(iso_string.replace("Z", "+00:00"))
-        return dt.strftime("%Y-%m-%d %H:%M UTC")
-    except Exception:
-        return iso_string or "unknown"
+    dt = _parse_iso(iso_string)
+    return dt.strftime("%Y-%m-%d %H:%M UTC") if dt else (iso_string or "unknown")
 
 
 def main():
     parser = argparse.ArgumentParser(description="IEM-PM: JSON → HTML + TXT")
     parser.add_argument("--canonical", required=True, type=Path, help="Path to findings.json")
-    parser.add_argument("--template", type=Path, help="Path to HTML template")
-    parser.add_argument("--output-html", type=Path, help="Output path for report.html")
-    parser.add_argument("--output-txt", type=Path, help="Output path for report.txt")
+    parser.add_argument(
+        "--template", type=Path, default=None,
+        help=f"Path to HTML template. Defaults to {DEFAULT_TEMPLATE.name}.",
+    )
+    parser.add_argument(
+        "--output-html", type=Path, default=None,
+        help="Output path for the HTML report. Defaults to reports/IEMPM_AuditGap_Report_"
+             "DDMMYY_HHMM.html (Appendix G) using the audit's own Date.",
+    )
+    parser.add_argument(
+        "--output-txt", type=Path, default=None,
+        help="Output path for the TXT report. Defaults to reports/IEMPM_AuditGap_Report_"
+             "DDMMYY_HHMM.txt (Appendix G) using the audit's own Date.",
+    )
     args = parser.parse_args()
 
+    if not args.canonical.exists():
+        print(f"[E-RENDER-001] Canonical findings JSON not found: {args.canonical}")
+        exit(1)
+
     canonical = json.loads(args.canonical.read_text(encoding="utf-8"))
+    audit_dt = _parse_iso(canonical.get("generated_at", "")) or datetime.now(timezone.utc)
+
+    # Explicit paths always win; otherwise use the naming convention (Appendix G).
+    output_txt = args.output_txt or (REPORTS_DIR / _iempm_filename(audit_dt, "txt"))
+    output_html = args.output_html or (REPORTS_DIR / _iempm_filename(audit_dt, "html"))
+    template_path = args.template or DEFAULT_TEMPLATE
+
+    if args.output_txt is None or args.output_html is None:
+        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
     # TXT
-    if args.output_txt:
-        txt = render_txt(canonical)
-        args.output_txt.write_text(txt, encoding="utf-8")
-        print(f"TXT report: {args.output_txt}")
+    txt = render_txt(canonical)
+    output_txt.write_text(txt, encoding="utf-8")
+    print(f"TXT report: {output_txt}")
 
     # HTML
-    if args.output_html and args.template:
-        template = load_template(args.template)
-        html = render_html(canonical, template)
-        args.output_html.write_text(html, encoding="utf-8")
-        print(f"HTML report: {args.output_html}")
-
-    if not args.output_txt and not args.output_html:
-        print("ERROR: Specify at least one of --output-html or --output-txt")
-        exit(1)
+    template = load_template(template_path)
+    html = render_html(canonical, template)
+    output_html.write_text(html, encoding="utf-8")
+    print(f"HTML report: {output_html}")
 
 
 if __name__ == "__main__":

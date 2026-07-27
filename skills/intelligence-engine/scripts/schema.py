@@ -27,7 +27,7 @@ def validate_canonical(findings_json: Dict[str, Any]) -> List[str]:
     schema = load_schema()
     validator = jsonschema.Draft7Validator(schema)
     errors = sorted(validator.iter_errors(findings_json), key=lambda e: e.path)
-    return [f"{'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors]
+    return [f"[E-VALID-001] {'/'.join(str(p) for p in e.path)}: {e.message}" for e in errors]
 
 
 def validate_no_duplicates(findings_json: Dict[str, Any]) -> List[str]:
@@ -47,7 +47,7 @@ def validate_no_duplicates(findings_json: Dict[str, Any]) -> List[str]:
             key = (f["gap_type"], f["root_origin"], art_id, std_id)
             if key in seen:
                 dups.append(
-                    f"Duplicate finding signature: gap={key[0]}, origin={key[1]}, "
+                    f"[E-VALID-002] Duplicate finding signature: gap={key[0]}, origin={key[1]}, "
                     f"artifact={key[2]}, standard_id={key[3]}"
                 )
             seen.add(key)
@@ -70,8 +70,8 @@ def validate_evidence_coverage(findings_json: Dict[str, Any]) -> List[str]:
             art_id = ev.get("artifact_id")
             if art_id not in baseline_artifacts:
                 errors.append(
-                    f"{finding.get('id')}: Evidence references unknown artifact '{art_id}' "
-                    f"not declared in baseline"
+                    f"[E-VALID-003] {finding.get('id')}: Evidence references unknown artifact "
+                    f"'{art_id}' not declared in baseline"
                 )
 
     return errors

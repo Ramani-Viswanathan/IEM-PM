@@ -23,6 +23,20 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage
 
+# ─── Output naming (Appendix G, references/file-naming.md) ───
+REPO_ROOT = Path(__file__).resolve().parents[3]
+REPORTS_DIR = REPO_ROOT / "reports"
+
+
+def _to_utc(dt: datetime) -> datetime:
+    return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
+
+
+def _iempm_filename(dt: datetime, ext: str) -> str:
+    """IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext> -- see references/file-naming.md."""
+    return f"IEMPM_AuditGap_Report_{_to_utc(dt).strftime('%d%m%y_%H%M')}.{ext}"
+
+
 # ─── Closed Taxonomies (must match schema and SKILL.md) ───
 GAP_TYPES = {
     "Missing", "Ignored", "Disconnected", "Untrusted",
@@ -59,12 +73,17 @@ class ManifestParser:
         findings = self._parse_findings()
         synthesis = self._parse_synthesis()
 
+        # generated_at is the audit's own Date (Manifest header), not "now" --
+        # this is what lets every artifact from one audit share one file name
+        # (Appendix G) even when this script and render.py run minutes apart.
+        audit_date = self._parse_date(header.get("date")) or datetime.now(timezone.utc)
+
         # Build canonical structure
         canonical = {
             "audit_id": header.get("audit_id", self._generate_audit_id()),
             "schema_version": "1.1.0",
             "charter_version": header.get("charter_version", "unknown"),
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": audit_date.isoformat(),
             "baseline": {
                 "standards_declared": self._parse_standards(header.get("standards_baseline", "")),
                 "artifacts_examined": artifacts,
@@ -158,16 +177,16 @@ class ManifestParser:
 
         # Validate closed taxonomies
         if gap_type not in GAP_TYPES:
-            self.errors.append(f"{fid}: Invalid gap_type '{gap_type}'")
+            self.errors.append(f"[E-PARSE-002] {fid}: Invalid gap_type '{gap_type}'")
             return None
         if root_origin not in ROOT_ORIGINS:
-            self.errors.append(f"{fid}: Invalid root_origin '{root_origin}'")
+            self.errors.append(f"[E-PARSE-003] {fid}: Invalid root_origin '{root_origin}'")
             return None
 
         # Parse evidence bullets
         evidence = self._parse_evidence_bullets(block)
         if not evidence:
-            self.errors.append(f"{fid}: No evidence bullets found")
+            self.errors.append(f"[E-PARSE-004] {fid}: No evidence bullets found")
             return None
 
         # Parse intelligence dimensions
@@ -181,7 +200,7 @@ class ManifestParser:
             if not 1 <= severity <= 5:
                 raise ValueError
         except ValueError:
-            self.errors.append(f"{fid}: Invalid severity '{sev_str}'")
+            self.errors.append(f"[E-PARSE-005] {fid}: Invalid severity '{sev_str}'")
             severity = 3
 
         return {
@@ -222,7 +241,7 @@ class ManifestParser:
 
         match = re.search(r'## SYNTHESIS(.*?)(?=## APPENDIX|$)', self.raw, re.DOTALL | re.IGNORECASE)
         if not match:
-            self.warnings.append("No SYNTHESIS section found")
+            self.warnings.append("[W-PARSE-001] No SYNTHESIS section found")
             return {"indicators": indicators}
 
         synth_text = match.group(1)
@@ -316,6 +335,16 @@ class ManifestParser:
         match = re.search(r'(\d+(?:\.\d+)?)\s*%?', text)
         return float(match.group(1)) if match else None
 
+    @staticmethod
+    def _parse_date(text: Optional[str]) -> Optional[datetime]:
+        """Parse the Manifest header's **Date:** field (ISO 8601, 'Z' or offset)."""
+        if not text:
+            return None
+        try:
+            return datetime.fromisoformat(text.strip().replace("Z", "+00:00"))
+        except ValueError:
+            return None
+
     def _generate_audit_id(self) -> str:
         """Generate fallback audit ID."""
         return f"IEM-{datetime.now(timezone.utc).strftime('%Y%m%d')}-{hashlib.sha256(self.raw.encode()).hexdigest()[:6].upper()}"
@@ -327,11 +356,15 @@ def main():
     parser = argparse.ArgumentParser(description="IEM-PM: Manifest → Canonical Findings")
     parser.add_argument("--manifest", required=True, type=Path, help="Path to Audit Manifest markdown")
     parser.add_argument("--charter", type=Path, help="Optional: Path to ratified PMO Data Charter")
-    parser.add_argument("--output", required=True, type=Path, help="Output path for findings.json")
+    parser.add_argument(
+        "--output", type=Path, default=None,
+        help="Output path for findings.json. Defaults to reports/IEMPM_AuditGap_Report_"
+             "DDMMYY_HHMM.json (Appendix G) using the audit's own Date.",
+    )
     args = parser.parse_args()
 
     if not args.manifest.exists():
-        print(f"ERROR: Manifest not found: {args.manifest}")
+        print(f"[E-PARSE-001] Manifest not found: {args.manifest}")
         exit(1)
 
     # Parse
@@ -347,9 +380,15 @@ def main():
             print(f"  - {e}")
         exit(1)
 
-    # Write
-    args.output.write_text(json.dumps(canonical, indent=2), encoding="utf-8")
-    print(f"Canonical findings written to {args.output}")
+    # Write -- explicit --output always wins; otherwise use the naming convention.
+    output_path = args.output
+    if output_path is None:
+        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        audit_dt = datetime.fromisoformat(canonical["generated_at"])
+        output_path = REPORTS_DIR / _iempm_filename(audit_dt, "json")
+
+    output_path.write_text(json.dumps(canonical, indent=2), encoding="utf-8")
+    print(f"Canonical findings written to {output_path}")
     print(f"Total findings: {len(canonical['findings'])}")
     print(f"Reporting Integrity Score: {canonical['reporting_integrity_score']['score']}")
 

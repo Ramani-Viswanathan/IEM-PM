@@ -73,7 +73,7 @@ def main() -> int:
     )
     if not sources:
         print(
-            "BASELINE_ABSENT — no standards found in knowledge/.\n"
+            "[E-BASE-001] BASELINE_ABSENT — no standards found in knowledge/.\n"
             "IEM-PM ships no bundled standard text and never audits from assumption "
             "or model memory. Place the organization's real standards "
             "(PMI or organizational; PDF/MD) in skills/intelligence-engine/knowledge/ "
@@ -132,7 +132,7 @@ def main() -> int:
     if orphans:
         print(f"  orphans removed from manifest: {orphans}")
     if unparseable:
-        print(f"  unparseable (skipped, not guessed): {unparseable}")
+        print(f"  [E-BASE-002] unparseable (skipped, not guessed): {unparseable}")
     print(f"  skeleton_map -> {SKELETON_PATH}")
     print(f"  derivation_manifest -> {MANIFEST_PATH}")
     return 0
