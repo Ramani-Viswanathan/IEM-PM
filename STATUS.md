@@ -133,6 +133,20 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
   Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
   Build Order item 11 (`.claude-plugin/plugin.json`) is actually started — not blocking anything now.
+- **Minimum Evidence Sufficiency gate (`references/evidence-sufficiency.md`, SKILL.md §6.6 condition
+  6)** — open, 2026-07-29. Halt Conditions 1–5 are all binary presence/absence checks; none catch a
+  *readable, ratifiable* evidence set too thin to support a credible audit. Raised by Pilot-audit-4:
+  one CSV was about to reach Charter proposal against a 6-standard PMI baseline with no gate to
+  catch that 1 artifact against PMI's expected core PMO governance categories doesn't meet minimum
+  evidentiary sufficiency — modeled on a real audit concept (scope limitation → disclaimer of
+  opinion) rather than a misleadingly scored result. Drafted collaboratively: 7 core categories
+  (A–G: Authorization, Scope, Cost, Schedule, Risk, Change Control, Performance Monitoring) and the
+  `.md`+`.html`-only Scope Limitation Notice output are settled. Two values remain
+  `TODO(you)` directly in the reference file: Rule 1's exact mandatory coverage of Categories B/C/D
+  (all three? at least one? at least two?), and Rule 2's minimum category-coverage threshold. Not
+  built — no schema/script changes, `references/file-naming.md` (Appendix G) doesn't yet document
+  the `IEMPM_ScopeLimitation_Notice_...` pattern, and Halt Condition 6 is explicitly not enforced
+  until the reference file's `version` moves past `0.1.0-draft`.
 - **UI/UX for non-technical PMs** — parked 2026-07-27, brainstormed only, no decision made. Core
   open question: is the PM the direct operator (needs a real guided UI — stage tracker, structured
   Charter-review screen, plain-English activity feed) or does a technical operator run Claude Code

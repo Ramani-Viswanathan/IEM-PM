@@ -46,11 +46,7 @@ the code never replaces it.
 | -------------- | ---------------------------------------- | ---------------------------------------------- |
 | `E-RENDER-001` | `--canonical` path doesn't exist.    | Run `manifest_to_findings.py` first.    |
 
-### Why codes at all
+### Category prefixes
 
-Before this pass, the three scripts raised free-text messages with no consistent shape — a
-caller (human or another agent) couldn't tell "the Manifest is malformed" from "the schema itself
-was violated" without reading prose and guessing which script produced it. The codes don't change
-what's checked or how strict it is; they make the existing checks addressable and groupable by
-category (`E-BASE-*` = Stage 0, `E-PARSE-*` = Manifest parsing, `E-VALID-*` = schema/dedup/coverage,
-`E-RENDER-*` = rendering).
+`E-BASE-*` = Stage 0 (`baseline.py`) · `E-PARSE-*` = Manifest parsing (`manifest_to_findings.py`) ·
+`E-VALID-*` = schema/dedup/coverage (`schema.py`) · `E-RENDER-*` = rendering (`render.py`).

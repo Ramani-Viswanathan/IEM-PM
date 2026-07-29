@@ -553,15 +553,10 @@ Stop immediately and report to the user if:
 3. **No delivery artifacts supplied** — nothing to audit.
 4. **Every artifact is unreadable** — corrupt, encrypted, or unsupported format.
 5. **You are asked to modify delivery data** — you are read-only.
-6. **Minimum Evidence Sufficiency** — DRAFT, not yet active. Conditions 1-5 are binary
-   presence/absence checks; none of them catch a *readable, ratifiable* evidence set that is still
-   too thin to support a credible audit. Real audit practice has a name for this: a **scope
-   limitation**, resolved with a **disclaimer of opinion** rather than a scored result. Read
-   `references/evidence-sufficiency.md` for the category model, the three coverage rules, and the
-   Scope Limitation Notice output — it has open questions flagged inline that need resolving before
-   this condition is live. Do NOT enforce this halt condition until that file's `version` moves past
-   `0.1.0-draft`. (Raised 2026-07-29, Pilot-audit-4 — a 1-artifact evidence set proceeded to a
-   Charter proposal instead of halting here.)
+6. **Minimum Evidence Sufficiency** — DRAFT, not yet active. An evidence set can be readable and
+   ratifiable and still too thin to support a credible audit. Read `references/evidence-sufficiency.md`
+   for the category model, the coverage rules, and the Scope Limitation Notice output. Do NOT
+   enforce this halt condition until that file's `version` moves past `0.1.0-draft`.
 
 Do not proceed past the halt. Do not guess. Do not "do your best."
 
@@ -852,20 +847,8 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.6.0** — 2026-07-29: added anchor links to the main Table of Contents
-(§0) so every top-level item is clickable, not just numbered text. Added a `Name`/`description`/
-`version` header to every `references/*.md` file that was missing one (`charter-spec.md`,
-`error-codes.md`, `file-naming.md`, `registry-format.md`, `report-generation.md`,
-`severity-matrix.md`, `audit-stages.md`), matching the header convention already used by
-`gap-taxonomy.md`/`root-origins.md`. Added the still-missing Contents TOC to `charter-spec.md`
-(110 lines) and `report-generation.md` (101 lines) — both over the 100-line threshold.
-Previous: **1.5.0** — 2026-07-29: moved §11's Report Generation content, verbatim,
-out of SKILL.md into `references/report-generation.md`; §11 is now a short pointer stub, same
-pattern as §7/§8. This closes a real gap: the section had been branched out with no pointer left
-behind, so the skill had no way to discover the report-generation guidance existed at all. Also
-fixed the "Example Complete Finding Block" that had landed, out of order and un-TOC'd, at the end
-of `assets/AUDIT_MANIFEST_template.md` after the Appendix template — moved it to sit right after
-the Finding Block Template (§10.2.3), before Synthesis, and added it to that file's Contents list.
-Verified `report-generation.md`'s content byte-identical against the pre-move §11.
+This skill file version: **1.6.0**
 Schema version: **1.1.0**
-Manifest format version: **1.1.0** — unchanged; only its location moved (see above).
+Manifest format version: **1.1.0**
+
+Full change history: `STATUS.md`. This section states the current version only.

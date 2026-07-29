@@ -68,7 +68,3 @@ when to derive vs. reuse.
   "reference": "Section 3.3.5, \"Update the Baseline Schedule Model\""
 }
 ```
-
-This exact item was independently reasoned to by the real pilot audit in `examples/pilot-audit/`
-(as FIND-0001) before this registry layer existed — confirming the two approaches converge on the
-same criterion.
