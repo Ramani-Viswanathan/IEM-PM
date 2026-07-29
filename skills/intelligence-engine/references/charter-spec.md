@@ -1,3 +1,20 @@
+---
+Name: PMO Data Charter Spec
+description: >
+  The PMO Data Charter's five functions — Artifact Declaration, Field Semantics Map, Materiality
+  and Scope, Propose → Ratify, Anti-Mirror Guard. Read before proposing or ratifying a Charter
+  (SKILL.md §4.2, Phase 0).
+version: 1.0.0
+---
+
+## Contents
+
+- [1. Artifact Declaration](#1-artifact-declaration)
+- [2. Field Semantics Map](#2-field-semantics-map)
+- [3. Materiality and Scope](#3-materiality-and-scope)
+- [4. Propose → Ratify](#4-propose--ratify)
+- [5. Anti-Mirror Guard](#5-anti-mirror-guard)
+
 ## 4.2 Contract 2 — PMO Data Charter
 
 The **PMO Data Charter** is the authoritative data-interpretation contract for every IEM-PM audit. It specifies **what** the delivery data is, **how** the engine must interpret it, and **what** matters — the boundaries within which the audit operates. **It is not the baseline**; the Standards (Contract 1) are the baseline the data is judged against.

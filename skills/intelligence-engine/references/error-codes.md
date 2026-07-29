@@ -1,3 +1,12 @@
+---
+Name: Error Codes
+description: >
+  Appendix H — the E-BASE-*/E-PARSE-*/W-PARSE-*/E-VALID-*/E-RENDER-* error code taxonomy embedded
+  across baseline.py, manifest_to_findings.py, schema.py, and render.py. Read when a script fails
+  and you need to know what a code means.
+version: 1.0.0
+---
+
 ## Appendix H — Error Codes
 
 Every error or validation failure the pipeline can produce carries a stable code, prefixed onto

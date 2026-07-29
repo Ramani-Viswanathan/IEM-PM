@@ -1,3 +1,12 @@
+---
+Name: Registry Item Format
+description: >
+  Appendix E — the file-wrapper schema for locally-derived standard registries (skeleton_map.json,
+  per-standard registry files). Read during Phase 0b (Derivation) before deriving or reading a
+  registry.
+version: 1.0.0
+---
+
 ## Appendix E — Registry Item Format
 
 | Attribute             | Type   | Description                                                                                         |

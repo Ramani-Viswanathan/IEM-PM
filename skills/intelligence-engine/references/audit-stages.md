@@ -1,3 +1,13 @@
+---
+Name: Audit State Machine
+description: >
+  Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose,
+  preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions
+  for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the
+  operational summary the LLM actually follows.
+version: 1.0.0
+---
+
 # Audit State Machine — Full Stage Specifications
 
 > **Read this file before executing any audit stage.**

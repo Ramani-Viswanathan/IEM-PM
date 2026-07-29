@@ -1,3 +1,12 @@
+---
+Name: Output File Naming
+description: >
+  Appendix G — the IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext> naming convention shared by every
+  artifact generated for a given audit, and why the timestamp comes from the audit's own Date,
+  not wall-clock run time. Read before Stage 9 (Render) or when writing the Manifest's Date field.
+version: 1.0.0
+---
+
 ## Appendix G — Output File Naming
 
 Every artifact produced for a given audit shares one file-name stem, differing only by extension:

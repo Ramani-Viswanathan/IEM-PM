@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.5.0
+version: 1.6.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -35,19 +35,19 @@ compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 
 # TABLE OF CONTENTS
 
-1. Mission
-2. Operating Principles
-3. Definitions
-4. Inputs & Outputs — the Five Contracts
-5. Thinking Phases
-6. Cross-Cutting Rules
-7. Gap Classification
-8. Root Origin Analysis
-9. Scoring
-10. Manifest Contract
-11. Report Generation
-12. Completion
-13. Appendices
+1. [Mission](#1-mission)
+2. [Operating Principles](#2-operating-principles)
+3. [Definitions](#3-definitions)
+4. [Inputs & Outputs — the Five Contracts](#4-inputs--outputs--the-five-contracts)
+5. [Thinking Phases](#5-thinking-phases)
+6. [Cross-Cutting Rules](#6-cross-cutting-rules)
+7. [Gap Classification](#7-gap-classification)
+8. [Root Origin Analysis](#8-root-origin-analysis)
+9. [Scoring](#9-scoring)
+10. [Manifest Contract](#10-manifest-contract)
+11. [Report Generation](#11-report-generation)
+12. [Completion](#12-completion)
+13. [Appendices](#13-appendices)
 
 ---
 
@@ -843,7 +843,14 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.5.0** — 2026-07-29: moved §11's Report Generation content, verbatim,
+This skill file version: **1.6.0** — 2026-07-29: added anchor links to the main Table of Contents
+(§0) so every top-level item is clickable, not just numbered text. Added a `Name`/`description`/
+`version` header to every `references/*.md` file that was missing one (`charter-spec.md`,
+`error-codes.md`, `file-naming.md`, `registry-format.md`, `report-generation.md`,
+`severity-matrix.md`, `audit-stages.md`), matching the header convention already used by
+`gap-taxonomy.md`/`root-origins.md`. Added the still-missing Contents TOC to `charter-spec.md`
+(110 lines) and `report-generation.md` (101 lines) — both over the 100-line threshold.
+Previous: **1.5.0** — 2026-07-29: moved §11's Report Generation content, verbatim,
 out of SKILL.md into `references/report-generation.md`; §11 is now a short pointer stub, same
 pattern as §7/§8. This closes a real gap: the section had been branched out with no pointer left
 behind, so the skill had no way to discover the report-generation guidance existed at all. Also
@@ -851,14 +858,5 @@ fixed the "Example Complete Finding Block" that had landed, out of order and un-
 of `assets/AUDIT_MANIFEST_template.md` after the Appendix template — moved it to sit right after
 the Finding Block Template (§10.2.3), before Synthesis, and added it to that file's Contents list.
 Verified `report-generation.md`'s content byte-identical against the pre-move §11.
-Previous: **1.4.0** — 2026-07-29: moved §4.2's PMO Data Charter spec (five functions: Artifact
-Declaration, Field Semantics Map, Materiality and Scope, Propose → Ratify, Anti-Mirror Guard),
-verbatim, out of SKILL.md into `references/charter-spec.md`; §4.2 is now a pointer, same pattern
-as §7/§8/§9.1/§10.2. Trims ~103 lines off SKILL.md's body, part of bringing it toward the
-<500-line guidance in Anthropic's skill-authoring best practices (SKILL.md was 1,071 lines
-pre-trim).
-as calibration reference — its three-dimension, PMI-cited rubric (Decision Impact × Spread ×
-Persistence) formalizes the same factors the calibration rules already named informally ("consider
-spread," "consider persistence"). No change to the 1–5 field itself.
 Schema version: **1.1.0**
 Manifest format version: **1.1.0** — unchanged; only its location moved (see above).

@@ -1,3 +1,12 @@
+---
+Name: Severity Matrix
+description: >
+  Appendix D — the three-dimension (Decision Impact × Spread × Persistence), PMI-cited severity
+  rubric that formalizes SKILL.md §9.1's calibration rules. Read as calibration reference when
+  assigning severity to an ambiguous finding.
+version: 1.0.0
+---
+
 ## Appendix D — Severity Scale (Tells How serious is it?)
 
 ## Contents

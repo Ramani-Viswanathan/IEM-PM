@@ -1,3 +1,19 @@
+---
+Name: Report Generation
+description: >
+  How your Audit Manifest becomes the 10-section rendered report — per-section content rules,
+  what you must never write, and the pre-handover output checklist. Read before finishing any
+  audit (SKILL.md §11).
+version: 1.0.0
+---
+
+## Contents
+
+- [The 10 Report Sections](#the-10-report-sections)
+- [Per-Section Content Rules for Your Manifest](#per-section-content-rules-for-your-manifest)
+- [What You Must Never Do](#what-you-must-never-do)
+- [Output Checklist for Your Manifest](#output-checklist-for-your-manifest)
+
 # 11. Report Generation
 
 You do **not** generate the final report. Software renders it from your Audit Manifest.
