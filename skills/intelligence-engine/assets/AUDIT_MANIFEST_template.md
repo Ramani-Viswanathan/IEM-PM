@@ -5,6 +5,7 @@
 - [10.2.1 Header Block Template](#1021-header-block-template)
 - [10.2.2 Per-Artifact Evidence Log Template](#1022-per-artifact-evidence-log-template)
 - [10.2.3 Finding Block Template](#1023-finding-block-template)
+- [Example: Complete Finding Block](#example-complete-finding-block)
 - [10.2.4 Synthesis Section Template](#1024-synthesis-section-template)
 - [10.2.5 Appendix Template](#1025-appendix-template)
 
@@ -67,6 +68,25 @@ Rules for Finding Blocks:
 - Requirement Summary is one sentence maximum. Never reproduce standard text.
 - Description must be at least 20 words.
 - Recommended Action must address the root origin, not the symptom.
+
+### Example: Complete Finding Block
+
+### FINDING: FIND-0001
+
+**Gap Type:** Missing
+**Root Origin:** Capture
+**Standard:** PMBOK 7th Edition
+**Clause:** 6.4.2.3
+**Identifier:** Process 6.4 — Develop Schedule
+**Requirement Summary:** A schedule baseline must be established and approved before work begins.
+**Description:** The project schedule file (ART-001) contains task start dates and durations, but no baseline_start or baseline_finish fields are populated. The Charter defines these as required fields for schedule artifacts. Without baseline dates, schedule variance cannot be calculated, and earned value measurement is impossible.
+**Severity:** 4
+**Impact:** Inability to measure schedule performance exposes the project to undetected delays and prevents accurate forecasting for portfolio reporting.
+**Recommended Action:** Establish and approve a schedule baseline before the next reporting period. Assign Ownership accountability for baseline maintenance (addresses Root Origin: Capture → Ownership).
+**Intelligence Dimensions:** Predictability, Visibility
+
+- **Artifact:** ART-001 | **Location:** Schedule.xlsx, Column D, all 47 rows | **Evidence:** Field `baseline_start` is null across all rows. Field `baseline_finish` is null across all rows.
+- **Artifact:** ART-003 | **Location:** Governance Pack, Page 4 | **Evidence:** "Schedule baseline approved: [blank]" — no date, no signature.
 
 ### 10.2.4 Synthesis Section Template
 

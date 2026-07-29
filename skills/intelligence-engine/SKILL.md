@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.4.0
+version: 1.5.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -716,25 +716,6 @@ Do not put these in the Manifest:
 - Executive summary at the top — the Header Block is metadata only. The synthesis comes after findings.
 - Software execution notes — do not write "Next, run manifest_to_findings.py" or similar.
 
-## 10.5 Example Complete Finding Block
-
-### FINDING: FIND-0001
-
-**Gap Type:** Missing
-**Root Origin:** Capture
-**Standard:** PMBOK 7th Edition
-**Clause:** 6.4.2.3
-**Identifier:** Process 6.4 — Develop Schedule
-**Requirement Summary:** A schedule baseline must be established and approved before work begins.
-**Description:** The project schedule file (ART-001) contains task start dates and durations, but no baseline_start or baseline_finish fields are populated. The Charter defines these as required fields for schedule artifacts. Without baseline dates, schedule variance cannot be calculated, and earned value measurement is impossible.
-**Severity:** 4
-**Impact:** Inability to measure schedule performance exposes the project to undetected delays and prevents accurate forecasting for portfolio reporting.
-**Recommended Action:** Establish and approve a schedule baseline before the next reporting period. Assign Ownership accountability for baseline maintenance (addresses Root Origin: Capture → Ownership).
-**Intelligence Dimensions:** Predictability, Visibility
-
-- **Artifact:** ART-001 | **Location:** Schedule.xlsx, Column D, all 47 rows | **Evidence:** Field `baseline_start` is null across all rows. Field `baseline_finish` is null across all rows.
-- **Artifact:** ART-003 | **Location:** Governance Pack, Page 4 | **Evidence:** "Schedule baseline approved: [blank]" — no date, no signature.
-
 ## 10.6 Output Location
 
 Write the Manifest to `reports/`, named per Appendix G (`references/file-naming.md`):
@@ -746,103 +727,13 @@ This is your only write target. Everything else is software's job.
 
 # 11. Report Generation
 
-You do **not** generate the final report. Software renders it from your Audit Manifest.
+You do **not** generate the final report. Software renders it from your Audit Manifest — but your
+Manifest is the source material, so a section missing from your Manifest is a section the report
+cannot produce.
 
-However, your Manifest is the **source material** for the report. If a section is missing from your Manifest, the report cannot produce it. Write your Manifest knowing it will become these 10 sections.
-
----
-
-## The 10 Report Sections
-
-Software produces the report in this order:
-
-| #   | Section                                                 | Source in Your Manifest                     | What You Must Provide                                                                                                              |
-| --- | ------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Executive Summary**                                   | Header Block + Gap Register                 | Audit ID, scope, total findings, severity distribution. Software computes the Reporting Integrity Score.                           |
-| 2   | **Audit Scope**                                         | Header Block + Per-Artifact Evidence Log    | Standards declared, artifacts examined, Charter version, status (ratified/provisional).                                            |
-| 3   | **Delivery Baseline**                                   | Header Block                                | List of governing standards with version/edition references.                                                                       |
-| 4   | **Delivery Evidence**                                   | Per-Artifact Evidence Log                   | For each artifact: ID, path, status, field coverage, and your narrative observations.                                              |
-| 5   | **Gap Register**                                        | Finding Blocks (all `### FINDING:`)         | Every finding with gap type, root origin, severity, evidence, and recommended action. This is the core of the report.              |
-| 6   | **Root Cause Analysis**                                 | Finding Blocks                              | Software aggregates your root origins into a frequency table. You do not write the table — you assign the origins in each finding. |
-| 7   | **Intelligence Indicators + Reporting Integrity Score** | Synthesis Section                           | Your narrative for all 7 dimensions. Software computes the score and places it alongside your text.                                |
-| 8   | **Recommended Actions**                                 | Finding Blocks — `Recommended Action` field | Software extracts all recommended actions and groups them by root origin for prioritization.                                       |
-| 9   | **Roadmap**                                             | Finding Blocks — severity + root origin     | Software generates a remediation roadmap from your severity scores and root origin distribution.                                   |
-| 10  | **Appendix**                                            | Appendix section of Manifest                | Schema version, artifact checksums, file references.                                                                               |
-
----
-
-## Per-Section Content Rules for Your Manifest
-
-### Section 1–3: Front Matter
-
-Keep the Header Block complete. Software pulls:
-
-- `Audit ID` for report branding
-- `Charter Version` and `Status` for scope credibility
-- `Standards Baseline` for the Delivery Baseline section
-
-### Section 4: Delivery Evidence
-
-In your Per-Artifact Evidence Log, write observations that are:
-
-- **Factual** — "47 of 50 required fields present"
-- **Specific** — "Sheet 'Project Plan' contains baseline dates; Sheet 'Actuals' is empty"
-- **Neutral** — describe what is there, not what should be there (that comes in findings)
-
-### Section 5: Gap Register
-
-This is the heart of the report. Every `### FINDING:` block becomes one entry. Ensure:
-
-- Evidence bullets are **quotable** — software will reproduce them verbatim
-- Descriptions are **self-contained** — a reader should understand the gap without reading the standard
-- Recommended actions are **actionable** — not "fix this" but "Assign a risk owner to all open risks by [date]"
-
-### Section 6: Root Cause Analysis
-
-You do not write this section. You assign root origins in each finding. Software counts and charts them. But write your root origin choices as if they will be aggregated — be consistent.
-
-### Section 7: Intelligence Indicators
-
-Write one paragraph per dimension in the Synthesis section. Each paragraph should:
-
-- Reference specific findings by ID (e.g., "FIND-0001 and FIND-0003 indicate...")
-- Explain the pattern, not just list gaps
-- Stay qualitative — no "score: 7/10" language
-
-### Section 8–9: Recommended Actions & Roadmap
-
-Software builds these from your findings. Make your `Recommended Action` field in each finding:
-
-- Specific enough to execute (who should do what by when)
-- Tied to the root origin (fix the cause, not the symptom)
-- Prioritizable by severity
-
-### Section 10: Appendix
-
-Keep it minimal. Software may add computed fields (gap density, checksums, timestamps).
-
----
-
-## What You Must Never Do
-
-- **Never write HTML, CSS, or markdown tables for findings** — software renders these. Your Finding blocks are the source.
-- **Never write an "Executive Summary" in your Manifest** — software generates this from your Header and Gap Register.
-- **Never write "Section 1: Executive Summary" headers in your Manifest** — your Manifest has its own structure (Header, Evidence Log, Findings, Synthesis, Appendix). Software maps this to the 10 report sections.
-- **Never attempt to format for print** — page breaks, fonts, and layout are renderer concerns.
-
----
-
-## Output Checklist for Your Manifest
-
-Before you finish writing, verify your Manifest contains:
-
-- [ ] Header Block with all fields
-- [ ] Per-Artifact Evidence Log for every artifact in scope
-- [ ] One `### FINDING:` block per gap (minimum one evidence bullet each)
-- [ ] Synthesis section with all 7 Intelligence Indicators
-- [ ] Appendix with schema version and artifact list
-
-If all are present, software can render the full report. If any are missing, the report will have gaps.
+Read `references/report-generation.md` for the full mapping: the 10 report sections, per-section
+content rules, what you must never write, and the pre-handover output checklist. Do NOT finish an
+audit without reading it first.
 
 ---
 
@@ -952,15 +843,20 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.4.0** — 2026-07-29: moved §4.2's PMO Data Charter spec (five functions:
-Artifact Declaration, Field Semantics Map, Materiality and Scope, Propose → Ratify, Anti-Mirror
-Guard), verbatim, out of SKILL.md into `references/charter-spec.md`; §4.2 is now a pointer, same
-pattern as §7/§8/§9.1/§10.2. `§4.1` (Standards) and `§4.3` (Audit Manifest — "your only output")
-deliberately stayed inline: both are short and read every invocation, unlike the Charter's longer
-explanatory prose. Verified byte-identical against the pre-move content. Trims ~103 lines off
-SKILL.md's body, part of bringing it toward the <500-line guidance in Anthropic's skill-authoring
-best practices (SKILL.md was 1,071 lines pre-trim).
-Previous: **1.3.0** — 2026-07-29: §9.1 now points to `references/severity-matrix.md` (Appendix D)
+This skill file version: **1.5.0** — 2026-07-29: moved §11's Report Generation content, verbatim,
+out of SKILL.md into `references/report-generation.md`; §11 is now a short pointer stub, same
+pattern as §7/§8. This closes a real gap: the section had been branched out with no pointer left
+behind, so the skill had no way to discover the report-generation guidance existed at all. Also
+fixed the "Example Complete Finding Block" that had landed, out of order and un-TOC'd, at the end
+of `assets/AUDIT_MANIFEST_template.md` after the Appendix template — moved it to sit right after
+the Finding Block Template (§10.2.3), before Synthesis, and added it to that file's Contents list.
+Verified `report-generation.md`'s content byte-identical against the pre-move §11.
+Previous: **1.4.0** — 2026-07-29: moved §4.2's PMO Data Charter spec (five functions: Artifact
+Declaration, Field Semantics Map, Materiality and Scope, Propose → Ratify, Anti-Mirror Guard),
+verbatim, out of SKILL.md into `references/charter-spec.md`; §4.2 is now a pointer, same pattern
+as §7/§8/§9.1/§10.2. Trims ~103 lines off SKILL.md's body, part of bringing it toward the
+<500-line guidance in Anthropic's skill-authoring best practices (SKILL.md was 1,071 lines
+pre-trim).
 as calibration reference — its three-dimension, PMI-cited rubric (Decision Impact × Spread ×
 Persistence) formalizes the same factors the calibration rules already named informally ("consider
 spread," "consider persistence"). No change to the 1–5 field itself.
