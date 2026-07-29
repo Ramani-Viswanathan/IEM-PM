@@ -5,7 +5,7 @@ description: >
   preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions
   for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the
   operational summary the LLM actually follows.
-version: 1.0.0
+version: 0.2.0-incomplete
 ---
 
 # Audit State Machine — Full Stage Specifications

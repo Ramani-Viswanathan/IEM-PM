@@ -129,6 +129,13 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   cutting along a heading boundary — deliberately scoped as its own, slower, separate pass. Ground
   rule: never cut or relocate content that's read every invocation just to hit the line count —
   quality/correctness outranks the metric. May land around 500–650 rather than exactly under 500.
+- **`references/audit-stages.md` incomplete** — open, 2026-07-29 (`version: 0.2.0-incomplete`).
+  44 `TODO(you)` markers across Stages 2–10 (Stage 0/1 fully written). See §7 Week 3–4 correction
+  for detail and how it was found. Does not block or affect real audits — Claude's operational path
+  never reads this file (SKILL.md marks it "Human developer" reference). Next step: fill the
+  `Inputs`/`Activities`/`Decision Logic`/`Outputs`/`Failure Conditions`/`Completion Criteria` stubs
+  for Stages 2–10, cross-referencing SKILL.md §5 and the already-complete `gap-taxonomy.md`/
+  `root-origins.md`/`error-codes.md`/`file-naming.md` for equivalent detail.
 - **`allowed-tools:` frontmatter field** — open, low priority. Not part of the general Agent Skills
   spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
   Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
@@ -181,8 +188,18 @@ here.)
 - Blueprint approved — 19 sections, 11-stage audit state machine — Done
 
 **Weeks 3–4 (Jul 6–26) — Build the Intelligence Engine — Completed.**
-- Intelligence Engine skill spec complete — Done (now v1.1.0)
-- Core reference docs complete: gap taxonomy, root origins, severity matrix, audit stages — Done
+- Intelligence Engine skill spec complete — Done (now v1.6.0)
+- ⚠️ "Core reference docs complete: gap taxonomy, root origins, severity matrix, audit stages" →
+  **false for audit-stages.md.** Gap taxonomy, root origins, and severity matrix are complete.
+  `references/audit-stages.md` is not: 44 `TODO(you)` markers across 9 of its 11 stages (only
+  Stage 0 Baseline and Stage 1 Charter are fully written — Stage 2 onward have `Purpose`/
+  `Preconditions`/`Transition` filled but `Inputs`/`Activities`/`Decision Logic`/`Outputs`/
+  `Failure Conditions`/`Completion Criteria` are all still stubs). Found 2026-07-29 when a
+  `Name`/`description`/`version: 1.0.0` header was added to the file without checking its actual
+  completeness first — the version number should not have claimed "done." Does not affect any real
+  audit already run: SKILL.md's own reference table marks this file "Human developer" / "you do not
+  need to open these" — the operational path Claude actually follows is SKILL.md §5 (Thinking
+  Phases), which is complete. This is documentation debt, not an engine defect.
 - Five Contracts built: Charter template, findings schema, validator, manifest parser, renderer — Done
 
 **Week 5 (Jul 27–Aug 2) — ⚠️ retitle "Design the Gaps→OPM3 Bridge" → "Prove the Pipeline on Real
