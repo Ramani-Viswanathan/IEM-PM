@@ -28,7 +28,7 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.6.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.7.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) now active. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
 | `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score. No maturity/OPM3 modeling — scrapped, see §2.2. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |
@@ -141,21 +141,23 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
   Build Order item 11 (`.claude-plugin/plugin.json`) is actually started — not blocking anything now.
 - **Minimum Evidence Sufficiency gate (`references/evidence-sufficiency.md`, SKILL.md §6.6 condition
-  6)** — open, 2026-07-29. Halt Conditions 1–5 are all binary presence/absence checks; none catch a
-  *readable, ratifiable* evidence set too thin to support a credible audit. Raised by Pilot-audit-4:
-  one CSV was about to reach Charter proposal against a 6-standard PMI baseline with no gate to
-  catch that 1 artifact against PMI's expected core PMO governance categories doesn't meet minimum
-  evidentiary sufficiency — modeled on a real audit concept (scope limitation → disclaimer of
-  opinion) rather than a misleadingly scored result. Drafted collaboratively: 7 core categories
-  (A–G: Authorization, Scope, Cost, Schedule, Risk, Change Control, Performance Monitoring), the
-  `.md`+`.html`-only Scope Limitation Notice output, its HTML template
-  (`assets/scope_limitation_template.html`, reuses `report_template.html`'s header/CSS, 6 sections:
+  6)** — spec **finalized 2026-07-29**, `version: 1.0.0`, zero `TODO(you)` markers, Halt Condition 6
+  now **active** in SKILL.md (was "DRAFT, not yet active" until this). Halt Conditions 1–5 were all
+  binary presence/absence checks; none caught a *readable, ratifiable* evidence set too thin to
+  support a credible audit — raised by Pilot-audit-4, where one CSV was about to reach Charter
+  proposal against a 6-standard PMI baseline with nothing to catch that. Modeled on a real audit
+  concept (scope limitation → disclaimer of opinion) rather than a misleadingly scored result.
+  Final spec: 7 core categories (A–G); Rule 1 — Categories A and E mandatory, plus at least 2 of
+  B/C/D; Rule 2 — at least 4 of 7 categories represented; Rule 3 — at least 3 distinct artifacts;
+  output is a `.md`+`.html`-only Scope Limitation Notice rendered from
+  `assets/scope_limitation_template.html` (reuses `report_template.html`'s header/CSS, 6 sections:
   Executive Summary, Coverage Analysis, Mandatory Failures, Professional Opinion, Recommendation,
-  Next Step — smoke-tested), and Rule 1 (Categories A and E mandatory; at least 2 of B/C/D mandatory)
-  are all settled. One value remains `TODO(you)`: Rule 2's minimum category-coverage threshold. Not
-  built — no schema/script changes, `references/file-naming.md` (Appendix G) doesn't yet document
-  the `IEMPM_ScopeLimitation_Notice_...` pattern, and Halt Condition 6 is explicitly not enforced
-  until the reference file's `version` moves past `0.1.0-draft`.
+  Next Step — smoke-tested). Note: Rule 1 alone already guarantees 4 categories (A + E + 2 of
+  B/C/D), so Rule 2's "at least 4" threshold can never independently trigger a halt Rule 1 wouldn't
+  have already caught — not a contradiction, just currently non-binding; flagged here in case that's
+  not what was intended. **Still not built:** no schema/script changes yet, and
+  `references/file-naming.md` (Appendix G) doesn't yet document the
+  `IEMPM_ScopeLimitation_Notice_...` naming pattern.
 - **UI/UX for non-technical PMs** — parked 2026-07-27, brainstormed only, no decision made. Core
   open question: is the PM the direct operator (needs a real guided UI — stage tracker, structured
   Charter-review screen, plain-English activity feed) or does a technical operator run Claude Code

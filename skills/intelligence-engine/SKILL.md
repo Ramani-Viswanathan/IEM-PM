@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.6.0
+version: 1.7.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -553,10 +553,9 @@ Stop immediately and report to the user if:
 3. **No delivery artifacts supplied** — nothing to audit.
 4. **Every artifact is unreadable** — corrupt, encrypted, or unsupported format.
 5. **You are asked to modify delivery data** — you are read-only.
-6. **Minimum Evidence Sufficiency** — DRAFT, not yet active. An evidence set can be readable and
-   ratifiable and still too thin to support a credible audit. Read `references/evidence-sufficiency.md`
-   for the category model, the coverage rules, and the Scope Limitation Notice output. Do NOT
-   enforce this halt condition until that file's `version` moves past `0.1.0-draft`.
+6. **Minimum Evidence Sufficiency** — an evidence set can be readable and ratifiable and still too
+   thin to support a credible audit. Read `references/evidence-sufficiency.md` for the category
+   model, the coverage rules, and the Scope Limitation Notice output before proposing a Charter.
 
 Do not proceed past the halt. Do not guess. Do not "do your best."
 
@@ -847,7 +846,7 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.6.0**
+This skill file version: **1.7.0**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 

@@ -4,7 +4,7 @@ description: >
   Halt Condition 6 (SKILL.md §6.6) — how the engine decides an evidence set is too thin to support
   a credible audit, even when every artifact supplied is present and readable. Read during Phase 0,
   before proposing or ratifying a Charter, and before halting on Condition 6.
-version: 0.1.0-draft
+version: 1.0.0
 ---
 
 ## Contents
@@ -43,8 +43,7 @@ At least two of Categories B, C, and D (Scope, Cost, Schedule) must also be repr
 these mandatory requirements is unmet → HALT immediately. No exceptions.
 
 **Rule 2 — Minimum Breadth**
-TODO(you): minimum number of the 7 categories in (a) that must be represented across the evidence
-set. Below that number → HALT.
+At least 4 of the 7 categories in (a) must be represented across the evidence set. Below 4 → HALT.
 
 **Rule 3 — Minimum Artifact Count**
 At least 3 distinct artifacts must be provided. If fewer than 3 → HALT, even if they nominally cover
