@@ -7,15 +7,17 @@ Deterministic: same JSON in → byte-identical out.
 
 import json
 import argparse
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional
 from jinja2 import Template
 
-# ─── Output naming (Appendix G, references/file-naming.md) ───
-REPO_ROOT = Path(__file__).resolve().parents[3]
-REPORTS_DIR = REPO_ROOT / "reports"
-DEFAULT_TEMPLATE = REPO_ROOT / "skills" / "intelligence-engine" / "assets" / "report_template.html"
+try:
+    from paths import REPORTS_DIR, DEFAULT_TEMPLATE
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from paths import REPORTS_DIR, DEFAULT_TEMPLATE
 
 
 def _to_utc(dt: datetime) -> datetime:

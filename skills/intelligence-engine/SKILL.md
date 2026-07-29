@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.1.0
+version: 1.2.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -411,7 +411,7 @@ Software writes to `reports/` only. Every file for one audit shares a single nam
 Appendix G (`references/file-naming.md`) for the exact pattern.
 
 | File     | Producer | Description                             |
-| -------- | -------- | ---------------------------------------- |
+| -------- | -------- | --------------------------------------- |
 | `*.json` | Software | Canonical JSON — single source of truth |
 | `*.html` | Software | Human-readable executive report         |
 | `*.txt`  | Software | Plain-text version                      |
@@ -753,13 +753,13 @@ Your Synthesis section ends at the seven Intelligence Indicators (§9.3). Do not
 ## 9.5 What You Write vs. What Software Writes
 
 | Element                             | You Write | Software Computes |
-| ----------------------------------- | --------- | ------------------ |
-| Severity per finding                | ✓         |                    |
-| Reporting Integrity Score           |           | ✓                  |
-| Intelligence Indicators narrative   | ✓         |                    |
-| Intelligence Indicators score/grade |           | ✗ (never scored)   |
-| Gap density                         |           | ✓                  |
-| Severity distribution               |           | ✓                  |
+| ----------------------------------- | --------- | ----------------- |
+| Severity per finding                | ✓         |                   |
+| Reporting Integrity Score           |           | ✓                 |
+| Intelligence Indicators narrative   | ✓         |                   |
+| Intelligence Indicators score/grade |           | ✗ (never scored)  |
+| Gap density                         |           | ✓                 |
+| Severity distribution               |           | ✓                 |
 
 ---
 
@@ -784,107 +784,11 @@ The Manifest must contain these sections in this order:
 
 ## 10.2 Format Rules (parser-grade)
 
-Follow these rules exactly. Software parses this file with regex and markdown parsers.
+Read `assets/AUDIT_MANIFEST_template.md` for the exact format — Header Block, Per-Artifact
+Evidence Log, Finding Block, Synthesis, and Appendix templates, byte-for-byte what
+`manifest_to_findings.py` parses. Do NOT write the Manifest without reading it first.
 
-### 10.2.1 Header Block Template
-
-```markdown
-# IEM-PM Audit Manifest
-
-**Audit ID:** IEM-YYYYMMDD-XXXXXX
-**Charter Version:** vX.X.X
-**Standards Baseline:** [Standard1, Standard2, ...]
-**Scope:** [Projects, Programs, Portfolios, PMO]
-**Analyst:** IEM-PM Intelligence Engine
-**Date:** [ISO-8601]
-**Status:** [RATIFIED / PROVISIONAL]
-
-### 10.2.2 Per-Artifact Evidence Log Template
-
-For every artifact declared in the Charter, write:
-
-## ARTIFACT: [ART-XXX]
-
-**Artifact Name:** [Human-readable name]
-**Path:** [file path]
-**Checksum:** [SHA-256 or "computed"]
-**Status:** [Examined / Partial / Corrupted / Empty]
-**Field Coverage:** [X%]
-**Observations:** [Narrative of what you found, field completeness, anomalies]
-
-### 10.2.3 Finding Block Template
-
-One block per gap. This is the parser's critical section.
-
-### FINDING: FIND-NNNN
-
-**Gap Type:** [Missing | Ignored | Disconnected | Untrusted | Underutilized | Misclassified | Divergent]
-**Root Origin:** [Capture | Integration | Definition / Taxonomy | Ownership | Process / Cadence | Tooling | Behavior]
-**Standard:** [Standard name]
-**Clause:** [Clause reference]
-**Identifier:** [Process/Practice ID]
-**Requirement Summary:** [One-sentence paraphrase — never full text]
-**Description:** [What you found and why it violates the standard — minimum 20 words]
-**Severity:** [1 | 2 | 3 | 4 | 5]
-**Impact:** [Narrative impact on delivery capability]
-**Recommended Action:** [Specific, actionable remediation addressing the root origin]
-**Intelligence Dimensions:** [Visibility, Integrity, ... comma-separated]
-
-- **Artifact:** [ART-XXX] | **Location:** [Sheet/Page/Line/Cell] | **Evidence:** [Direct quote or explicit absence statement]
-- **Artifact:** [ART-XXX] | **Location:** [Sheet/Page/Line/Cell] | **Evidence:** [Direct quote or explicit absence statement]
-```
-
-Rules for Finding Blocks:
-
-- Every finding must have at least one evidence bullet.
-- Every evidence bullet must reference an artifact declared in the Charter.
-- Gap Type and Root Origin must match the closed taxonomies exactly (case-sensitive).
-- Severity must be an integer 1–5.
-- Requirement Summary is one sentence maximum. Never reproduce standard text.
-- Description must be at least 20 words.
-- Recommended Action must address the root origin, not the symptom.
-
-### 10.2.4 Synthesis Section Template
-
-## SYNTHESIS
-
-### Visibility
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### Integrity
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### Connectivity
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### Governance
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### Predictability
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### Decision Quality
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### Continuous Improvement
-
-[Narrative diagnostic only. No scores, percentages, or grades.]
-
-### 10.2.5 Appendix Template
-
-## APPENDIX
-
-**Schema Version:** 1.0.0
-**Canonical JSON:** [To be generated by software from this manifest]
-**Total Findings:** [N]
-**Artifacts Examined:** [List of ART-XXX IDs]
-**Standards Referenced:** [List of standard names]
+---
 
 ## 10.3 Validation Rules
 
@@ -1063,9 +967,9 @@ If any check fails, fix the Manifest before finishing. Do not hand over a broken
 
 You produce exactly one file, named per Appendix G:
 
-| File                                              | You Write | Software Reads |
-| ---------------------------------------------------- | --------- | -------------- |
-| `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`     | ✓         | ✓              |
+| File                                           | You Write | Software Reads |
+| ---------------------------------------------- | --------- | -------------- |
+| `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` | ✓         | ✓              |
 
 That is all. Software produces the matching `.json`, `.html`, and `.txt` files using the same
 name stem:
@@ -1147,6 +1051,12 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.1.0** — 2026-07-27: removed OPM3/organizational-maturity modeling (scope boundary, not deferred). See BLUEPRINT-1.md §10 and STATUS.md locked decision #2.
+This skill file version: **1.2.0** — 2026-07-27: moved §10.2's parser-grade Manifest format,
+verbatim, out of SKILL.md into `assets/AUDIT_MANIFEST_template.md`; §10.2 is now a pointer,
+matching the existing references/-pointer pattern already used in §7/§8 (gap-taxonomy.md,
+root-origins.md) and Phase 0b (registry-format.md). `references/manifest-template.md` (an empty
+stub pointing at the same file) deleted as redundant. No format change — verified byte-identical
+against the pre-move content.
+Previous: **1.1.0** — 2026-07-27: removed OPM3/organizational-maturity modeling (scope boundary, not deferred). See BLUEPRINT-1.md §10 and STATUS.md locked decision #2.
 Schema version: **1.1.0**
-Manifest format version: **1.1.0**
+Manifest format version: **1.1.0** — unchanged; only its location moved (see above).

@@ -4,8 +4,11 @@
 > (Previous 2026-07-05 version had SKILL.md, the schema, validator, manifest parser, and renderer
 > listed as "next" — all five are now written and were verified end-to-end on 2026-07-26, then
 > committed and pushed as `df71e85`. Since then: a real pilot audit ran against real PMI standards
-> (`ce569ab`), a regression suite and user guide were added (`1c68116`), and OPM3/organizational-
-> maturity modeling was scrapped outright (2026-07-27, uncommitted as of this update).)
+> (`ce569ab`), a regression suite and user guide were added (`1c68116`), OPM3/organizational-
+> maturity modeling was scrapped outright (`0af0b43`), a real Stage 0 stale-cache bug was fixed and
+> the registry-derivation mechanism specified (`aeef25f`), and LICENSE/README/requirements.txt,
+> output naming (Appendix G), error codes (Appendix H), and two more real production-run pilot
+> audits landed (`336eb58`). All pushed to `origin/master`.)
 
 ---
 
@@ -26,6 +29,11 @@
 | `skills/intelligence-engine/registries/`            | Derived-at-runtime registry output (gitignored except README). Mechanism complete and specified in SKILL.md Phase 0b; `skeleton_map.json` fixed (25/29 real skeletons, up from 2/29 — see §2 locked decisions / §4 build order item 7). One real registry derived as proof (`ps_scheduling_3rd.json`, 3 items); the other 28 standards are not yet derived — deliberately deferred, not blocked. |
 | `_archive/`                                          | Superseded: old `pmo-data-gap-audit` skill, old `IEM-PM_BLUEPRINT.md`, `remit/` — history only            |
 | `stakeholder/`                                       | PMI volunteer copyrighted material — **never touch, never publish, never build on**                       |
+| `LICENSE`, `README.md`, `requirements.txt`           | ✅ Built — MIT license, visitor-facing README, pinned deps (jsonschema, jinja2, pypdf, cryptography, openpyxl). Packaging *prerequisites* — not the skill package itself (see §4 item 11). |
+| `references/file-naming.md` (Appendix G)             | ✅ Built — `IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`, timestamp sourced from the audit's own Date, not wall-clock run time. Wired into `manifest_to_findings.py` and `render.py` as the default. |
+| `references/error-codes.md` (Appendix H)             | ✅ Built — `E-BASE-*`/`E-PARSE-*`/`E-VALID-*`/`E-RENDER-*` prefix every validation failure across `baseline.py`/`schema.py`/`manifest_to_findings.py`/`render.py`. |
+| `examples/Pilot-audit-2/`, `examples/Pilot-audit-3/` | ✅ Two real, ratified production audits — real ClientOrg Consulting evidence (not synthetic), same project measured against two different baselines (org process flow, then PMI standards). Committed (evidence files included — repo is **private**). See §8. |
+| `skills/intelligence-engine/scripts/paths.py`        | ✅ Built 2026-07-27 — single source of truth for `SCRIPTS_DIR`/`ENGINE_DIR`/`REPO_ROOT`/`KNOWLEDGE_DIR`/`REGISTRIES_DIR`/`ASSETS_DIR`/`REPORTS_DIR`/`DEFAULT_TEMPLATE`. Fixes a real inconsistency: `manifest_to_findings.py`/`render.py` had duplicated a fragile `Path(__file__).resolve().parents[3]` in two places, different from `baseline.py`/`derive_knowledge_index.py`/`test_pipeline.py`'s `.parent.parent` style. All 5 scripts now import from here; verified working from both `scripts/` and the repo root, 5/5 regression tests still pass. |
 
 ## 2. Locked decisions (do not re-litigate)
 
@@ -66,7 +74,8 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
 8. ✅ Renderer — `scripts/render.py` written and verified.
 9. ✅ Report template — `assets/report_template.html` written (377 lines).
 10. ✅ Regression tests — `scripts/test_pipeline.py` rebuilt against real fixtures (5 tests: Manifest→JSON, Schema Validation, JSON→Reports, Knowledge Index, Duplicate Detection), 5/5 passing, committed. Not pytest-based (stdlib only, by design), but no longer manual/informal.
-11. ❌ Package as Claude Code skill — not started (no `.claude-plugin/plugin.json` or `marketplace.json`).
+11. ⚠️ Package as Claude Code skill — prerequisites done (LICENSE, README, requirements.txt); the
+    actual package (`.claude-plugin/plugin.json`, `marketplace.json`) not started.
 
 ## 5. Open design items
 
@@ -76,11 +85,22 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   (25/29 skeletons were silently stuck empty). Proven on one standard. Bulk derivation across the
   remaining 28 standards is the next open item, not this one.
 - **Severity bands (Appendix D)** — done: `references/severity-matrix.md` (153 lines) + SKILL.md §9.1.
-- **Error codes (Appendix H)** — still `TODO(you)` (`references/error-codes.md`, 3 lines).
-- **File naming (Appendix G)** — still `TODO(you)` (`references/file-naming.md`, 3 lines).
+- ~~Error codes (Appendix H)~~ — **done 2026-07-27**. `references/error-codes.md` documents
+  `E-BASE-*`/`E-PARSE-*`/`E-VALID-*`/`E-RENDER-*`; embedded as message prefixes in the actual
+  scripts, not just documented on paper.
+- ~~File naming (Appendix G)~~ — **done 2026-07-27**. `references/file-naming.md` specifies
+  `IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`; `manifest_to_findings.py`/`render.py` default to it,
+  smoke-tested for real.
 - **Charter spec reference (`references/charter-spec.md`)** — empty file; content currently lives only in SKILL.md §4.2.
 - **`assets/AUDIT_MANIFEST_template.md`** — empty; the format is specified in SKILL.md §10 but has no standalone template file yet.
 - **Deterministic back half (Stages 8–9)** — ✅ built and verified (was previously listed as "not built").
+- **UI/UX for non-technical PMs** — parked 2026-07-27, brainstormed only, no decision made. Core
+  open question: is the PM the direct operator (needs a real guided UI — stage tracker, structured
+  Charter-review screen, plain-English activity feed) or does a technical operator run Claude Code
+  on their behalf (current model, UI need is much lighter)? That framing choice has to be resolved
+  before any UI technology is picked. See conversation log 2026-07-27 for the fuller options
+  analysis (Artifact-based prototype → Agent SDK + local web app → packaged desktop app). Explicitly
+  not started — "long test [runway] to go before packaging."
 
 ## 6. Working protocol
 
@@ -160,6 +180,31 @@ domains."
 4. Week 7 — mark "End-to-end pilot audit against a real baseline" as Done.
 5. Longer Arc, 12–24 months — drop "maturity model" from the description.
 
+## 8. Real production audits (2026-07-27)
+
+Two further audits ran after the first (synthetic-evidence) pilot, this time against **real
+organizational data** — ClientOrg Consulting's "Client Rooftop Project - Rhombus 25%" project
+(real Excel exports: Cost Tracker, Gate Review, Risk-Issue Log, Task Board). Both went through
+full Charter propose→ratify, not a shortcut:
+
+| Audit | Baseline measured against | Findings | Reporting Integrity Score | Charter |
+| ------- | ---------------------------- | ---------- | ---------------------------- | --------- |
+| `examples/Pilot-audit-2/` | ClientOrg's own Sales-PMO-Operations process flow | 6 | 41.0/100 | Ratified |
+| `examples/Pilot-audit-3/` | 4 PMI standards (Scheduling, Risk Mgmt, EVM, Governance PG) | 6 | 34.0/100 | Ratified |
+
+Same underlying evidence, deliberately re-audited against a stricter external baseline instead of
+the org's own process — RIS dropped as expected. One real standard document
+(`ClientOrg_PMO_Process_AND_GUIDELINES.pdf`) turned out to be scanned screenshots with no text layer;
+formally waived out of both Charters rather than guessed at — a real "can't read this" case the
+engine had not hit before.
+
+**Real bug found during these runs:** reading `.xlsx` evidence required `openpyxl`, installed ad
+hoc mid-session and initially **not** added to `requirements.txt` — caught only when asked directly
+"did you make any code changes." Now fixed. Take-away logged in Open Design Items / future work:
+requirements.txt updates must land in the same step as any new `import`, and a clean-room
+`pip install -r requirements.txt` + `test_pipeline.py` run (or CI) is the actual backstop, not
+memory.
+
 # Status update : Table
 
 | Status | Item                                                                                                                                 | Source                |
@@ -183,11 +228,17 @@ domains."
 | done   | Published a role-based user guide for PMs, program managers, and PMO leads (Public/IEM-PM-User-Guide.html).                            | STATUS.md             |
 | done   | Ran a real end-to-end pilot audit against the real PMI baseline (examples/pilot-audit/) — 4 findings, Reporting Integrity Score 50.67/100. | STATUS.md             |
 | done   | Fixed a real Stage 0 bug (baseline.py stale-skeleton cache) that had silently frozen 27 of 29 real standards at zero TOC entries; specified the registry-derivation procedure in SKILL.md Phase 0b and the file format in registry-format.md; derived one real registry as proof. | STATUS.md             |
+| done   | Created LICENSE (MIT), root README.md, and requirements.txt (packaging prerequisites).                                                | STATUS.md             |
+| done   | Defined and embedded output file naming (Appendix G) and error codes (Appendix H) into the actual scripts, not just docs.             | STATUS.md             |
+| done   | Ran two further real production audits against real (non-synthetic) organizational data, both fully Charter-ratified — one org-baseline, one PMI-baseline. See §8. | STATUS.md             |
+| done   | Found and fixed a real dependency gap (openpyxl missing from requirements.txt) surfaced by the real-data audits.                       | STATUS.md             |
+| done   | Consolidated path resolution across all 5 scripts into a single source of truth (scripts/paths.py) — fixed a real duplicated/inconsistent `parents[3]` pattern in manifest_to_findings.py and render.py. | STATUS.md             |
 | next   | Build the Audit Manifest standalone template file (assets/AUDIT_MANIFEST_template.md — currently empty).                             | STATUS.md             |
-| next   | Populate references/charter-spec.md, error-codes.md, file-naming.md (currently empty/TODO stubs).                                    | STATUS.md             |
+| next   | Populate references/charter-spec.md (currently empty/TODO stub).                                                                      | STATUS.md             |
 | next   | Run bulk Stage 0 criteria-derivation across the remaining 28 real standards (mechanism proven on 1 of 29).                             | STATUS.md             |
-| next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json).                                                          | STATUS.md             |
-| open   | Define error codes and finalize file naming conventions (Appendices G–H).                                                             | STATUS.md             |
+| next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done.   | STATUS.md             |
+| next   | Add CI (GitHub Actions) running test_pipeline.py + a clean-room requirements.txt install on every push.                                | STATUS.md             |
+| open   | UI/UX for non-technical PMs — parked, brainstormed only, no decision. See §5 Open design items.                                        | STATUS.md             |
 
 # 6-Week Plan
 
@@ -198,7 +249,7 @@ domains."
 | Week 3 | Validator        | Build schema.py to validate findings JSON against the schema and closed taxonomies.                                  | done   |
 | Week 4 | Audit Manifest   | Create the Audit Manifest template that converts LLM analysis into a parser-friendly structure.                      | done   |
 | Week 5 | SKILL.md         | Write the skill sections and lock the core logic, inputs, and stage flow.                                            | done   |
-| Week 6 | Reports + Tests  | Build the renderer, report template, and regression tests; package the skill.                                        | in progress — renderer, report template, and regression tests done; packaging as a Claude Code skill remains |
+| Week 6 | Reports + Tests  | Build the renderer, report template, and regression tests; package the skill.                                        | in progress — renderer, report template, regression tests, and packaging prerequisites (LICENSE/README/requirements.txt) done; the actual .claude-plugin package remains |
 
 # mapping of the five Claude Certified Architect Foundations domains to your IEM-PM modules.
 

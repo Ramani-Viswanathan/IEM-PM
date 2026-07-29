@@ -23,9 +23,12 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage
 
-# ─── Output naming (Appendix G, references/file-naming.md) ───
-REPO_ROOT = Path(__file__).resolve().parents[3]
-REPORTS_DIR = REPO_ROOT / "reports"
+try:
+    from paths import REPORTS_DIR
+except ImportError:
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from paths import REPORTS_DIR
 
 
 def _to_utc(dt: datetime) -> datetime:

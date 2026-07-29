@@ -5,11 +5,16 @@ Scans knowledge/ directories and builds a machine-readable index.
 Run this whenever standards are added, removed, or reorganized.
 """
 import json
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 
-ENGINE_DIR = Path(__file__).parent.parent  # Up from scripts/ to intelligence-engine/
-KNOWLEDGE_DIR = ENGINE_DIR / "knowledge"
+try:
+    from paths import ENGINE_DIR, KNOWLEDGE_DIR
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from paths import ENGINE_DIR, KNOWLEDGE_DIR
+
 INDEX_PATH = ENGINE_DIR / "knowledge_index.json"
 
 

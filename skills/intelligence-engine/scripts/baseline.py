@@ -14,9 +14,12 @@ import json
 import sys
 from pathlib import Path
 
-ENGINE_DIR = Path(__file__).parent.parent
-KNOWLEDGE_DIR = ENGINE_DIR / "knowledge"
-REGISTRIES_DIR = ENGINE_DIR / "registries"
+try:
+    from paths import KNOWLEDGE_DIR, REGISTRIES_DIR
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from paths import KNOWLEDGE_DIR, REGISTRIES_DIR
+
 MANIFEST_PATH = REGISTRIES_DIR / "derivation_manifest.json"
 SKELETON_PATH = REGISTRIES_DIR / "skeleton_map.json"
 

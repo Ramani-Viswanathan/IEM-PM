@@ -18,9 +18,11 @@ from pathlib import Path
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-ENGINE_DIR = Path(__file__).parent.parent  # skills/intelligence-engine/
-SCRIPTS_DIR = ENGINE_DIR / "scripts"
-ASSETS_DIR = ENGINE_DIR / "assets"
+try:
+    from paths import ENGINE_DIR, SCRIPTS_DIR, ASSETS_DIR
+except ImportError:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from paths import ENGINE_DIR, SCRIPTS_DIR, ASSETS_DIR
 
 # The project's real regression fixture -- "actual data", not an inline stub.
 REAL_MANIFEST_PATH = SCRIPTS_DIR / "test_manifest.md"
