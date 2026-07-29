@@ -147,10 +147,12 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   catch that 1 artifact against PMI's expected core PMO governance categories doesn't meet minimum
   evidentiary sufficiency — modeled on a real audit concept (scope limitation → disclaimer of
   opinion) rather than a misleadingly scored result. Drafted collaboratively: 7 core categories
-  (A–G: Authorization, Scope, Cost, Schedule, Risk, Change Control, Performance Monitoring) and the
-  `.md`+`.html`-only Scope Limitation Notice output are settled. Two values remain
-  `TODO(you)` directly in the reference file: Rule 1's exact mandatory coverage of Categories B/C/D
-  (all three? at least one? at least two?), and Rule 2's minimum category-coverage threshold. Not
+  (A–G: Authorization, Scope, Cost, Schedule, Risk, Change Control, Performance Monitoring), the
+  `.md`+`.html`-only Scope Limitation Notice output, its HTML template
+  (`assets/scope_limitation_template.html`, reuses `report_template.html`'s header/CSS, 6 sections:
+  Executive Summary, Coverage Analysis, Mandatory Failures, Professional Opinion, Recommendation,
+  Next Step — smoke-tested), and Rule 1 (Categories A and E mandatory; at least 2 of B/C/D mandatory)
+  are all settled. One value remains `TODO(you)`: Rule 2's minimum category-coverage threshold. Not
   built — no schema/script changes, `references/file-naming.md` (Appendix G) doesn't yet document
   the `IEMPM_ScopeLimitation_Notice_...` pattern, and Halt Condition 6 is explicitly not enforced
   until the reference file's `version` moves past `0.1.0-draft`.
