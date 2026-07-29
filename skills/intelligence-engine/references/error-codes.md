@@ -1,9 +1,9 @@
 ---
 Name: Error Codes
 description: >
-  Appendix H — the E-BASE-*/E-PARSE-*/W-PARSE-*/E-VALID-*/E-RENDER-* error code taxonomy embedded
-  across baseline.py, manifest_to_findings.py, schema.py, and render.py. Read when a script fails
-  and you need to know what a code means.
+  Appendix H — the E-BASE-*/E-PARSE-*/W-PARSE-*/E-VALID-*/E-RENDER-*/E-NOTICE-* error code taxonomy
+  embedded across baseline.py, manifest_to_findings.py, schema.py, render.py, and
+  render_scope_limitation.py. Read when a script fails and you need to know what a code means.
 version: 1.0.0
 ---
 
@@ -46,7 +46,17 @@ the code never replaces it.
 | -------------- | ---------------------------------------- | ---------------------------------------------- |
 | `E-RENDER-001` | `--canonical` path doesn't exist.    | Run `manifest_to_findings.py` first.    |
 
+### Scope Limitation Notice parsing/rendering — `render_scope_limitation.py`
+
+| Code           | Meaning                                                                | What to do                                                                     |
+| -------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `E-NOTICE-001` | `--notice` path doesn't exist.                                        | Check the path passed on the command line.                                    |
+| `E-NOTICE-002` | Frontmatter missing, or missing a required field (`notice_id`, `generated_at`, `artifact_count`). | Fix the notice's YAML frontmatter block — see references/evidence-sufficiency.md (c). |
+| `E-NOTICE-003` | Coverage Analysis table doesn't parse to exactly 7 categories (A–G).  | Fix the Section 2 markdown table — one row per category, in order.            |
+| `E-NOTICE-004` | Executive Summary, Professional Opinion, or Next Step section is empty. | Fill in the missing section (Sections 1, 4, 6 are mandatory content).         |
+
 ### Category prefixes
 
 `E-BASE-*` = Stage 0 (`baseline.py`) · `E-PARSE-*` = Manifest parsing (`manifest_to_findings.py`) ·
-`E-VALID-*` = schema/dedup/coverage (`schema.py`) · `E-RENDER-*` = rendering (`render.py`).
+`E-VALID-*` = schema/dedup/coverage (`schema.py`) · `E-RENDER-*` = rendering (`render.py`) ·
+`E-NOTICE-*` = Scope Limitation Notice parsing/rendering (`render_scope_limitation.py`).

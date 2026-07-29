@@ -1,9 +1,10 @@
 ---
 Name: Output File Naming
 description: >
-  Appendix G — the IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext> naming convention shared by every
-  artifact generated for a given audit, and why the timestamp comes from the audit's own Date,
-  not wall-clock run time. Read before Stage 9 (Render) or when writing the Manifest's Date field.
+  Appendix G — the IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext> and IEMPM_ScopeLimitation_Notice_
+  DDMMYY_HHMM.<ext> naming conventions shared by every artifact generated for a given audit or
+  halt, and why the timestamp comes from the audit's own Date, not wall-clock run time. Read
+  before Stage 9 (Render), when writing the Manifest's Date field, or on Halt Condition 6.
 version: 1.0.0
 ---
 
@@ -52,3 +53,31 @@ for tests and one-off comparisons — but production runs should let the default
 Two audits dated to the same UTC minute would collide on this name. Given real PMO audits run at
 most a few times a day, this is accepted rather than engineered around. The `audit_id` inside
 every file (e.g. `IEM-20260727-MRD001`) is the true unique identifier if you ever need one.
+
+## Halt Condition 6 — Scope Limitation Notice naming
+
+A halted audit (Minimum Evidence Sufficiency Gate — see references/evidence-sufficiency.md) shares
+the same stem convention, on its own prefix:
+
+```
+IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.<ext>
+```
+
+`DDMMYY_HHMM` is derived the same way — from the notice's own `generated_at` frontmatter field, not
+wall-clock run time.
+
+| Artifact           | Extension | Written by                             |
+| ------------------- | --------- | ---------------------------------------- |
+| Scope Limitation Notice | `.md`     | You (the LLM) — see evidence-sufficiency.md (c) |
+| HTML notice          | `.html`   | `render_scope_limitation.py`           |
+
+No `.json`/`.txt` variant exists for this family — a halted audit produces no findings data to
+canonicalize (evidence-sufficiency.md (c)). `render_scope_limitation.py` defaults `--output-html`
+to the `--notice` path with its extension swapped, so both files always share one stem.
+
+**Example**, for a notice dated `2026-07-29T00:00:00Z`:
+
+```
+reports/IEMPM_ScopeLimitation_Notice_290726_0000.md
+reports/IEMPM_ScopeLimitation_Notice_290726_0000.html
+```

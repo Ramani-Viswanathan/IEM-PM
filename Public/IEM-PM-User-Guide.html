@@ -585,24 +585,36 @@
               <span class="who">You gather</span>
               <h3>Assemble delivery evidence</h3>
               <p>Put the schedules, logs, and reports somewhere Claude Code can read them. Real files, not summaries — the audit cites exact locations, so it needs the originals. Export first if your data lives in Jira, ADO, or Primavera — the engine doesn't log into tools.</p>
-              <div class="tiers">
-                <div class="tier min">
-                  <span class="tier-label">Minimum viable</span>
-                  <ul>
-                    <li>1 project schedule</li>
-                    <li>1 RAID log</li>
-                    <li>1 status or governance pack</li>
-                    <li>1 budget report</li>
-                  </ul>
-                </div>
-                <div class="tier">
-                  <span class="tier-label">Ideal set</span>
-                  <ul>
-                    <li>Project charter, risk register, issue log</li>
-                    <li>Change log, decision log, lessons learned</li>
-                    <li>Steering pack, dashboard export</li>
-                  </ul>
-                </div>
+
+              <p style="margin-top:1rem;"><strong>Before it starts scoring anything, IEM-PM checks whether your evidence set is even enough to support a credible audit.</strong> This runs automatically, before Step 4 — you can't skip it and you can't argue with it. It maps your artifacts to 7 categories, then applies 3 rules.</p>
+
+              <div class="table-wrap">
+                <table class="report-map">
+                  <tr>
+                    <th>Category</th>
+                    <th>Domain</th>
+                    <th>Mandatory?</th>
+                  </tr>
+                  <tr><td class="section-name">A — Authorization</td><td>Charter</td><td><span class="pill">Required</span></td></tr>
+                  <tr><td class="section-name">B — Scope</td><td>Scope</td><td>2 of B/C/D</td></tr>
+                  <tr><td class="section-name">C — Cost</td><td>Cost</td><td>2 of B/C/D</td></tr>
+                  <tr><td class="section-name">D — Schedule</td><td>Schedule</td><td>2 of B/C/D</td></tr>
+                  <tr><td class="section-name">E — Risk</td><td>Risk</td><td><span class="pill">Required</span></td></tr>
+                  <tr><td class="section-name">F — Change Control</td><td>Change control</td><td>—</td></tr>
+                  <tr><td class="section-name">G — Performance Monitoring</td><td>Reports</td><td>—</td></tr>
+                </table>
+              </div>
+
+              <div class="rules-box" style="margin-top:1rem;">
+                <ol>
+                  <li><strong>Rule 1 — Mandatory categories.</strong> A and E must each have at least one artifact. At least two of B, C, D must also be covered. Miss any of this → the audit halts. No exceptions, nothing you can override.</li>
+                  <li><strong>Rule 2 — Minimum breadth.</strong> At least 4 of the 7 categories must be represented overall.</li>
+                  <li><strong>Rule 3 — Minimum artifact count.</strong> At least 3 distinct artifacts. One file cannot cover multiple categories by itself, no matter how much it contains.</li>
+                </ol>
+              </div>
+
+              <div class="callout accent" style="margin-top:1rem;">
+                <p><strong>If your evidence fails this check, you don't get a report.</strong> You get a <code>ScopeLimitation_Notice</code> instead — it names exactly which categories are missing and what to add. No score gets calculated on evidence that can't support one.</p>
               </div>
             </div>
           </div>
@@ -848,6 +860,11 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
               <td class="section-name">Claude offers to run the scripts itself</td>
               <td>A reminder got missed — judgment and execution are meant to stay separate</td>
               <td>Tell it: "You write the Manifest. I run the scripts."</td>
+            </tr>
+            <tr>
+              <td class="section-name">You get a Scope Limitation Notice, not a report</td>
+              <td>Your evidence set failed the 7-category coverage check (see Step 3) — too thin to support a credible audit</td>
+              <td>Read the notice's Coverage Analysis table, add artifacts for the categories it flags, and re-run.</td>
             </tr>
           </table>
         </div>

@@ -4,7 +4,7 @@ description: >
   Halt Condition 6 (SKILL.md §6.6) — how the engine decides an evidence set is too thin to support
   a credible audit, even when every artifact supplied is present and readable. Read during Phase 0,
   before proposing or ratifying a Charter, and before halting on Condition 6.
-version: 1.0.0
+version: 1.1.0
 ---
 
 ## Contents
@@ -22,7 +22,7 @@ Derived from the standards, not hardcoded. For a PMI-standard audit:
 | Category                   | Domain         | What "represented" means                                 |
 | -------------------------- | -------------- | -------------------------------------------------------- |
 | A — Authorization          | Charter        | The endeavor is formally authorized and governed.        |
-| B — Scope                  | Scope          | Scope, schedule, and cost are baselined and interlinked. |
+| B — Scope                  | Scope          | A scope baseline (WBS or equivalent) is defined and documented. |
 | C — Cost                   | Cost           | Financial authority exists and is controlled.            |
 | D — Schedule               | Schedule       | Schedule is baselined.                                   |
 | E — Risk                   | Risk           | Uncertainty is identified, analyzed, and owned.          |
@@ -59,9 +59,11 @@ those are separate processes with separate owners and separate artifacts in any 
 
 If the evidence set fails the sufficiency gate, the engine writes:
 
-- `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.md`
-- `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.html`, rendered from
-  `assets/scope_limitation_template.html` (same header/style as `assets/report_template.html`)
+- `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.md` — you (the LLM) write this directly.
+- `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.html` — run
+  `scripts/render_scope_limitation.py --notice <path to the .md above>`. It parses the frontmatter
+  and all 6 sections and renders `assets/scope_limitation_template.html` (same header/style as
+  `assets/report_template.html`). Naming: references/file-naming.md.
 
 No `.txt`/`.json` — there is no findings data to emit. No Gap Register, no Reporting Integrity
 Score.

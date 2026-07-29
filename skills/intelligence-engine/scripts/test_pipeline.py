@@ -27,6 +27,9 @@ except ImportError:
 # The project's real regression fixture -- "actual data", not an inline stub.
 REAL_MANIFEST_PATH = SCRIPTS_DIR / "test_manifest.md"
 
+# Real Halt Condition 6 output (the fresh-session Pilot-audit-4 run), not a synthetic stub.
+REAL_NOTICE_PATH = SCRIPTS_DIR / "test_scope_limitation_notice.md"
+
 CANONICAL_INDICATOR_ORDER = [
     "visibility", "integrity", "connectivity", "governance",
     "predictability", "decision_quality", "continuous_improvement",
@@ -214,6 +217,38 @@ def test_duplicate_detection():
         print("  PASS: duplicate signature (Underutilized/Behavior/ART-002/Process 11.7) correctly rejected")
 
 
+def test_scope_limitation_render():
+    """Test 6: real Halt Condition 6 notice (md) -> HTML, checking real content,
+    not just that a file got written."""
+    with tempfile.TemporaryDirectory() as tmp:
+        html_path = Path(tmp) / "notice.html"
+
+        run_script_ok("render_scope_limitation.py", [
+            "--notice", str(REAL_NOTICE_PATH),
+            "--output-html", str(html_path),
+        ])
+
+        html_content = html_path.read_text(encoding="utf-8")
+
+        assert "IEM-20260729-PA4001" in html_content
+        assert "SCOPE LIMITED" in html_content
+
+        # Both mandatory categories (A, E) must render as missing.
+        assert html_content.count("status-missing") >= 2, "mandatory failures not rendered as missing"
+
+        # All 7 categories present as table rows (7 data rows, not just the header).
+        assert html_content.count("<tr>") >= 7
+
+        # Mandatory Failures narrative and the cited artifact must survive parsing.
+        assert "Mandatory Failures" in html_content
+        assert "Project Management (1).csv" in html_content
+
+        # Recommendation list (4 numbered items in the fixture) must all come through.
+        assert html_content.count("Category A") >= 1 and html_content.count("Category E") >= 1
+
+        print(f"  PASS: HTML notice: {len(html_content):,} chars, 7 categories, mandatory failures rendered")
+
+
 def main():
     print("=" * 60)
     print("IEM-PM Regression Test Suite")
@@ -225,6 +260,7 @@ def main():
         ("JSON -> Reports", test_rendering),
         ("Knowledge Index", test_knowledge_index),
         ("Duplicate Detection", test_duplicate_detection),
+        ("Scope Limitation Notice Render", test_scope_limitation_render),
     ]
 
     passed = 0

@@ -155,9 +155,23 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   Next Step — smoke-tested). Note: Rule 1 alone already guarantees 4 categories (A + E + 2 of
   B/C/D), so Rule 2's "at least 4" threshold can never independently trigger a halt Rule 1 wouldn't
   have already caught — not a contradiction, just currently non-binding; flagged here in case that's
-  not what was intended. **Still not built:** no schema/script changes yet, and
-  `references/file-naming.md` (Appendix G) doesn't yet document the
-  `IEMPM_ScopeLimitation_Notice_...` naming pattern.
+  not what was intended.
+  **Real-world validation, 2026-07-29:** ran on a fresh Claude Code session (no prior context) against
+  the actual Pilot-audit-4 evidence (`examples/pilot-audit-4/evidence/`, 1 CSV file). Cold session
+  correctly applied all 3 rules, correctly halted, and produced a calibrated `.md` notice (see
+  `Public/Fresh Claude test.txt` for the transcript) — confirming the spec is self-sufficient without
+  conversation history to lean on. Two issues surfaced by that run, both fixed same day: (1) Category
+  B's "what represented means" text mixed in schedule/cost language, which the fresh session read
+  literally into its Coverage Analysis table (`Domain: Scope/Schedule/Cost` instead of `Scope`) —
+  fixed at the source. (2) No script existed to render the `.html` half of the notice — **built**:
+  `scripts/render_scope_limitation.py` parses the `.md` (frontmatter + all 6 sections, including the
+  Coverage Analysis table and Mandatory Failures bullets) directly to HTML via
+  `assets/scope_limitation_template.html` — no canonical JSON step, matching evidence-sufficiency.md
+  (c)'s "no findings data to emit." Verified against the real Pilot-audit-4 notice (7/7 categories,
+  4/4 recommendations parsed correctly) and added as regression test 6/6 in `test_pipeline.py`
+  (fixture: `scripts/test_scope_limitation_notice.md`). `references/file-naming.md` (Appendix G) now
+  documents the `IEMPM_ScopeLimitation_Notice_...` family and `error-codes.md` documents the new
+  `E-NOTICE-*` prefix. This item is now fully built, not just specified.
 - **UI/UX for non-technical PMs** — parked 2026-07-27, brainstormed only, no decision made. Core
   open question: is the PM the direct operator (needs a real guided UI — stage tracker, structured
   Charter-review screen, plain-English activity feed) or does a technical operator run Claude Code

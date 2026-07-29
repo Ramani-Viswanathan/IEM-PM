@@ -1,0 +1,140 @@
+Fresh Claude test
+
+ ▐▛███▜▌   Claude Code v2.1.119
+▝▜█████▛▘  Sonnet 4.6 · Claude Pro
+  ▘▘ ▝▝    ~\Documents\Personal\Projects\IEM-PM
+
+❯ Run the intelligence-engine skill (skills/intelligence-engine/SKILL.md) to perform an
+  IEM-PM PMO Data Gap audit on examples/pilot-audit-4/evidence/, against the PMI standard
+  in skills/intelligence-engine/knowledge/PMI/. Start from Stage 0 and follow the process
+  exactly — including the Minimum Evidence Sufficiency check before proposing a Charter.
+
+I'll start by reading SKILL.md and surveying the evidence and knowledge directories in parallel.
+
+  Read 1 file, listed 1 directory, ran 1 shell command
+
+Good. Now I need to read the evidence-sufficiency.md (Halt Condition 6), the charter-spec.mence files.
+
+  Read 2 files, listed 1 directory, ran 1 shell command
+
+Only one file in evidence. Let me read it and check the other required references before ap
+
+  Read 2 files, ran 1 shell command
+
+The evidence directory has exactly one file — a CSV. I need to apply the sufficiency gate bme check whether the reports directory exists and read the scope limitation template.
+
+  Read 1 file, listed 1 directory, ran 1 shell command
+
+I have everything needed to apply the gate. Let me do the formal sufficiency assessment now
+
+Phase 0 — Evidence Sufficiency Gate Assessment
+
+Evidence set: 1 artifact — Project Management (1).csv
+
+CSV column inventory: Project ID, Project Name, Project Type, Location, Start Date, End DatTask ID, Task Name, Task Status, Assigned To, Hours Spent, Budget, Actual Cost, Progress
+
+Category mapping:
+
+┌────────────────────────────┬─────────────────────┬───────────────────┬───────────────────────────────────────────────────────────────────────────────────┐
+│            Cat             │       Domain        │      Verdict      │                                                     Basis                                                      │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ A — Authorization          │ Charter             │ MISSING           │ No project charter, no governance authorization, no sponsor approval. CSV has project names and statuses only. │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ B — Scope                  │ Scope/Schedule/Cost │ Present (partial) │ Start/End dates and Budget fields present — no scope baseline, but partially represented                       │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ C — Cost                   │ Cost                │ Present (partial) │ Budget and Actual Cost columns present                                                                         │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ D — Schedule               │ Schedule            │ Present (partial) │ Task-level Start/End dates present                                                                             │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ E — Risk                   │ Risk                │ MISSING           │ Zero risk data — no register, no identifiers, no owners, no probability/impact                                 │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ F — Change Control         │ Change control      │ MISSING           │ No change log, no change requests, no deviation records                                                        │
+├────────────────────────────┼─────────────────────┼───────────────────┼───────────────────────────────────────────────────────────────────────────────────┤
+│ G — Performance Monitoring │ Reports             │ Present (partial) │ Progress % and Actual Cost vs Budget present                                                                   │
+└────────────────────────────┴─────────────────────┴───────────────────┴───────────────────────────────────────────────────────────────────────────────────┘
+
+Rule 1 — Mandatory Categories: FAIL
+- Category A (Authorization): absent — mandatory, no exception
+- Category E (Risk): absent — mandatory, no exception
+
+Rule 2 — Minimum Breadth: BORDERLINE (4 of 7 covered — at threshold, but moot given Rule 1
+
+Rule 3 — Minimum Artifact Count: FAIL
+- 1 artifact supplied; minimum is 3
+
+Result: HALT — Halt Condition 6 triggered on Rules 1 and 3.
+
+Writing the Scope Limitation Notice now.
+
+  Ran 1 shell command
+
+● Write(examples\pilot-audit-4\reports\IEMPM_ScopeLimitation_Notice_290726_0000.md)
+Wrote 135 lines to examples\pilot-audit-4\reports\IEMPM_ScopeLimitation_Notice_290726_00
+---
+notice_id: IEM-20260729-PA4001
+type: Scope Limitation Notice
+standards_declared:
+  - PMI Standards (PMBOK 8th Edition, PMI Practice Guides)
+audit_path: examples/pilot-audit-4/evidence/
+artifact_count: 1
+generated_at: 2026-07-29T00:00:00Z
+status: SCOPE LIMITED — NO OPINION ISSUED
+---
+… +125 lines
+
+HALT — Halt Condition 6: Minimum Evidence Sufficiency
+
+The audit cannot proceed. Here is the full gate assessment:
+
+---
+Sufficiency Gate Results
+
+Evidence supplied: 1 artifact — Project Management (1).csv (multi-project task-level spreads)
+
+Rule 1 — Mandatory Categories: FAIL
+
+┌────────────────────────────┬───────────────┬───────────────────┬──────────────────────────────────────────────────┐
+│          Category          │   Required?   │      Status       │                                    Reason                                     │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ A — Authorization          │ Mandatory     │ MISSING           │ No project charter, no sponsor authorization, no governance approval document │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ B — Scope                  │ 2 of 3 needed │ Present (partial) │ Start/End dates + Budget fields in CSV                                        │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ C — Cost                   │ 2 of 3 needed │ Present (partial) │ Budget + Actual Cost columns in CSV                                           │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ D — Schedule               │ 2 of 3 needed │ Present (partial) │ Task-level Start/End dates in CSV                                             │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ E — Risk                   │ Mandatory     │ MISSING           │ Zero risk data — no register, no owners, no probability/impact                │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ F — Change Control         │ Optional      │ Missing           │ No change log or deviation records                                            │
+├────────────────────────────┼───────────────┼───────────────────┼──────────────────────────────────────────────────┤
+│ G — Performance Monitoring │ Optional      │ Present (partial) │ Progress % + Actual Cost vs Budget in CSV                                     │
+└────────────────────────────┴───────────────┴───────────────────┴──────────────────────────────────────────────────┘
+
+Both mandatory categories (A and E) are absent. No exception.
+
+Rule 2 — Minimum Breadth: Borderline (4 of 7 — moot given Rule 1 failure)
+
+Rule 3 — Minimum Artifact Count: FAIL
+
+1 artifact supplied; minimum is 3. A single kitchen-sink spreadsheet cannot simultaneously line integrity, and risk governance — those are separate processes with separate owners.
+
+---
+Scope Limitation Notice written
+
+examples/pilot-audit-4/reports/IEMPM_ScopeLimitation_Notice_290726_0000.md
+
+The notice contains all six required sections: Executive Summary, Coverage Analysis, Mandatory Failures, Professional Opinion, Recommendation, and Next Step. The HTML rendering
+(IEMPM_ScopeLimitation_Notice_290726_0000.html) requires running render.py against the scopthat is a software task.
+
+---
+To unblock the audit
+
+Add at minimum these two artifacts to examples/pilot-audit-4/evidence/:
+
+1. A project or program charter — must identify the sponsor, authorize the PM, and establish high-level scope (resolves Category A + brings artifact count to 2)
+2. A risk register or RAID log — must contain risk IDs, probability/impact, owners, and resy E + brings artifact count to 3)
+
+Once those three artifacts are present, re-run the skill. The gate will re-evaluate, and ifeed to propose a PMO Data Charter for your ratification before any findings are formed.
+
+✻ Sautéed for 2m 46s
