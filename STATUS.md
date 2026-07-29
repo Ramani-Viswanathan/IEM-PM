@@ -16,7 +16,9 @@
 > with TOCs added to the reference files that needed them (`ff81989`); §11 Report Generation branched
 > out to `references/report-generation.md`, a real gap fixed (the branch-out had left no pointer
 > behind in SKILL.md at all), and the Example Finding Block reordered into its correct place in
-> `AUDIT_MANIFEST_template.md` (`48f7857`). All pushed to `origin/master`.)
+> `AUDIT_MANIFEST_template.md` (`48f7857`); SKILL.md's main TOC linked, and every `references/*.md`
+> file given a `Name`/`description`/`version` header for consistency, plus the two still-missing
+> sub-TOCs (`charter-spec.md`, `report-generation.md`) added (`18a6517`). All pushed to `origin/master`.)
 
 ---
 
@@ -26,7 +28,7 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.5.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 864 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern). Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.6.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
 | `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score. No maturity/OPM3 modeling — scrapped, see §2.2. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |
@@ -274,6 +276,7 @@ memory.
 | done   | Archived references/confidence-scale.md (unreferenced anywhere in SKILL.md) to _archive/; wired references/severity-matrix.md into SKILL.md §9.1 as a calibration-reference pointer.     | STATUS.md             |
 | done   | Reviewed SKILL.md against Anthropic's official skill-authoring best practices; moved §4.2's Charter spec verbatim into references/charter-spec.md; added Tables of Contents to the three reference/asset files over the 100-line threshold (severity-matrix.md, audit-stages.md, AUDIT_MANIFEST_template.md). SKILL.md body: 1,071 → 968 lines. | STATUS.md             |
 | done   | Branched §11 Report Generation out to references/report-generation.md; found and fixed a real gap where the move had left no pointer behind in SKILL.md at all; reordered the Example Finding Block into its correct place in AUDIT_MANIFEST_template.md and added it to that file's TOC. SKILL.md body: 968 → 864 lines. | STATUS.md             |
+| done   | Linked SKILL.md's main Table of Contents; added Name/description/version headers to every references/*.md file (charter-spec, error-codes, file-naming, registry-format, report-generation, severity-matrix, audit-stages); added the two still-missing sub-TOCs (charter-spec.md, report-generation.md, both >100 lines). | STATUS.md             |
 | next   | Further SKILL.md conciseness edit (§2/§5/§6/§9 — core, per-invocation content) to bring the body closer to Anthropic's <500-line guidance — separate, slower pass; may not land exactly under 500 without cutting real operational guidance. | STATUS.md             |
 | next   | Run bulk Stage 0 criteria-derivation across the remaining 28 real standards (mechanism proven on 1 of 29).                             | STATUS.md             |
 | next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done. Verify the `allowed-tools:` frontmatter field against Claude Code's own skill-packaging docs when this starts. | STATUS.md             |
