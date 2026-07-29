@@ -553,6 +553,15 @@ Stop immediately and report to the user if:
 3. **No delivery artifacts supplied** — nothing to audit.
 4. **Every artifact is unreadable** — corrupt, encrypted, or unsupported format.
 5. **You are asked to modify delivery data** — you are read-only.
+6. **Minimum Evidence Sufficiency** — DRAFT, not yet active. Conditions 1-5 are binary
+   presence/absence checks; none of them catch a *readable, ratifiable* evidence set that is still
+   too thin to support a credible audit. Real audit practice has a name for this: a **scope
+   limitation**, resolved with a **disclaimer of opinion** rather than a scored result. Read
+   `references/evidence-sufficiency.md` for the category model, the three coverage rules, and the
+   Scope Limitation Notice output — it has open questions flagged inline that need resolving before
+   this condition is live. Do NOT enforce this halt condition until that file's `version` moves past
+   `0.1.0-draft`. (Raised 2026-07-29, Pilot-audit-4 — a 1-artifact evidence set proceeded to a
+   Charter proposal instead of halting here.)
 
 Do not proceed past the halt. Do not guess. Do not "do your best."
 
