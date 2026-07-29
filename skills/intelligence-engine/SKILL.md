@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.2.0
+version: 1.3.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -694,6 +694,11 @@ Every finding gets a severity rating. This is your judgment. Use the full scale.
 | 4        | Major    | The gap threatens delivery outcomes, breaks a critical process, or creates significant compliance exposure. | No earned value measurement on a fixed-price contract. Steering committee has not met in 6 months on a critical program. RAID log is missing all high-severity risks. |
 | 5        | Critical | The gap threatens program/portfolio failure, regulatory breach, or strategic objective collapse.            | No baseline exists for any project in the portfolio. Financial controls are bypassed. Governance packs are fabricated or backdated.                                   |
 
+The three factors behind the calibration rules below — delivery threat, spread, and persistence —
+are formalized into a scored, PMI-cited rubric in `references/severity-matrix.md` (Appendix D).
+Read it for the fully worked-out version of this judgment call. The 1–5 field above stays the one
+the Manifest/schema/RIS actually consume; Appendix D is calibration reference, not a parsed input.
+
 ### Severity Calibration Rules
 
 - **Base on delivery threat, not documentation completeness.** A missing signature on a low-value project is not Severity 5. A missing baseline on a strategic program is.
@@ -1051,12 +1056,16 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.2.0** — 2026-07-27: moved §10.2's parser-grade Manifest format,
-verbatim, out of SKILL.md into `assets/AUDIT_MANIFEST_template.md`; §10.2 is now a pointer,
-matching the existing references/-pointer pattern already used in §7/§8 (gap-taxonomy.md,
-root-origins.md) and Phase 0b (registry-format.md). `references/manifest-template.md` (an empty
-stub pointing at the same file) deleted as redundant. No format change — verified byte-identical
-against the pre-move content.
-Previous: **1.1.0** — 2026-07-27: removed OPM3/organizational-maturity modeling (scope boundary, not deferred). See BLUEPRINT-1.md §10 and STATUS.md locked decision #2.
+This skill file version: **1.3.0** — 2026-07-29: §9.1 now points to `references/severity-matrix.md`
+(Appendix D) as calibration reference — its three-dimension, PMI-cited rubric (Decision Impact ×
+Spread × Persistence) formalizes the same factors the calibration rules already named informally
+("consider spread," "consider persistence"). Previously unreferenced anywhere in SKILL.md. No
+change to the 1–5 field itself — it stays what the Manifest/schema/RIS consume; Appendix D is
+reference, not a parsed input.
+Previous: **1.2.0** — 2026-07-27: moved §10.2's parser-grade Manifest format, verbatim, out of
+SKILL.md into `assets/AUDIT_MANIFEST_template.md`; §10.2 is now a pointer, matching the existing
+references/-pointer pattern already used in §7/§8 (gap-taxonomy.md, root-origins.md) and Phase 0b
+(registry-format.md). `references/manifest-template.md` (an empty stub pointing at the same file)
+deleted as redundant. No format change — verified byte-identical against the pre-move content.
 Schema version: **1.1.0**
 Manifest format version: **1.1.0** — unchanged; only its location moved (see above).
