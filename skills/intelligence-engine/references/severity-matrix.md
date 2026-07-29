@@ -1,5 +1,14 @@
 ## Appendix D — Severity Scale (Tells How serious is it?)
 
+## Contents
+
+- [Decision Impact](#decision-impact)
+- [Spread](#spread)
+- [Persistence](#persistence)
+- [Severity Bands](#severity-bands)
+- [Severity Matrix (all 80 combinations)](#severity-matrix-all-80-combinations--generated-from-the-rule-above)
+- [PMI anchors for this appendix](#pmi-anchors-for-this-appendix-verified-in-the-held-documents-2026-07-05)
+
 Severity is determined by evaluating three dimensions:
 
 Decision Impact – How significantly the gap affects business, governance, financial, or delivery decisions.

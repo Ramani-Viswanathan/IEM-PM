@@ -3,6 +3,20 @@
 > **Read this file before executing any audit stage.**
 > Every stage uses EXACTLY the template below. No exceptions.
 
+## Contents
+
+- [Stage 0 — Baseline](#stage-0--baseline)
+- [Stage 1 — Charter](#stage-1--charter)
+- [Stage 2 — Define](#stage-2--define)
+- [Stage 3 — Measure](#stage-3--measure)
+- [Stage 4 — Classify](#stage-4--classify)
+- [Stage 5 — Trace](#stage-5--trace)
+- [Stage 6 — Engineer & Score](#stage-6--engineer--score)
+- [Stage 7 — Synthesize (the Manifest Gate)](#stage-7--synthesize-the-manifest-gate)
+- [Stage 8 — Findings JSON (deterministic)](#stage-8--findings-json-deterministic--script-to-build)
+- [Stage 9 — Render (deterministic)](#stage-9--render-deterministic--script-to-build)
+- [Stage 10 — Final Summary](#stage-10--final-summary)
+
 <!--
   RULE: every stage uses EXACTLY this template. No exceptions.
 
