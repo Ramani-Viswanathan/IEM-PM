@@ -1,6 +1,6 @@
 # IEM-PM — Project Status
 
-> Last updated: 2026-07-27. This file is the single save-point: decisions, current state, next actions.
+> Last updated: 2026-07-29. This file is the single save-point: decisions, current state, next actions.
 > (Previous 2026-07-05 version had SKILL.md, the schema, validator, manifest parser, and renderer
 > listed as "next" — all five are now written and were verified end-to-end on 2026-07-26, then
 > committed and pushed as `df71e85`. Since then: a real pilot audit ran against real PMI standards
@@ -8,7 +8,12 @@
 > maturity modeling was scrapped outright (`0af0b43`), a real Stage 0 stale-cache bug was fixed and
 > the registry-derivation mechanism specified (`aeef25f`), and LICENSE/README/requirements.txt,
 > output naming (Appendix G), error codes (Appendix H), and two more real production-run pilot
-> audits landed (`336eb58`). All pushed to `origin/master`.)
+> audits landed (`336eb58`). Since then: path resolution consolidated into `scripts/paths.py`, the
+> Manifest format moved out of SKILL.md into `assets/AUDIT_MANIFEST_template.md` (`771fd24`);
+> `confidence-scale.md` archived as unwired, `severity-matrix.md` wired into SKILL.md §9.1 as
+> calibration reference (`c7cb29e`); SKILL.md checked against Anthropic's official skill-authoring
+> best practices (500-line guidance) and the Charter spec moved out to `references/charter-spec.md`
+> with TOCs added to the reference files that needed them (`ff81989`). All pushed to `origin/master`.)
 
 ---
 
@@ -18,7 +23,7 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete** — all 13 sections written (no `TODO(you)` markers remain)                                 |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.4.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 968 lines (Charter spec branched out to `references/charter-spec.md`), still above the documented <500-line guidance — a further trim/branch-out pass is open, see §5. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
 | `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score. No maturity/OPM3 modeling — scrapped, see §2.2. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |
@@ -57,7 +62,7 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
 1. ✅ Define the PMO Data Charter — `assets/PMO_DATA_CHARTER_template.md` written (297 lines).
 2. ✅ Define the Findings Schema — `scripts/findings.schema.json` written.
 3. ✅ Build the Validator — `scripts/schema.py` written and passes on test fixture.
-4. ⚠️ Build the Audit Manifest template — the parser-grade format is fully specified inline in SKILL.md §10; the standalone `assets/AUDIT_MANIFEST_template.md` file is still empty.
+4. ✅ Build the Audit Manifest template — `assets/AUDIT_MANIFEST_template.md` now holds the full parser-grade format, moved verbatim out of SKILL.md §10.2 (byte-identical, verified) and TOC'd; SKILL.md §10.2 is now a pointer.
 5. ✅ Write SKILL.md — complete, all 13 sections, no TODO markers remain.
 6. ✅ Knowledge Base derivation — scan tooling built and fixed (`baseline.py`, `derive_knowledge_index.py`); 29 real PMI standards now live in `knowledge/PMI/`, `baseline.py` correctly recurses into subfolders (`BASELINE_READY — 29 document(s)`).
 7. ✅ Registry derivation — mechanism complete. Found and fixed a real Stage 0 bug: `baseline.py`'s
@@ -85,15 +90,39 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   (25/29 skeletons were silently stuck empty). Proven on one standard. Bulk derivation across the
   remaining 28 standards is the next open item, not this one.
 - **Severity bands (Appendix D)** — done: `references/severity-matrix.md` (153 lines) + SKILL.md §9.1.
+  Wired in 2026-07-29 as an explicit calibration-reference pointer from §9.1 (was previously
+  unreferenced anywhere in SKILL.md despite formalizing the same Decision Impact/Spread/Persistence
+  factors §9.1's calibration rules already named informally). The 1–5 field is still what the
+  Manifest/schema/RIS consume — Appendix D is reference, not a parsed input.
+- **`references/confidence-scale.md` (Appendix C)** — archived 2026-07-29 to
+  `_archive/skills/intelligence-engine/references/`. Real, substantive content, but unreferenced
+  anywhere in SKILL.md and no corresponding field in the schema/Manifest contract — not deleted,
+  kept as history in case it's revisited.
 - ~~Error codes (Appendix H)~~ — **done 2026-07-27**. `references/error-codes.md` documents
   `E-BASE-*`/`E-PARSE-*`/`E-VALID-*`/`E-RENDER-*`; embedded as message prefixes in the actual
   scripts, not just documented on paper.
 - ~~File naming (Appendix G)~~ — **done 2026-07-27**. `references/file-naming.md` specifies
   `IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`; `manifest_to_findings.py`/`render.py` default to it,
   smoke-tested for real.
-- **Charter spec reference (`references/charter-spec.md`)** — empty file; content currently lives only in SKILL.md §4.2.
-- **`assets/AUDIT_MANIFEST_template.md`** — empty; the format is specified in SKILL.md §10 but has no standalone template file yet.
+- ~~Charter spec reference (`references/charter-spec.md`)~~ — **done 2026-07-29**. SKILL.md §4.2's
+  five-function Charter spec moved out verbatim (byte-identical, verified); §4.2 is now a pointer.
+  §4.1 (Standards) and §4.3 (Audit Manifest — "your only output") deliberately stayed inline: both
+  are short and read every invocation, unlike the Charter's longer explanatory prose.
+- ~~`assets/AUDIT_MANIFEST_template.md`~~ — **done** (see Build Order item 4 above).
 - **Deterministic back half (Stages 8–9)** — ✅ built and verified (was previously listed as "not built").
+- **SKILL.md line budget** — open, 2026-07-29. Checked against Anthropic's official skill-authoring
+  best practices (docs.claude.com "Skill authoring best practices" + the `anthropics/skills`
+  skill-creator/template repos): SKILL.md body should stay under 500 lines; ours is 968 after this
+  round's Charter-spec move (was 1,071). §11 "Report Generation" (~102 lines — the 10 report
+  sections + per-section content rules) is the next candidate to branch out, but the remaining trim
+  needs an actual conciseness read, not just relocation — deliberately scoped as a separate,
+  larger pass rather than rushed alongside this session's moves. Ground rule going forward: never
+  cut or relocate content that's read every invocation (e.g. §4.3, §9.1's core table) just to hit
+  the line count — quality/correctness outranks the metric.
+- **`allowed-tools:` frontmatter field** — open, low priority. Not part of the general Agent Skills
+  spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
+  Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
+  Build Order item 11 (`.claude-plugin/plugin.json`) is actually started — not blocking anything now.
 - **UI/UX for non-technical PMs** — parked 2026-07-27, brainstormed only, no decision made. Core
   open question: is the PM the direct operator (needs a real guided UI — stage tracker, structured
   Charter-review screen, plain-English activity feed) or does a technical operator run Claude Code
@@ -233,10 +262,12 @@ memory.
 | done   | Ran two further real production audits against real (non-synthetic) organizational data, both fully Charter-ratified — one org-baseline, one PMI-baseline. See §8. | STATUS.md             |
 | done   | Found and fixed a real dependency gap (openpyxl missing from requirements.txt) surfaced by the real-data audits.                       | STATUS.md             |
 | done   | Consolidated path resolution across all 5 scripts into a single source of truth (scripts/paths.py) — fixed a real duplicated/inconsistent `parents[3]` pattern in manifest_to_findings.py and render.py. | STATUS.md             |
-| next   | Build the Audit Manifest standalone template file (assets/AUDIT_MANIFEST_template.md — currently empty).                             | STATUS.md             |
-| next   | Populate references/charter-spec.md (currently empty/TODO stub).                                                                      | STATUS.md             |
+| done   | Moved SKILL.md's Manifest format (§10.2) verbatim into assets/AUDIT_MANIFEST_template.md; §10.2 is now a pointer. Deleted the now-redundant references/manifest-template.md stub.       | STATUS.md             |
+| done   | Archived references/confidence-scale.md (unreferenced anywhere in SKILL.md) to _archive/; wired references/severity-matrix.md into SKILL.md §9.1 as a calibration-reference pointer.     | STATUS.md             |
+| done   | Reviewed SKILL.md against Anthropic's official skill-authoring best practices; moved §4.2's Charter spec verbatim into references/charter-spec.md; added Tables of Contents to the three reference/asset files over the 100-line threshold (severity-matrix.md, audit-stages.md, AUDIT_MANIFEST_template.md). SKILL.md body: 1,071 → 968 lines. | STATUS.md             |
+| next   | Further SKILL.md conciseness/branch-out pass to bring the body under Anthropic's <500-line guidance (candidate: §11 Report Generation) — separate, larger pass, not rushed.           | STATUS.md             |
 | next   | Run bulk Stage 0 criteria-derivation across the remaining 28 real standards (mechanism proven on 1 of 29).                             | STATUS.md             |
-| next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done.   | STATUS.md             |
+| next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done. Verify the `allowed-tools:` frontmatter field against Claude Code's own skill-packaging docs when this starts. | STATUS.md             |
 | next   | Add CI (GitHub Actions) running test_pipeline.py + a clean-room requirements.txt install on every push.                                | STATUS.md             |
 | open   | UI/UX for non-technical PMs — parked, brainstormed only, no decision. See §5 Open design items.                                        | STATUS.md             |
 
