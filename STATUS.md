@@ -18,7 +18,13 @@
 > behind in SKILL.md at all), and the Example Finding Block reordered into its correct place in
 > `AUDIT_MANIFEST_template.md` (`48f7857`); SKILL.md's main TOC linked, and every `references/*.md`
 > file given a `Name`/`description`/`version` header for consistency, plus the two still-missing
-> sub-TOCs (`charter-spec.md`, `report-generation.md`) added (`18a6517`). All pushed to `origin/master`.)
+> sub-TOCs (`charter-spec.md`, `report-generation.md`) added (`18a6517`). Since then: Minimum
+> Evidence Sufficiency (Halt Condition 6) finalized and activated (`5061342`); the Scope Limitation
+> Notice HTML renderer built (`scripts/render_scope_limitation.py`), verified against a real
+> fresh-session Pilot-audit-4 run, and evidence-sufficiency.md's Category B wording fixed (`caa158b`);
+> a new cross-cutting rule, Terminology Discipline (`references/terminology.md`, SKILL.md §6.7),
+> added to keep all free-text narrative in the standard's own PM vocabulary rather than synonyms or
+> vendor jargon — SKILL.md now v1.8.0. All pushed to `origin/master`.)
 
 ---
 
@@ -28,7 +34,7 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.7.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) now active. |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.8.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) now active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
 | `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score. No maturity/OPM3 modeling — scrapped, see §2.2. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |

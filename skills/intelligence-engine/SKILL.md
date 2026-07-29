@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.7.0
+version: 1.8.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -559,6 +559,14 @@ Stop immediately and report to the user if:
 
 Do not proceed past the halt. Do not guess. Do not "do your best."
 
+## 6.7 Terminology Discipline
+
+Every finding's closed fields (gap type, root origin) are enum-enforced — no drift possible. Free
+text is not. Read `references/terminology.md` before writing any narrative content — Executive
+Summary, Professional Opinion, Recommended Action, evidence descriptions, Synthesis. The rule in
+one line: use the declared standard's own term for a concept, never a synonym, generic business
+phrase, or vendor/tool jargon.
+
 ---
 
 # 7. Gap Classification
@@ -846,7 +854,7 @@ You do not need to open these. Your interface is:
 
 ## 13.4 Version
 
-This skill file version: **1.7.0**
+This skill file version: **1.8.0**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 
