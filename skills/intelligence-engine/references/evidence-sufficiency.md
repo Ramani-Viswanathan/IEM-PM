@@ -12,6 +12,8 @@ version: 0.1.0-draft
 - [(a) Core Artifact Categories](#a-core-artifact-categories)
 - [(b) Coverage Threshold](#b-coverage-threshold)
 - [(c) Halt Output — Scope Limitation Notice](#c-halt-output--scope-limitation-notice)
+  - [Notice Sections](#notice-sections)
+  - [Template Context](#template-context)
 
 ## (a) Core Artifact Categories
 
@@ -59,7 +61,37 @@ those are separate processes with separate owners and separate artifacts in any 
 If the evidence set fails the sufficiency gate, the engine writes:
 
 - `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.md`
-- `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.html`
+- `reports/IEMPM_ScopeLimitation_Notice_DDMMYY_HHMM.html`, rendered from
+  `assets/scope_limitation_template.html` (same header/style as `assets/report_template.html`)
 
 No `.txt`/`.json` — there is no findings data to emit. No Gap Register, no Reporting Integrity
-Score. The notice states which categories and rules failed, and why.
+Score.
+
+### Notice Sections
+
+| # | Section | Content |
+| --- | --- | --- |
+| 1 | Executive Summary | Plain-language summary of why the audit could not proceed. |
+| 2 | Coverage Analysis | Table — all 7 categories from (a), each marked Present/Missing, with artifact(s) mapped. |
+| 3 | Mandatory Failures | Explicit list of absent mandatory categories (Rule 1) and why each fails. |
+| 4 | Professional Opinion | Statement — modeled on a disclaimer of opinion under a scope limitation. |
+| 5 | Recommendation | Specific artifacts/categories required before the audit can proceed. |
+| 6 | Next Step | What happens once the evidence gap is closed. |
+
+### Template Context
+
+`assets/scope_limitation_template.html` expects:
+
+| Variable | Type | Content |
+| --- | --- | --- |
+| `notice.audit_id` | string | |
+| `notice.standards_declared` | list[string] | |
+| `notice.executive_summary` | string | Section 1 |
+| `categories` | list[object] | `{letter, name, domain, mandatory, present, artifacts, failure_reason}` — one per category in (a) |
+| `notice.artifact_count` | int | Distinct artifacts supplied |
+| `notice.professional_opinion` | string | Section 4 |
+| `notice.recommendations` | list[string] | Section 5 |
+| `notice.next_step` | string | Section 6 |
+| `generated_at` | string | |
+
+Section 3 (Mandatory Failures) is derived in-template from `categories` — no separate variable.
