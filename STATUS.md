@@ -197,7 +197,7 @@ SKILL.md is now fully written, so this protocol's remaining scope is the stub ap
 The public portfolio site (`RUAA Consulting/.../src/views/RoadmapPage.jsx`) carries its own copy of
 this sprint plan for public display. That copy has drifted from actual repo state in four places
 (⚠️ below), mainly because it still assumes the OPM3 bridge exists. This section is the corrected,
-authoritative version as of 2026-07-27 — the next time an agent edits `RoadmapPage.jsx`, sync it
+authoritative version as of 2026-07-29 — the next time an agent edits `RoadmapPage.jsx`, sync it
 from here, not the other way around.
 
 **Week 1 (Jun 22–28) — Define the Discipline — Completed.** Unchanged, still accurate. (IEM-PM +
@@ -244,16 +244,30 @@ decision #2), so there is nothing left to design. What actually happened this we
   the *mechanism* is complete and proven on 1 of 29 standards (see Week 5); full derivation across
   all 29 remains — In progress, not Upcoming
 - Deterministic renderer & report template — LLM judges, code renders — Done
-- Regression tests across the audit state machine — Done (`test_pipeline.py`, 5/5 passing, committed
-  in `1c68116`)
+- Regression tests across the audit state machine — Done (`test_pipeline.py`, 6/6 passing —
+  originally 5/5, committed in `1c68116`; a 6th test for the Scope Limitation Notice renderer added
+  `caa158b`)
+- Second renderer — `render_scope_limitation.py` (Halt Condition 6's `.md` → `.html`, no canonical
+  JSON step) — Done, `caa158b`
+- Minimum Evidence Sufficiency gate (Halt Condition 6) — new methodology, not in the original sprint
+  plan: raised by real pilot evidence being too thin to support a credible audit even though
+  every prior halt condition passed. Modeled on real audit-practice scope limitation / disclaimer
+  of opinion. Spec finalized and active — Done, `5061342`
+- Terminology Discipline (SKILL.md §6.7, `references/terminology.md`) — controlled PM vocabulary for
+  all free-text narrative, cross-mapped across PMI/PRINCE2/ISO 21502 — Done, `059d8f8`
 
 **Week 7 (Aug 10–16) — Pilot & Package — Upcoming.**
 - Role-based user guide published for PMs, program managers, and PMO leads — Done
   (`Public/IEM-PM-User-Guide.html`)
 - ⚠️ "End-to-end pilot audit against a real baseline" → **Done**, not Upcoming — it ran 2026-07-27,
   three weeks ahead of schedule (see Week 5 above)
-- "Fix what the pilot breaks" — Done for this round (the two `baseline.py` fixes above); more may
-  surface once the next pilot runs
+- "Fix what the pilot breaks" — Done for the first round (the two `baseline.py` fixes above). A
+  second round landed 2026-07-29: a fresh Claude Code session (no prior context) ran a real audit
+  attempt against Pilot-audit-4's evidence, correctly triggered the new Minimum Evidence Sufficiency
+  gate (Halt Condition 6), and its output surfaced two real gaps — a wording defect in
+  `evidence-sufficiency.md`'s Category B definition, and a missing HTML renderer for the Scope
+  Limitation Notice — both fixed same day (`caa158b`). This is the mechanism working as intended:
+  real cold-session runs keep finding real gaps.
 - Package as an open-source Claude Code skill — Upcoming, not started (no `.claude-plugin/plugin.json`
   or `marketplace.json`)
 
