@@ -37,7 +37,9 @@ For every artifact declared in the Charter, write:
 
 **Artifact Name:** [Human-readable name]
 **Path:** [file path]
-**Checksum:** [SHA-256 or "computed"]
+**Checksum:** [Real SHA-256 of the artifact file — compute it, never write the literal word
+"computed" as a stand-in value. A placeholder that isn't a real hash defeats Stage 1 Activity 2's
+checksum-based prior-audit lookup for every future run against this evidence.]
 **Status:** [Examined / Partial / Corrupted / Empty]
 **Field Coverage:** [N of M declared columns present (X%)]
 **Observations:** [Narrative of what you found, field completeness, anomalies]

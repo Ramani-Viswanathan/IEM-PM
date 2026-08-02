@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.3.1
+version: 1.3.2
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -831,7 +831,11 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
 2. **Write the Header Block** (§10.2.1) — Audit ID, Charter Version, Standards Baseline, Scope,
    Analyst, Date, Status (RATIFIED / PROVISIONAL).
 3. **Write the Per-Artifact Evidence Log** (§10.2.2) — one `## ARTIFACT:` block per artifact
-   declared in the Charter, with observations from Stage 3's evidence reading.
+   declared in the Charter, with observations from Stage 3's evidence reading. For `**Checksum:**`,
+   compute a real SHA-256 of the artifact file (e.g. a one-line shell/Python command such as
+   `python -c "import hashlib;print(hashlib.sha256(open(path,'rb').read()).hexdigest())"`) — never
+   write the literal word "computed" as a placeholder. A fabricated-looking hash string is worse
+   than an honest gap: only write a hash you actually computed from the file.
 4. **Write the Gap Register** (§10.2.3) — one `### FINDING:` block per engineered finding from
    Stage 6, in the exact format: Gap Type, Root Origin, Standard, Clause, Identifier, Requirement
    Summary, Description (minimum 20 words), Severity, Impact, Recommended Action, Intelligence

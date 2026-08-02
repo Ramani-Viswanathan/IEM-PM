@@ -444,10 +444,10 @@ memory.
 
 ## 9. Errors Found & Fixed — Consolidated Log (for write-ups)
 
-**Compiled 2026-08-02 01:13 CDT, updated 2026-08-02 01:31 CDT, 11:38 CDT.** Every real defect found
-in this project, how it was found, the fix, and its commit — in one place. Distinct from the
-narrative in §1/§5/§7/§8 above, which is scattered by topic; this is chronological and exhaustive,
-kept up to date going forward.
+**Compiled 2026-08-02 01:13 CDT, updated 01:31, 11:38, 11:49 CDT.** Every real defect found in this
+project, how it was found, the fix, and its commit — in one place. Distinct from the narrative in
+§1/§5/§7/§8 above, which is scattered by topic; this is chronological and exhaustive, kept up to
+date going forward.
 
 ### A. Engine/process defects — found and fixed
 
@@ -465,12 +465,7 @@ kept up to date going forward.
 | 14 | 2026-08-02 ~00:30 | (Was item #10/#11 below, now fixed.) (a) Cross-audit contamination: Stage 1's prior-audit checksum check (fix #7e) was worded loosely enough that a `Pilot-audit-5` Charter-proposal run read *content* from unrelated `Pilot-audit-2/3` evidence and asserted a fabricated vendor-name match ("Rhombus/TD Synnex/Amazon/IDN/RingCentral") as corroboration for the organization's identity — "Rhombus" is actually part of a different project's *name*, not a vendor, and doesn't appear anywhere in Pilot-audit-5's own evidence. (b) The same run's Charter-ratification step asked 3 separate clarifying questions (org name, CR-001 exclusion, candidate-Missing disposition) before reaching the single ratify/edit/"just run it"/decline decision Stage 1's own Decision Logic defines — unspecified friction. | (a) `grep -il "Rhombus\|TD Synnex\|RingCentral\|Amazon\|IDN\|ClientOrg" examples/Pilot-audit-5/*.md` → no output. (b) Full transcript review of the Charter-proposal run. | (a) Stage 1 Activity 2 narrowed to a strict checksum lookup — explicitly forbids opening or reasoning about another audit's content. (b) Stage 1 Activity 7 now requires proposing a default for every ambiguity and flagging it in the Charter text itself, resolved by the single ratification response — no separate question rounds. `audit-stages.md` → v1.3.0. | `e3661ff` |
 | 15 | 2026-08-02 ~01:10 | Stage 3 had no systematic self-consistency check — a document could be marked 100% field-coverage while two of its own sections silently disagreed on the same figure, and Synthesis could assert "traces consistently" without that specific claim ever having been verified. This is exactly how findings #12 and #13 below both got past the engine. | Independent review (a "second opinion" audit of the audit) surfaced the same pattern twice across two unrelated evidence sets — a validated recurring miss, not a one-off. | New Stage 3 Activity 3: for every artifact, identify any figure stated more than once and verify the restatements agree; a mismatch is a raw `Untrusted` gap on its own, independent of any registry criterion. New Decision Logic rule ties it to the taxonomy. Stage 7 Activity 5 and SKILL.md §9.3 now require positive Synthesis claims ("traces consistently," "figures match") to be grounded in what Activity 3 actually checked, not asserted as general impression. `audit-stages.md` → v1.3.0, SKILL.md → v1.9.3. | `e3661ff` |
 | 17 | 2026-08-02 11:38 | No standing top-level rule stated that only the evidence in the folder being audited is admissible — evidence isolation existed only as a Stage 1 Activity 2 side-effect (fix #14), not a general rule covering every stage. | User directive, generalizing from the #14 incident: "The claude should only analyse based on evidence provided in the folder that its asked to validate. It should not use previous knowledge or similar file reviewed knowledge." | New **Principle 8 — Evidence Isolation** added to SKILL.md §2 (Operating Principles): only this run's own evidence/Charter/`knowledge/` are admissible; the Stage 1 checksum lookup is the one explicit, narrow exception, checksum-only. Stage 1 Activity 2 cross-references it. SKILL.md → v1.9.4, `audit-stages.md` → v1.3.1. | `14f92c8` |
-
-### B. Found and reported — **not yet fixed**
-
-| # | Date/time found | What broke | Evidence | Suggested fix (not applied) |
-|---|---|---|---|---|
-| 16 | 2026-08-02 ~02:15 | `AUDIT_MANIFEST_template.md` allows `**Checksum:** [SHA-256 or "computed"]` — the literal word `"computed"` is a sanctioned placeholder, not a real hash. `Pilot-audit-5`'s report used it for all 11 artifacts. This silently defeats fix #14's checksum-lookup mechanism: a later audit (`Pilot-audit-6`) tried to check whether its evidence matched a prior audit and found no real checksum to compare against, even though the two are very likely the same project. | `Pilot-audit-6`'s own Scope Limitation Notice flagged it directly: *"the existing report files record the literal placeholder text `computed`... so no real checksum match against this evidence set was possible."* Confirmed: `grep -n "Checksum" reports/IEMPM_AuditGap_Report_020826_0000.md` → `computed` × 11. | Remove `"computed"` as an allowed value in the template; require a real SHA-256 always — there's no legitimate case where hashing a locally-supplied file isn't feasible. |
+| 16 | 2026-08-02 ~02:15, fixed 11:49 | `AUDIT_MANIFEST_template.md` allowed `**Checksum:** [SHA-256 or "computed"]` — the literal word `"computed"` was a sanctioned placeholder, not a real hash. `Pilot-audit-5`'s report used it for all 11 artifacts, silently defeating fix #14's checksum-lookup mechanism: `Pilot-audit-6` tried to check whether its evidence matched a prior audit and found no real checksum to compare against, even though the two are very likely the same project. | `Pilot-audit-6`'s own Scope Limitation Notice flagged it directly: *"the existing report files record the literal placeholder text `computed`... so no real checksum match against this evidence set was possible."* Confirmed: `grep -n "Checksum" reports/IEMPM_AuditGap_Report_020826_0000.md` → `computed` × 11. | **Two .md-only edits, no code touched:** (1) `assets/AUDIT_MANIFEST_template.md` line 40 — `**Checksum:** [SHA-256 or "computed"]` → now requires a real SHA-256, explicitly forbids the literal word "computed". (2) `references/audit-stages.md` Stage 7 Activity 3 — added the actual computation method (a one-line shell/Python hash command) so the LLM computes a real hash instead of either writing "computed" or, worse, fabricating a plausible-looking fake hash string. `audit-stages.md` → v1.3.2. Deliberately left `manifest_to_findings.py`'s `or "computed"` fallback untouched — changing it to `None` would violate `findings.schema.json`'s `"checksum": {"type": "string"}` constraint, which is exactly the kind of code/schema change this fix was scoped to avoid; the fallback is now a defensive last resort for a well-behaved run, not the expected path. | `(this commit)` |
 
 ### C. Evidence-quality issues found in example data (not tool defects — the pattern that drove fix #15)
 
@@ -485,12 +480,10 @@ record of what got missed and why the fix mattered.
 
 ### Open items summary (as of this log)
 
-- All items previously listed as "suggested, not fixed" (#10/#11, folded into #14) and the
-  self-consistency gap that let #12/#13 through (#15) are now fixed — see table A. Evidence
-  Isolation is now a standing Principle (#17, SKILL.md §2 Principle 8), not just a Stage 1
-  side-effect.
-- **Open: #16** — `AUDIT_MANIFEST_template.md` still allows the `"computed"` checksum placeholder,
-  which defeats fix #14's checksum lookup whenever a Manifest uses it. Flagged, not yet fixed.
+- **All defect-log items closed as of this update** (#10 through #17) — see table A. Nothing remains
+  in "found, not yet fixed." Evidence Isolation is now a standing Principle (#17, SKILL.md §2
+  Principle 8), not just a Stage 1 side-effect; the checksum-placeholder gap (#16) that undercut it
+  is also closed.
 - Registry derivation: **7 of 29** PMI standards now deep-dived (`requirementsmgmt_pg.json` added this
   session), all on-demand from real audits, none pre-batched. 22 remain — see §5's strategy note.
 - SKILL.md conciseness pass (<500-line guidance), bulk registry derivation, `.claude-plugin/` packaging,
