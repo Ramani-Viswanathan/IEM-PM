@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.10.0
+version: 1.11.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -340,197 +340,23 @@ You write only the Manifest. Software writes everything else.
 
 This is how you operate. It is a cycle of judgment, not a software pipeline.
 
-Define Baseline
-↓
-Collect Evidence
-↓
-Measure
-↓
-Find Gap
-↓
-Classify Gap
-↓
-Trace Root Cause
-↓
-Score Impact
-↓
-Synthesize Manifest
-↓
-Repeat (next artifact, next standard, next criterion)
+Define Baseline → Collect Evidence → Measure → Find Gap → Classify Gap → Trace Root Cause →
+Score Impact → Synthesize Manifest → Repeat (next artifact, next standard, next criterion)
 
-## Loop Steps
+Each phase below is an index entry, not the procedure. `references/audit-stages.md` holds the
+complete Decision Logic, Failure Conditions, and Completion Criteria for every Stage — read the
+matching Stage **before** acting in that phase. Do NOT rely on the one-line purpose alone.
 
-## Phase 0 — Baseline
-
-**What you do:** Read and understand the ruler, then turn it into a registry.
-
-### 0a. Mechanics (scripted)
-
-Run `python scripts/baseline.py`. It fingerprints every file in `knowledge/`, extracts a
-TOC/bookmark skeleton per document, and writes `registries/skeleton_map.json` +
-`registries/derivation_manifest.json`. It never reads body text and never derives criteria —
-that stays with you (Principle 7). Exit code 1 (`BASELINE_ABSENT`) is a hard stop.
-
-### 0b. Derivation (you)
-
-For each standard actually declared in scope by the ratified Charter (not the whole `knowledge/`
-folder indiscriminately — derive what this audit needs):
-
-1. Check `registries/<slug>.json`, where `<slug>` is the source filename, lowercased, with any
-   run of non-alphanumeric characters collapsed to a single underscore (e.g.
-   `PS_Scheduling_3rd.pdf` → `registries/ps_scheduling_3rd.json`).
-2. **Skip derivation and reuse the file as-is** if it already exists **and** its
-   `source_fingerprint` matches this document's entry in `derivation_manifest.json`.
-3. **Otherwise derive it.** Read the standard (using `skeleton_map.json`'s section anchors to
-   navigate; read body text directly for any document with an empty skeleton — some source PDFs
-   genuinely carry no bookmarks). For each checkable expectation you find — a requirement, a key
-   success factor, a mandatory practice — write one registry item using the 13 attributes in
-   Appendix E (`references/registry-format.md`), paraphrased per Principle 3, never verbatim.
-4. Write `registries/<slug>.json` in the wrapper format specified in Appendix E. This file is
-   standard-derived content: local-only, gitignored, never committed.
-
-Registry items are reused across audits; re-derive only when a standard's fingerprint changes.
-Nothing here replaces your own reading — the registry is a checkable index of what you already
-read, not a substitute for reading it.
-
-**Inputs:** `knowledge/` standards, `skeleton_map.json`, `derivation_manifest.json`, ratified Charter.
-**Output:** Your understanding of Expected Delivery, plus one `registries/<slug>.json` per in-scope standard.
-
-**Hard stop if:** No standards in `knowledge/`, or Charter is unratified and the user has not authorized a PROVISIONAL run.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 0, for the complete Decision Logic,
-Failure Conditions (exact printed messages), and Completion Criteria behind this phase. Stage 2 in
-the same file is the full expansion of 0b's derivation work above. Charter ratification (Contract 2,
-§4.2) happens between this phase and Phase 1, even though it isn't its own numbered Phase here —
-read Stage 1 for its full Decision Logic and Failure Conditions.
-
----
-
-## Phase 1 — Evidence
-
-**What you do:** Read and observe.
-
-Read every delivery artifact declared in the Charter. Schedules, RAID logs, governance packs, dashboards, status reports, financials, lessons learned. Read them to observe, not yet to judge.
-
-**Inputs:** All delivery artifacts in scope.
-**Output:** Mental notes of Observed Delivery.
-
-**Rule:** Do not interpret fields that the Charter has not defined. Flag unmapped fields and move on.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 3 (Activity 1), for how this reading step
-connects into Measure.
-
----
-
-## Phase 2 — Measure
-
-**What you do:** Compare Expected vs Observed.
-
-For each criterion derived from the baseline, check whether the evidence satisfies it. Every variance is a **raw gap**. Every raw gap must be tied to specific evidence: a quote, a field value, a missing record, or an explicit absence.
-
-**Inputs:** Your mental maps from Phase 0 and Phase 1.
-**Output:** A list of raw gaps, each with cited evidence.
-
-**Rule:** If you suspect a gap but cannot cite evidence, it is not a raw gap. It is a candidate for the Synthesis narrative only.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 3, for the complete Decision Logic
-(evidence citation rules, the no-duplicate consolidation rule, unreadable-artifact handling) and
-Failure Conditions before measuring.
-
----
-
-## Phase 3 — Classify
-
-**What you do:** Assign exactly one Gap Type to each raw gap.
-
-Read Section 7 before classifying. The seven types are a closed list. No overlap. No duplicates. If a gap could fit two types, use the disambiguation rules in Section 7.
-
-**Inputs:** Raw gaps from Phase 2.
-**Output:** Classified gaps.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 4, for the complete Decision Logic —
-including what happens if Stage 5 (Trace) later finds a classification inconsistent with the gap's
-true root cause.
-
----
-
-## Phase 4 — Trace
-
-**What you do:** Assign exactly one Root Origin to each classified gap.
-
-Read Section 8 before tracing. The seven origins are a closed list. You must identify the **earliest structural point** where the gap entered the system — not the symptom, not the downstream effect.
-
-**Inputs:** Classified gaps from Phase 3.
-**Output:** Gaps with root origins.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 5, for the complete Decision Logic,
-including the Earliest Point rule and the reconciliation path back to Stage 4 when a trace reveals
-the gap type doesn't actually hold.
-
----
-
-## Phase 5 — Score
-
-**What you do:** Assign severity and recommend action.
-
-For each gap, assign severity 1–5 based on its threat to delivery capability. Read Section 9 before scoring. Write a specific, actionable recommendation that addresses the root origin (not the symptom).
-
-**Inputs:** Classified and traced gaps from Phase 4.
-**Output:** Scored findings with recommended actions.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 6, for the four-part diagnostic method
-(Evidence · Impact · Why/Who/Scope · Fix-at-source) and the severity-matrix band-to-1–5 bridge —
-this phase's summary above does not repeat that detail. Do not assign severity without it.
-
----
-
-## Phase 6 — Synthesize
-
-**What you do:** Write the Audit Manifest.
-
-This is your **only output**. Write one markdown file containing:
-
-1. **Header block** — audit ID, charter version, standards, scope.
-2. **Per-artifact evidence logs** — what you observed in each artifact.
-3. **Finding blocks** — one `### FINDING:` per gap, with:
-   - Gap Type
-   - Root Origin
-   - Standard reference (name, clause, identifier, summary only)
-   - Description
-   - Severity
-   - Impact
-   - Recommended Action
-   - Evidence bullets (minimum one per finding)
-4. **Synthesis section** — narrative diagnostics for the seven Intelligence Indicators (Visibility, Integrity, Connectivity, Governance, Predictability, Decision Quality, Continuous Improvement). These are qualitative only. Never assign scores or percentages here.
-
-**Rule:** Write the Manifest as you go, or write it all at the end — but never hold findings in memory without recording them. The Manifest must be complete and self-contained.
-
-**Full detail:** Read `references/audit-stages.md`, Stage 7, **before** writing anything. It
-specifies a chain-verification check that must run first — confirming every finding actually
-carries its full Stage 3–6 contributions before you trust the working memory behind it — plus the
-exact Failure Conditions and Completion Criteria for this gate. This is the compaction-survival
-checkpoint; do not skip the verification to save time.
-
----
-
-## Phase 7 — Handover
-
-**What you do:** Stop.
-
-Your work ends at the Audit Manifest. You do not:
-
-- Validate JSON
-- Run Python scripts
-- Calculate the Reporting Integrity Score
-- Render HTML or TXT reports
-- Manage file names or directories
-
-## The human runs `manifest_to_findings.py` and `render.py` after you finish. Your job is judgment through Phase 6 only.
-
-**Full detail:** Read `references/audit-stages.md`, Stages 8–10, if you want to understand what
-happens after you stop — you do not execute any of it, but knowing the exact RIS formula, the
-render determinism guarantee, and the final console summary helps you write a Manifest that serves
-that deterministic tail well, rather than treating Phase 6 as the true end of the process.
+| Phase | Purpose | Read before acting |
+| --- | --- | --- |
+| 0 — Baseline | Read the standards; derive a checkable registry (`scripts/baseline.py` for mechanics, you for derivation). | Stage 0 (also Stage 2 for the derivation expansion; Charter ratification between this phase and Phase 1 is Stage 1). |
+| 1 — Evidence | Read every delivery artifact declared in the Charter. Observe, don't judge yet. | Stage 3, Activity 1. |
+| 2 — Measure | Compare Expected vs. Observed. Every variance is a raw gap, cited to evidence. | Stage 3. |
+| 3 — Classify | Assign exactly one Gap Type (§7) to each raw gap. | Stage 4. |
+| 4 — Trace | Assign exactly one Root Origin (§8) to each classified gap. | Stage 5. |
+| 5 — Score | Assign severity 1–5 and a fix-at-source recommendation (§9). | Stage 6 — the four-part diagnostic method; do not assign severity without it. |
+| 6 — Synthesize | Write the Audit Manifest (§10) — your only output. | Stage 7, **before writing anything** — includes the mandatory chain-verification check. |
+| 7 — Handover | Stop. You do not validate, script, compute the score, or render — the human runs `manifest_to_findings.py`/`render.py`. | Stages 8–10, if you want to understand the deterministic tail your Manifest feeds. |
 
 ---
 
@@ -922,7 +748,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.10.0**
+This skill file version: **1.11.0**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 
