@@ -14,10 +14,10 @@ from typing import Optional
 from jinja2 import Template
 
 try:
-    from paths import REPORTS_DIR, DEFAULT_TEMPLATE
+    from paths import DEFAULT_TEMPLATE
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
-    from paths import REPORTS_DIR, DEFAULT_TEMPLATE
+    from paths import DEFAULT_TEMPLATE
 
 
 def _to_utc(dt: datetime) -> datetime:
@@ -178,13 +178,15 @@ def main():
     )
     parser.add_argument(
         "--output-html", type=Path, default=None,
-        help="Output path for the HTML report. Defaults to reports/IEMPM_AuditGap_Report_"
-             "DDMMYY_HHMM.html (Appendix G) using the audit's own Date.",
+        help="Output path for the HTML report. Defaults to IEMPM_AuditGap_Report_DDMMYY_HHMM.html "
+             "(Appendix G) using the audit's own Date, written into the same reports/ folder as "
+             "--canonical (a sibling of the project's evidence/ folder).",
     )
     parser.add_argument(
         "--output-txt", type=Path, default=None,
-        help="Output path for the TXT report. Defaults to reports/IEMPM_AuditGap_Report_"
-             "DDMMYY_HHMM.txt (Appendix G) using the audit's own Date.",
+        help="Output path for the TXT report. Defaults to IEMPM_AuditGap_Report_DDMMYY_HHMM.txt "
+             "(Appendix G) using the audit's own Date, written into the same reports/ folder as "
+             "--canonical (a sibling of the project's evidence/ folder).",
     )
     args = parser.parse_args()
 
@@ -195,13 +197,15 @@ def main():
     canonical = json.loads(args.canonical.read_text(encoding="utf-8"))
     audit_dt = _parse_iso(canonical.get("generated_at", "")) or datetime.now(timezone.utc)
 
-    # Explicit paths always win; otherwise use the naming convention (Appendix G).
-    output_txt = args.output_txt or (REPORTS_DIR / _iempm_filename(audit_dt, "txt"))
-    output_html = args.output_html or (REPORTS_DIR / _iempm_filename(audit_dt, "html"))
+    # Explicit paths always win; otherwise land next to --canonical itself, i.e. the
+    # same project reports/ folder Stage 8 already wrote the JSON into.
+    reports_dir = args.canonical.resolve().parent
+    output_txt = args.output_txt or (reports_dir / _iempm_filename(audit_dt, "txt"))
+    output_html = args.output_html or (reports_dir / _iempm_filename(audit_dt, "html"))
     template_path = args.template or DEFAULT_TEMPLATE
 
     if args.output_txt is None or args.output_html is None:
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        reports_dir.mkdir(parents=True, exist_ok=True)
 
     # TXT
     txt = render_txt(canonical)

@@ -23,13 +23,6 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage
 
-try:
-    from paths import REPORTS_DIR
-except ImportError:
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent))
-    from paths import REPORTS_DIR
-
 
 def _to_utc(dt: datetime) -> datetime:
     return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt.astimezone(timezone.utc)
@@ -390,8 +383,9 @@ def main():
     parser.add_argument("--charter", type=Path, help="Optional: Path to ratified PMO Data Charter")
     parser.add_argument(
         "--output", type=Path, default=None,
-        help="Output path for findings.json. Defaults to reports/IEMPM_AuditGap_Report_"
-             "DDMMYY_HHMM.json (Appendix G) using the audit's own Date.",
+        help="Output path for findings.json. Defaults to IEMPM_AuditGap_Report_DDMMYY_HHMM.json "
+             "(Appendix G) using the audit's own Date, written into the same reports/ folder as "
+             "--manifest (a sibling of the project's evidence/ folder).",
     )
     args = parser.parse_args()
 
@@ -412,12 +406,14 @@ def main():
             print(f"  - {e}")
         exit(1)
 
-    # Write -- explicit --output always wins; otherwise use the naming convention.
+    # Write -- explicit --output always wins; otherwise land next to --manifest itself,
+    # i.e. the same project reports/ folder the Manifest was already written into.
     output_path = args.output
     if output_path is None:
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+        reports_dir = args.manifest.resolve().parent
+        reports_dir.mkdir(parents=True, exist_ok=True)
         audit_dt = datetime.fromisoformat(canonical["generated_at"])
-        output_path = REPORTS_DIR / _iempm_filename(audit_dt, "json")
+        output_path = reports_dir / _iempm_filename(audit_dt, "json")
 
     output_path.write_text(json.dumps(canonical, indent=2), encoding="utf-8")
     print(f"Canonical findings written to {output_path}")

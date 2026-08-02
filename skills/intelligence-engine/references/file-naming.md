@@ -5,7 +5,7 @@ description: >
   DDMMYY_HHMM.<ext> naming conventions shared by every artifact generated for a given audit or
   halt, and why the timestamp comes from the audit's own Date, not wall-clock run time. Read
   before Stage 9 (Render), when writing the Manifest's Date field, or on Halt Condition 6.
-version: 1.0.0
+version: 1.1.0
 ---
 
 ## Appendix G — Output File Naming
@@ -30,27 +30,31 @@ IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>
 | HTML report               | `.html`   | `render.py`                            |
 | TXT report                | `.txt`    | `render.py`                            |
 
-All four live in the **repository root's** `reports/` folder — e.g. `IEM-PM/reports/`, sibling to
-`skills/`, never inside the example or evidence folder being audited (`examples/<name>/reports/` is
-not a valid output location, even for a run scoped to that example). `scripts/paths.py`'s
-`REPORTS_DIR` is the single source of truth for this path; it resolves relative to the scripts'
-own location, not the current working directory. Gitignored, local-only — see repo `.gitignore`.
+All four live in a `reports/` folder that is a **sibling of the `evidence/` folder** for the project
+being audited — e.g. `Audit/<ProjectName>/reports/`, next to `Audit/<ProjectName>/evidence/`. There
+is no single shared reports location: every project gets its own. `manifest_to_findings.py` and
+`render.py` derive this automatically from their own input path (the `--manifest` / `--canonical`
+file's parent folder) whenever an explicit `--output`/`--output-html`/`--output-txt` isn't given —
+see `scripts/paths.py`'s header comment. Gitignored, local-only — see repo `.gitignore`
+(`Audit/*` / `!Audit/README.md`).
 
-**Example**, for an audit dated `2026-07-27T14:30:00Z`:
+**Example**, for a project at `Audit/Acme-Q3-2026/` with an audit dated `2026-07-27T14:30:00Z`:
 
 ```
-reports/IEMPM_AuditGap_Report_270726_1430.md
-reports/IEMPM_AuditGap_Report_270726_1430.json
-reports/IEMPM_AuditGap_Report_270726_1430.html
-reports/IEMPM_AuditGap_Report_270726_1430.txt
+Audit/Acme-Q3-2026/evidence/...                                    <- your artifacts
+Audit/Acme-Q3-2026/reports/IEMPM_AuditGap_Report_270726_1430.md
+Audit/Acme-Q3-2026/reports/IEMPM_AuditGap_Report_270726_1430.json
+Audit/Acme-Q3-2026/reports/IEMPM_AuditGap_Report_270726_1430.html
+Audit/Acme-Q3-2026/reports/IEMPM_AuditGap_Report_270726_1430.txt
 ```
 
 ### Enforcement
 
 `manifest_to_findings.py` and `render.py` compute this name automatically (see `_iempm_filename()`
-in each script) from the audit's own Date, and use it whenever `--output` / `--output-html` /
-`--output-txt` is not explicitly given. An explicit path always overrides the convention — useful
-for tests and one-off comparisons — but production runs should let the default apply.
+in each script) from the audit's own Date, and write into the same folder as their own input file
+whenever `--output` / `--output-html` / `--output-txt` is not explicitly given. An explicit path
+always overrides the convention — useful for tests and one-off comparisons — but production runs
+should let the default apply.
 
 ### Known limitation
 
@@ -79,9 +83,9 @@ No `.json`/`.txt` variant exists for this family — a halted audit produces no 
 canonicalize (evidence-sufficiency.md (c)). `render_scope_limitation.py` defaults `--output-html`
 to the `--notice` path with its extension swapped, so both files always share one stem.
 
-**Example**, for a notice dated `2026-07-29T00:00:00Z`:
+**Example**, for a notice dated `2026-07-29T00:00:00Z`, project `Audit/Acme-Q3-2026/`:
 
 ```
-reports/IEMPM_ScopeLimitation_Notice_290726_0000.md
-reports/IEMPM_ScopeLimitation_Notice_290726_0000.html
+Audit/Acme-Q3-2026/reports/IEMPM_ScopeLimitation_Notice_290726_0000.md
+Audit/Acme-Q3-2026/reports/IEMPM_ScopeLimitation_Notice_290726_0000.html
 ```

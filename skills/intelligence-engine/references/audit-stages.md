@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.3.2
+version: 1.4.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -138,17 +138,18 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
 2. **Check for a prior audit of this evidence** — this is the one narrow, explicit exception SKILL.md
    Principle 8 (Evidence Isolation) carves out, and only in the form specified here: compute the
    checksum of every supplied artifact and compare it **only** against the checksums already recorded
-   in existing `reports/` Manifests' `## ARTIFACT:` blocks (`**Checksum:**` field). This is a checksum
-   lookup, nothing more: do not open, read, or reason about the *content* of another audit's evidence,
-   Charter, or Manifest as part of this check — a match is reported by checksum alone. Reading another
-   audit's content here is how unrelated details (a different project's name, a different org's
-   vendor list) leak into this run's reasoning; the isolation is the point. If a prior audit already
-   covers this same
-   evidence, surface the match (audit ID, date, file) to the human **before** drafting a new
-   Charter — do not silently re-derive a Charter and re-run the full pipeline against evidence that
-   already has a report. This is a visibility step, not a block: the human may still choose to
-   re-audit (e.g. against a different standard baseline), but that should be a deliberate choice,
-   not a discovery made by accident after the fact.
+   in any `reports/` folder's existing Manifests' `## ARTIFACT:` blocks (`**Checksum:**` field) —
+   reports now live per-project (each project's own `reports/`, sibling to its `evidence/`), so this
+   means checking across every project folder you have visibility into, not one shared location. This
+   is a checksum lookup, nothing more: do not open, read, or reason about the *content* of another
+   audit's evidence, Charter, or Manifest as part of this check — a match is reported by checksum
+   alone. Reading another audit's content here is how unrelated details (a different project's name,
+   a different org's vendor list) leak into this run's reasoning; the isolation is the point. If a
+   prior audit already covers this same evidence, surface the match (audit ID, date, file) to the
+   human **before** drafting a new Charter — do not silently re-derive a Charter and re-run the full
+   pipeline against evidence that already has a report. This is a visibility step, not a block: the
+   human may still choose to re-audit (e.g. against a different standard baseline), but that should
+   be a deliberate choice, not a discovery made by accident after the fact.
 3. **Propose Artifact Declaration (function 1)** — from the data: classify each supplied artifact by type (risk register, schedule, status report, …).
 4. **Propose Field Semantics Map (function 2)** — from the data: for each significant field, propose its business meaning, flagging every assumption.
 5. **Propose Materiality & Scope (function 3)** — from the applicability map: which artifact types, governance levels, thresholds, and time period the _standards_ expect to be in evidence.
@@ -162,13 +163,15 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
    each one before the human can even reach a ratification decision. The single ratify / edit / "just
    run it" / decline response (Decision Logic) is the resolution mechanism; "edit" is how the human
    overrides any default that's wrong.
-8. **Record the outcome and write the Charter** to the repository root's `reports/` folder (e.g.
-   `IEM-PM/reports/`, sibling to `skills/` — never inside the example/evidence folder being audited;
-   `references/file-naming.md`) — ratified (with ratifier and date) or PROVISIONAL.
+8. **Record the outcome and write the Charter** to this project's own `reports/` folder — a sibling
+   of its `evidence/` folder (e.g. `Audit/<ProjectName>/reports/`, next to
+   `Audit/<ProjectName>/evidence/`; `references/file-naming.md`) — ratified (with ratifier and date)
+   or PROVISIONAL.
 
 ### Decision Logic
 
-- IF a prior audit of this same evidence (matching checksums) already exists in `reports/` → present
+- IF a prior audit of this same evidence (matching checksums) already exists in another project's
+  `reports/` folder → present
   it to the human alongside the draft Charter proposal (Activity 2) rather than proceeding silently.
   A different standard baseline, a re-scoped Charter, or evidence that has since changed are all
   legitimate reasons to re-audit — but the human should decide that knowingly, not learn about the
@@ -182,8 +185,8 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
 
 ### Outputs
 
-Written to the repository root's `reports/` folder (never inside the example/evidence folder being
-audited — see Activity 8):
+Written to this project's own `reports/` folder, a sibling of its `evidence/` folder (see
+Activity 8):
 
 1. **The PMO Data Charter** — ratified (ratifier + date) or marked PROVISIONAL.
 2. **Candidate Missing gap dispositions** — each standards-expected absence with its outcome: supplied / confirmed (carried into Stage 3 as a finding seed) / waived (with the human's stated reason).
@@ -851,10 +854,9 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
    Referenced.
 7. **Run Final Validation** — check the completed Manifest against all 9 checks in SKILL.md §12.1
    before declaring it done.
-8. **Save the Manifest** — to the repository root's `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`
-   (e.g. `IEM-PM/reports/...`, sibling to `skills/` — never inside the example/evidence folder being
-   audited; Appendix G, `references/file-naming.md`), using this audit's own Date — not wall-clock
-   run time.
+8. **Save the Manifest** — to this project's own `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, a
+   sibling of its `evidence/` folder (e.g. `Audit/<ProjectName>/reports/...`; Appendix G,
+   `references/file-naming.md`), using this audit's own Date — not wall-clock run time.
 9. **Print the Handover Message** (§12.3) and stop. Do not run scripts, calculate the Reporting
    Integrity Score, or render reports.
 
@@ -892,10 +894,10 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
 
 ### Outputs
 
-Written to `reports/` (local-only, gitignored) — the first disk-persisted judgment content since
-Stage 1's Charter:
+Written to this project's own `reports/` folder (local-only, gitignored, sibling of `evidence/`) —
+the first disk-persisted judgment content since Stage 1's Charter:
 
-1. **The Audit Manifest** — `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` (Appendix G,
+1. **The Audit Manifest** — `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` (Appendix G,
    `references/file-naming.md`), containing all 5 required sections in order (§10.1): Header Block,
    Per-Artifact Evidence Log, Gap Register, Synthesis, Appendix.
 
@@ -959,7 +961,7 @@ here — this stage is pure software.
 
 ### Inputs
 
-- The Audit Manifest written in Stage 7 — `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`.
+- The Audit Manifest written in Stage 7 — `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`.
 - Optionally, the ratified Charter path (`--charter`), if the run wants it passed through.
 
 ### Activities
@@ -976,8 +978,10 @@ here — this stage is pure software.
    (Weighted Gap Profile v1.0.0: severity deduction, density deduction, root-cause diversity
    deduction, Missing-gap deduction — §9.2). This is the **only** place the RIS is calculated,
    anywhere in the pipeline.
-6. **Write on success only** — if every check passes, write the canonical findings JSON to
-   `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` (Appendix G, same stem as the Manifest). If any
+6. **Write on success only** — if every check passes, write the canonical findings JSON next to the
+   Manifest, in the same project `reports/` folder:
+   `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` (Appendix G, same stem as the
+   Manifest). If any
    check fails, print every error prefixed with its code and exit non-zero — `findings.json` is not
    written.
 
@@ -995,8 +999,8 @@ here — this stage is pure software.
 
 ### Outputs
 
-`reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` (Appendix G, same stem as the Manifest) — written
-only on successful validation.
+`<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` (Appendix G, same stem as the Manifest,
+same project `reports/` folder) — written only on successful validation.
 
 ### Failure Conditions
 
@@ -1032,7 +1036,7 @@ this stage is pure software.
 
 ### Inputs
 
-- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` from Stage 8.
+- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` from Stage 8.
 - `assets/report_template.html` (the default template — `paths.py`'s `DEFAULT_TEMPLATE`; overridable
   via `--template`).
 
@@ -1043,11 +1047,12 @@ this stage is pure software.
 2. **Compute display aggregates** — severity counts, gap-type counts, root-origin counts, artifact
    count — purely derived from the JSON already validated in Stage 8. No new judgment.
 3. **Render the HTML report** — via Jinja2 template substitution against
-   `assets/report_template.html`, written to `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`.
+   `assets/report_template.html`, written next to the input JSON, in the same project `reports/`
+   folder: `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`.
 4. **Render the TXT report** — the 10-section structure (Executive Summary, Audit Scope & Baseline,
    Delivery Evidence Summary, Gap Register, Root Cause Analysis, Intelligence Indicators, Reporting
    Integrity Score, Recommended Actions, Roadmap, Appendix), written to
-   `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt`.
+   `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt`.
 
 ### Decision Logic
 
@@ -1062,8 +1067,8 @@ this stage is pure software.
 
 ### Outputs
 
-`reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html` and `.txt` (Appendix G, same stem as the Manifest
-and JSON).
+`<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html` and `.txt` (Appendix G, same stem as the
+Manifest and JSON, same project `reports/` folder).
 
 ### Failure Conditions
 
@@ -1096,7 +1101,7 @@ Print the TXT summary and the output file pointers; confirm the run checklist (�
 
 ### Inputs
 
-- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt` from Stage 9.
+- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt` from Stage 9.
 - The 4 output file paths sharing this audit's name stem (Appendix G): `.md` (Stage 7), `.json`
   (Stage 8), `.html` and `.txt` (Stage 9).
 - SKILL.md §12.2's Output Checklist — for the confirmation step.

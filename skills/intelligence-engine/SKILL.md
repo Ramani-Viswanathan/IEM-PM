@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.9.4
+version: 1.10.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -786,11 +786,12 @@ Do not put these in the Manifest:
 
 ## 10.6 Output Location
 
-Write the Manifest to the **repository root's** `reports/` folder (e.g. `IEM-PM/reports/`, sibling
-to `skills/` — never inside the example or evidence folder being audited), named per Appendix G
-(`references/file-naming.md`): `IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, where the date/time is this
-audit's own Date — the same value you put in the header's `**Date:**` field, not an arbitrary
-filename.
+Write the Manifest to a `reports/` folder that is a **sibling of the `evidence/` folder** for the
+project you are auditing — e.g. `Audit/<ProjectName>/reports/`, next to
+`Audit/<ProjectName>/evidence/`. There is no single shared reports location; every project gets its
+own, per Appendix G (`references/file-naming.md`). Name it `IEMPM_AuditGap_Report_DDMMYY_HHMM.md`,
+where the date/time is this audit's own Date — the same value you put in the header's `**Date:**`
+field, not an arbitrary filename.
 This is your only write target. Everything else is software's job.
 
 ---
@@ -827,18 +828,19 @@ If any check fails, fix the Manifest before finishing. Do not hand over a broken
 
 ## 12.2 Output Checklist
 
-You produce exactly one file, named per Appendix G:
+You produce exactly one file, named per Appendix G, written into the project's own `reports/`
+folder (sibling of its `evidence/` folder):
 
 | File                                           | You Write | Software Reads |
 | ---------------------------------------------- | --------- | -------------- |
-| `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` | ✓         | ✓              |
+| `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` | ✓         | ✓              |
 
-That is all. Software produces the matching `.json`, `.html`, and `.txt` files using the same
-name stem:
+That is all. Software produces the matching `.json`, `.html`, and `.txt` files in the same folder,
+using the same name stem:
 
-- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json`
-- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`
-- `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt`
+- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json`
+- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`
+- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt`
 
 You do not touch these.
 
@@ -919,7 +921,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.9.4**
+This skill file version: **1.10.0**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 

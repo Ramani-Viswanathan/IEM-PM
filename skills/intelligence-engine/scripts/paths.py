@@ -15,6 +15,10 @@ REPO_ROOT = ENGINE_DIR.parent.parent                # repository root
 KNOWLEDGE_DIR = ENGINE_DIR / "knowledge"
 REGISTRIES_DIR = ENGINE_DIR / "registries"
 ASSETS_DIR = ENGINE_DIR / "assets"
-REPORTS_DIR = REPO_ROOT / "reports"
+# No single REPORTS_DIR: reports are written into a `reports/` folder that is
+# always a sibling of the `evidence/` folder for the project being audited
+# (e.g. `Audit/<Project>/reports/`, sibling to `Audit/<Project>/evidence/`).
+# Each script derives this from its own input path -- see manifest_to_findings.py
+# and render.py, which default their output next to the file they were given.
 DEFAULT_TEMPLATE = ASSETS_DIR / "report_template.html"
 DEFAULT_SCOPE_LIMITATION_TEMPLATE = ASSETS_DIR / "scope_limitation_template.html"

@@ -5,6 +5,10 @@ skills/intelligence-engine/registries/*
 !skills/intelligence-engine/registries/README.md
 skills/intelligence-engine/knowledge_index.json
 
+# Audit/: real-engagement drop-zone — evidence and generated reports, local only
+Audit/*
+!Audit/README.md
+
 # intelligence-engine: generated test-run output (reproducible from test_manifest.md)
 skills/intelligence-engine/scripts/report.html
 skills/intelligence-engine/scripts/report.txt

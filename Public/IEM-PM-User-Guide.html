@@ -549,7 +549,7 @@
           </li>
         </ul>
         <div class="callout accent" style="margin-top:1.4rem;">
-          <p><strong>Nothing you hand it gets changed.</strong> IEM-PM only reads your standards, your Charter, and your evidence. The only thing it ever writes is inside <code>reports/</code> — your source data is never touched.</p>
+          <p><strong>Nothing you hand it gets changed.</strong> IEM-PM only reads your standards, your Charter, and your evidence. The only thing it ever writes is inside your project's own <code>reports/</code> folder, inside <code>Audit/&lt;YourProjectName&gt;/</code> — your source data is never touched.</p>
         </div>
       </section>
 
@@ -575,7 +575,7 @@
               <span class="who">You write</span>
               <h3>Complete the Data Charter</h3>
               <p>Fill in the template: give each artifact an ID (<code>ART-001</code>, <code>ART-002</code>...), define what your fields mean (what does "on track" mean in your steering pack?), and set materiality — what's big enough to matter. This is the only step where your judgment, not the engine's, sets the rules.</p>
-              <p><strong>Then ratify it</strong> — literally type a name, role, and date at the bottom, and save it as <code>reports/PMO_DATA_CHARTER_ratified.md</code>. That filename is what makes it real rather than a draft.</p>
+              <p><strong>Then ratify it</strong> — literally type a name, role, and date at the bottom, and save it as <code>Audit/&lt;YourProjectName&gt;/reports/PMO_DATA_CHARTER_ratified.md</code>. That filename is what makes it real rather than a draft.</p>
             </div>
           </div>
 
@@ -584,7 +584,7 @@
             <div>
               <span class="who">You gather</span>
               <h3>Assemble delivery evidence</h3>
-              <p>Put the schedules, logs, and reports somewhere Claude Code can read them. Real files, not summaries — the audit cites exact locations, so it needs the originals. Export first if your data lives in Jira, ADO, or Primavera — the engine doesn't log into tools.</p>
+              <p>Create a folder for this project under <code>Audit/</code> — any name you like, e.g. <code>Audit/Acme-Q3-2026/</code> — and put your schedules, logs, and reports inside an <code>evidence/</code> folder there: <code>Audit/Acme-Q3-2026/evidence/</code>. Real files, not summaries — the audit cites exact locations, so it needs the originals. Export first if your data lives in Jira, ADO, or Primavera — the engine doesn't log into tools. The engine creates a matching <code>reports/</code> folder next to your <code>evidence/</code> folder automatically — you don't create that part yourself.</p>
 
               <p style="margin-top:1rem;"><strong>Before it starts scoring anything, IEM-PM checks whether your evidence set is even enough to support a credible audit.</strong> This runs automatically, before Step 4 — you can't skip it and you can't argue with it. It maps your artifacts to 7 categories, then applies 3 rules.</p>
 
@@ -624,7 +624,7 @@
             <div>
               <span class="who">Claude Code runs</span>
               <h3>The audit itself</h3>
-              <p>Ask Claude Code to run the <code>intelligence-engine</code> skill against your Charter and evidence. It reads everything, compares it to your standards, and writes exactly one file: <code>reports/audit_manifest.md</code>.</p>
+              <p>Ask Claude Code to run the <code>intelligence-engine</code> skill against your Charter and evidence. It reads everything, compares it to your standards, and writes exactly one file: <code>Audit/&lt;YourProjectName&gt;/reports/audit_manifest.md</code>.</p>
               <details class="prompts">
                 <summary>Exact wording, if you'd rather paste than describe</summary>
                 <div class="prompt-set">
@@ -635,7 +635,7 @@ what is required. Confirm: which standards govern this audit?</pre>
                   </div>
                   <div class="prompt">
                     <span class="prompt-label">2 · Load the Charter</span>
-                    <pre>Read the ratified PMO Data Charter at reports/PMO_DATA_CHARTER_ratified.md.
+                    <pre>Read the ratified PMO Data Charter at Audit/&lt;YourProjectName&gt;/reports/PMO_DATA_CHARTER_ratified.md.
 Confirm which artifacts are in scope and what the fields mean.
 Do not proceed until you confirm the Charter is ratified.</pre>
                   </div>
@@ -660,7 +660,7 @@ the Audit Manifest as you go.</pre>
                   </div>
                   <div class="prompt">
                     <span class="prompt-label">6 · Save</span>
-                    <pre>Save the complete Audit Manifest to reports/audit_manifest.md.</pre>
+                    <pre>Save the complete Audit Manifest to Audit/&lt;YourProjectName&gt;/reports/audit_manifest.md.</pre>
                   </div>
                 </div>
               </details>
@@ -674,9 +674,9 @@ the Audit Manifest as you go.</pre>
               <h3>Convert and validate</h3>
               <p>Ask Claude Code to turn the Manifest into your report — it runs the two conversion steps for you. If you'd rather do it yourself, the commands are underneath.</p>
               <div class="aside">
-                For reference — two commands, run from <code>skills/intelligence-engine/scripts/</code>:
-                <code>python manifest_to_findings.py --manifest ../../../reports/audit_manifest.md --output ../../../reports/findings.json
-python render.py --canonical ../../../reports/findings.json --template ../assets/report_template.html --output-html ../../../reports/report.html --output-txt ../../../reports/report.txt</code>
+                For reference — two commands, run from <code>skills/intelligence-engine/scripts/</code> (both scripts default their output next to the input file you give them, inside your project's own <code>reports/</code> folder, so <code>--output</code>/<code>--output-html</code>/<code>--output-txt</code> are optional):
+                <code>python manifest_to_findings.py --manifest ../../../Audit/&lt;YourProjectName&gt;/reports/audit_manifest.md
+python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json --template ../assets/report_template.html</code>
               </div>
             </div>
           </div>
@@ -686,7 +686,7 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
             <div>
               <span class="who">You read</span>
               <h3>Open the report</h3>
-              <p><code>reports/report.html</code> — double-click it, or open it in any browser. That file is the entire interface. Nothing to log into, nothing to configure.</p>
+              <p>Inside <code>Audit/&lt;YourProjectName&gt;/reports/</code> — the rendered <code>.html</code> file. Double-click it, or open it in any browser. That file is the entire interface. Nothing to log into, nothing to configure.</p>
             </div>
           </div>
 
@@ -821,7 +821,7 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
           </div>
           <div class="faq-item">
             <dt>Will it change or move any of my files?</dt>
-            <dd>No. It only reads your standards, Charter, and evidence, and only ever writes inside <code>reports/</code>.</dd>
+            <dd>No. It only reads your standards, Charter, and evidence, and only ever writes inside your project's own <code>reports/</code> folder, next to <code>evidence/</code>.</dd>
           </div>
           <div class="faq-item">
             <dt>Do I need to learn Python or the terminal?</dt>
@@ -878,7 +878,7 @@ python render.py --canonical ../../../reports/findings.json --template ../assets
             <li><strong>No ratified Charter, no audit.</strong> Never let it guess what your data means.</li>
             <li><strong>Every finding needs evidence.</strong> No quote, no absence, no finding.</li>
             <li><strong>It judges, you run the software.</strong> Claude writes the Manifest; you (or Claude, on request) run the two scripts.</li>
-            <li><strong>Read-only, always.</strong> Only the Manifest and <code>reports/</code> ever get written.</li>
+            <li><strong>Read-only, always.</strong> Only the Manifest and your project's own <code>reports/</code> folder ever get written.</li>
             <li><strong>Local-first.</strong> No cloud calls, no databases — everything stays on your machine.</li>
           </ol>
         </div>

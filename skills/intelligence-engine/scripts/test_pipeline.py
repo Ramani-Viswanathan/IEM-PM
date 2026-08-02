@@ -168,6 +168,35 @@ def test_rendering():
         print(f"  PASS: TXT report: {len(txt_content):,} chars, no phantom truncation")
 
 
+def test_default_output_location():
+    """
+    Test: with no --output/--output-html/--output-txt given, each script must
+    default to writing next to its own input file -- the project's own reports/
+    folder (sibling of evidence/), not any fixed global directory. Regression for
+    the Audit/<Project>/evidence/+reports/ per-project layout.
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        project_dir = Path(tmp) / "SomeProject"
+        reports_dir = project_dir / "reports"
+        reports_dir.mkdir(parents=True)
+
+        manifest_path = reports_dir / "manifest.md"
+        manifest_path.write_text(REAL_MANIFEST_PATH.read_text(encoding="utf-8"), encoding="utf-8")
+
+        run_script_ok("manifest_to_findings.py", ["--manifest", str(manifest_path)])
+        json_candidates = list(reports_dir.glob("IEMPM_AuditGap_Report_*.json"))
+        assert len(json_candidates) == 1, f"expected 1 default-named JSON in {reports_dir}, found {json_candidates}"
+        findings_path = json_candidates[0]
+
+        run_script_ok("render.py", ["--canonical", str(findings_path)])
+        html_candidates = list(reports_dir.glob("IEMPM_AuditGap_Report_*.html"))
+        txt_candidates = list(reports_dir.glob("IEMPM_AuditGap_Report_*.txt"))
+        assert len(html_candidates) == 1, f"expected 1 default-named HTML in {reports_dir}"
+        assert len(txt_candidates) == 1, f"expected 1 default-named TXT in {reports_dir}"
+
+        print(f"  PASS: JSON/HTML/TXT all defaulted next to their input, in {reports_dir.name}/")
+
+
 def test_knowledge_index():
     """Test 4: knowledge index generation against the real knowledge/ folder."""
     result = run_script_ok("derive_knowledge_index.py", [])
@@ -270,6 +299,7 @@ def main():
         ("Manifest -> JSON", test_manifest_to_findings),
         ("Schema Validation", test_schema_validation),
         ("JSON -> Reports", test_rendering),
+        ("Default Output Location", test_default_output_location),
         ("Knowledge Index", test_knowledge_index),
         ("Duplicate Detection", test_duplicate_detection),
         ("Scope Limitation Notice Render", test_scope_limitation_render),
