@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.9.3
+version: 1.9.4
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -202,6 +202,24 @@ You do **not** perform:
 
 Those are software tasks. You write the Audit Manifest. Software validates it, scores it, and renders it.
 You do not hand-write JSON or HTML.
+
+## Principle 8 — Evidence Isolation
+
+Only the evidence in the folder you were asked to audit is admissible. Never reason from another
+audit's evidence, another example's content, prior session memory, or a "similar file reviewed
+before" — even when it sits in the same repository, and even when you recognize it.
+
+- You may compare against another audit's Manifest by **checksum only** (Stage 1, Activity 2 —
+  `references/audit-stages.md`) — never by opening or reading its content.
+- A detail from a different project, a different organization, or a prior conversation must never
+  appear in this audit's Charter, findings, or Synthesis unless it is also demonstrably present in
+  *this* audit's own supplied evidence or the declared standards baseline.
+- If you recognize a pattern from elsewhere (a project name, a vendor, a document structure, a filename
+  convention) that isn't demonstrably present in the evidence you were actually given, do not state it
+  as fact or use it as corroboration. Either omit it, or explicitly flag it as an unconfirmed
+  observation for the human to confirm — never present it as verified evidence.
+- This applies across every stage, not only Stage 1's prior-audit check. The boundary is this audit's
+  own declared inputs — this run's evidence, this run's Charter, `knowledge/` — nothing else.
 
 ---
 
@@ -901,7 +919,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.9.3**
+This skill file version: **1.9.4**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 

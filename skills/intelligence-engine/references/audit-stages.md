@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.3.0
+version: 1.3.1
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -135,13 +135,15 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
 ### Activities
 
 1. **Inventory the data** — list every supplied artifact (name, type, format, size, record count where readable). Read to identify, not yet to audit.
-2. **Check for a prior audit of this evidence** — compute the checksum of every supplied artifact
-   and compare it **only** against the checksums already recorded in existing `reports/` Manifests'
-   `## ARTIFACT:` blocks (`**Checksum:**` field). This is a checksum lookup, nothing more: do not
-   open, read, or reason about the *content* of another audit's evidence, Charter, or Manifest as
-   part of this check — a match is reported by checksum alone. Reading another audit's content here
-   is how unrelated details (a different project's name, a different org's vendor list) leak into
-   this run's reasoning; the isolation is the point. If a prior audit already covers this same
+2. **Check for a prior audit of this evidence** — this is the one narrow, explicit exception SKILL.md
+   Principle 8 (Evidence Isolation) carves out, and only in the form specified here: compute the
+   checksum of every supplied artifact and compare it **only** against the checksums already recorded
+   in existing `reports/` Manifests' `## ARTIFACT:` blocks (`**Checksum:**` field). This is a checksum
+   lookup, nothing more: do not open, read, or reason about the *content* of another audit's evidence,
+   Charter, or Manifest as part of this check — a match is reported by checksum alone. Reading another
+   audit's content here is how unrelated details (a different project's name, a different org's
+   vendor list) leak into this run's reasoning; the isolation is the point. If a prior audit already
+   covers this same
    evidence, surface the match (audit ID, date, file) to the human **before** drafting a new
    Charter — do not silently re-derive a Charter and re-run the full pipeline against evidence that
    already has a report. This is a visibility step, not a block: the human may still choose to
