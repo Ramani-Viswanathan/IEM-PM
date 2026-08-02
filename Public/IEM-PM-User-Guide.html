@@ -831,6 +831,37 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             <dt>Is there a live dashboard I should be looking for?</dt>
             <dd>No, and there isn't meant to be. <code>report.html</code> is the whole interface — open it, read it, share the file itself with whoever needs it.</dd>
           </div>
+          <div class="faq-item">
+            <dt>I'm new — how do I audit a project's artifacts against PMI standards?</dt>
+            <dd>
+              <ul>
+                <li>Create <code>Audit/&lt;ProjectName&gt;/evidence/</code> and drop your artifacts in (schedules, RAID logs, charters, status reports, etc.).</li>
+                <li>Make sure <code>knowledge/PMI/</code> has real PMI standard documents in it — nothing runs without a baseline.</li>
+                <li>Open Claude Code, point it at <code>skills/intelligence-engine/SKILL.md</code>, and ask it to audit <code>Audit/&lt;ProjectName&gt;/evidence/</code> against PMI.</li>
+                <li>Review the Charter it proposes (scope + standards) and ratify, edit, or decline it.</li>
+                <li>Let it run to completion — reports land in <code>Audit/&lt;ProjectName&gt;/reports/</code>.</li>
+              </ul>
+              <p style="margin-top:0.6rem;"><strong>What it audits:</strong> your delivery artifacts against the real PMI standard text you dropped into <code>knowledge/</code> — clause by clause, never from memory.</p>
+              <p style="margin-top:0.4rem;"><strong>Which gaps:</strong> one of 7, closed taxonomy — Missing · Ignored · Disconnected · Untrusted · Underutilized · Misclassified · Divergent — each also traced to one of 7 root origins (Capture · Integration · Definition/Taxonomy · Ownership · Process/Cadence · Tooling · Behavior).</p>
+              <p style="margin-top:0.4rem;"><strong>What sequence it follows:</strong> Baseline → Charter (proposed → ratified) → Define → Measure → Classify → Trace → Engineer &amp; Score → Synthesize (Manifest) → JSON (validated) → Render → Final Summary.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>What does "auditing the gap" actually mean — what is it comparing?</dt>
+            <dd>
+              <p>Not your project's performance — whether the <em>data PMI requires you to capture and use</em> actually exists, is complete, trusted, and used correctly in your evidence. For every checkable criterion in the standard, it asks "does this evidence satisfy it?" A "no" becomes one of:</p>
+              <ul>
+                <li><strong>Missing</strong> — required, doesn't exist anywhere in your evidence.</li>
+                <li><strong>Ignored</strong> — exists, but isn't acted on.</li>
+                <li><strong>Disconnected</strong> — exists, but doesn't tie to another artifact it should reference.</li>
+                <li><strong>Untrusted</strong> — exists, but contradicts itself or another source.</li>
+                <li><strong>Underutilized</strong> — exists and is correct, but isn't used to inform decisions.</li>
+                <li><strong>Misclassified</strong> — exists, but tagged/categorized wrong against the standard's taxonomy.</li>
+                <li><strong>Divergent</strong> — exists, but deviates from the standard's defined process/format without documented rationale.</li>
+              </ul>
+              <p style="margin-top:0.6rem;">So the check is: standard's required data element → present in evidence? → if yes, is it trustworthy, connected, used, correctly classified, and consistent with the standard's process? Every "no" is one finding, one gap type, traced to a root cause.</p>
+            </dd>
+          </div>
         </dl>
 
         <h3 style="margin-top:1.8rem;">If something fails</h3>
