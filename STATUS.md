@@ -442,6 +442,53 @@ requirements.txt updates must land in the same step as any new `import`, and a c
 `pip install -r requirements.txt` + `test_pipeline.py` run (or CI) is the actual backstop, not
 memory.
 
+## 9. Errors Found & Fixed — Consolidated Log (for write-ups)
+
+**Compiled 2026-08-02 01:13 CDT.** Every real defect found in this project, how it was found, the
+fix, and its commit — in one place. Distinct from the narrative in §1/§5/§7/§8 above, which is
+scattered by topic; this is chronological and exhaustive, kept up to date going forward.
+
+### A. Engine/process defects — found and fixed
+
+| # | Date/time found | What broke | How it was found | Fix | Commit |
+|---|---|---|---|---|---|
+| 1 | 2026-07-27 11:34 | `baseline.py` Stage 0 scan didn't recurse into `knowledge/` subfolders — hid every standard in a subdirectory. | First real pilot audit against real PMI standards. | Fixed the scan to recurse. | `ce569ab` |
+| 2 | 2026-07-27 12:57 | `baseline.py`'s "reuse if fingerprint unchanged" cache trusted an *empty* skeleton as valid — 27 of 29 real standards silently frozen at zero TOC entries from an earlier failed extraction, never retried. | Stage 0 follow-up audit of the real knowledge base. | Never trust an empty skeleton as cached-valid; always retry until a non-empty skeleton is extracted. Registry-derivation procedure specified (SKILL.md Phase 0b, `registry-format.md`). | `aeef25f` |
+| 3 | 2026-07-27 ~14:00 | `openpyxl` (needed to read `.xlsx` evidence) installed ad hoc mid-session, never added to `requirements.txt`. | Only surfaced when directly asked "did you make any code changes." | Added to `requirements.txt`. Take-away: dependency additions must land in the same step as the `import`, not be caught by memory. | `336eb58` |
+| 4 | 2026-07-29 16:10–16:45 | No halt condition caught a *readable, ratifiable* evidence set too thin to support a credible audit (a single CSV was about to reach Charter proposal against a 6-standard PMI baseline). | Real Pilot-audit-4 evidence deliberately this thin. | Minimum Evidence Sufficiency Gate (Halt Condition 6) designed and finalized: 7 categories, 3 cumulative rules, Scope Limitation Notice output. | `91205ae`…`5061342` |
+| 5 | 2026-07-29 17:16 | Category B's "what represented means" text mixed schedule/cost language into a Scope-only category; the Scope Limitation Notice `.html` renderer didn't exist at all. | Cold, fresh-session (no prior context) real run of Halt Condition 6 against Pilot-audit-4. | Wording fixed at the source; `scripts/render_scope_limitation.py` built and regression-tested. | `caa158b` |
+| 6 | 2026-08-01 23:11 | `audit-stages.md` Stage 6's Purpose falsely claimed to compute the Reporting Integrity Score (directly contradicting SKILL.md §9.2/§9.5). The four-part diagnostic (Evidence·Impact·Why/Who/Scope·Fix-at-source) was in the original design but silently absent from the live SKILL.md path. Stage 8/9 headings falsely claimed their scripts didn't exist. Stage 7's Preconditions trusted a bare `SCORED` flag with no verification that Stages 0–6's working memory actually survived intact. Stage 4 had no way to distinguish a legitimate zero-gap clean audit from Stage 3 never having run at all. | Completing `audit-stages.md` end-to-end and cross-checking every claim against the actual SKILL.md/scripts it described, not just filling in template blanks. | RIS-claim corrected; four-part diagnostic restored and mapped to real Finding Block fields; Stage 8/9 corrected; Stage 7 hardened with real chain-verification + new hard-stop `CHAIN_INTEGRITY_LOST`; Stage 4 gained `EVALUATION_UNVERIFIED`. Wired into SKILL.md (§5 pointers) — promoted from excluded to actively-read. `audit-stages.md` → v1.0.0 complete, SKILL.md → v1.9.0. | `54a54d9` |
+| 7 | 2026-08-02 00:00–00:15 | `manifest_to_findings.py`: (a) `_parse_standards`/`_parse_scope` split on `,`, shredding any standard title with its own internal comma (several real PMI titles have one) into bogus fragments. (b) `_parse_percentage` accepted a bare number with no `%`, so "27 of 27 declared columns present" was misread as 27% instead of 100%. (c) RIS formula's severity/density deduction caps saturated too easily — a routine 14-finding audit already floored at 0.0, indistinguishable from a catastrophic one. (d) `reports/` output location was ambiguous in prose and the Manifest was actually written to the wrong place (`examples/Pilot-audit-2/reports/` instead of repo-root). (e) No check for whether evidence had already been audited — `Pilot-audit-2` was independently re-audited against PMI without knowing `Pilot-audit-3` already covered the same evidence. (f) Two real evidence-reading mistakes: a Cost Tracker column misread (Total Variance/Remaining Budget values swapped), and Task Board FIND-0010 undercounted affected rows (13 claimed vs. 17 actual) while missing an entire 4th affected subtree entirely. | Live PMI re-run of Pilot-audit-2, then rigorous verification of the output against the real `.xlsx` evidence (checksums, cell-by-cell reads) rather than trusting the Manifest's prose. | (a)/(b) fixed with new regression assertions. (c) Caps widened by user decision, methodology → v1.1.0. (d) `file-naming.md`/SKILL.md §10.6/`audit-stages.md` Stage 1+7 now state repo-root explicitly. (e) New Stage 1 Activity: checksum-match supplied evidence against existing `reports/` Manifests before drafting a new Charter. (f) Two new Stage 3 rules: column-index alignment, exhaustive row counting. `audit-stages.md` → v1.1.0, SKILL.md → v1.9.1. | `e3afc76` |
+| 8 | 2026-08-02 ~00:20 | SKILL.md §13.2's Knowledge Base Reading Guide hardcoded a fixed, already-stale folder-name table (`PMBOK/`, `MSP/`, `ISO21502/` never existed; real folders existed but weren't all listed) — any org restructuring `knowledge/` breaks it. | User reorganized `knowledge/PMI/`'s 30 files into `PMI/`+`PMI-AI/`+`PMI-Other/`+`PMI-Sustainability/`, immediately breaking the table. | `baseline.py` now calls `derive_knowledge_index.py`'s scan as part of Stage 0 itself, writing `knowledge_index.json` (actual current folder/category structure, whatever it's named) every run. SKILL.md §13.2/§4.1 now point to that dynamic index; zero hardcoded folder names anywhere in the mechanism. `audit-stages.md` → v1.2.0, SKILL.md → v1.9.2. | `6663688` |
+| 9 | 2026-08-02 00:49 | STATUS.md itself had drifted stale in 5+ places (registry-derivation count stuck at "1 of 29" through several real derivations; version numbers; the PMI folder reorg undocumented). | Direct review while answering a registry-derivation question. | All stale references corrected; new rows added throughout. | `2c94a58` |
+
+### B. Found and reported — **not yet fixed** (suggested only, per explicit instruction)
+
+| # | Date/time found | What broke | Evidence | Suggested fix (not applied) |
+|---|---|---|---|---|
+| 10 | 2026-08-02 ~00:30 | Cross-audit contamination: a fresh Charter-proposal run for `Pilot-audit-5` asserted "the hardware vendors 'Rhombus/TD Synnex/Amazon/IDN/RingCentral' match" as corroborating evidence that the evidence belongs to ClientOrg Consulting. Grepped all 11 Pilot-audit-5 files for those terms — zero matches. "Rhombus" is actually part of a *different project's name* from the unrelated Pilot-audit-2/3 evidence. The new Stage 1 prior-audit check (fix #7e above) appears to have led the model to read *content* from other audits' folders, not just compare checksums. | `grep -il "Rhombus\|TD Synnex\|RingCentral\|Amazon\|IDN\|ClientOrg" examples/Pilot-audit-5/*.md` → no output. | Narrow Stage 1 Activity 2's wording to be strictly mechanical: compare checksums only, never open or reason about *content* from another audit's evidence/Charter/Manifest. Consider a standalone "Evidence Isolation" principle near Evidence Discipline in SKILL.md. |
+| 11 | 2026-08-02 ~00:30 | Charter ratification interaction asked 3 separate clarifying questions (org-name confirmation, CR-001 exclusion, candidate-Missing disposition) *before* reaching the single ratify/edit/"just run it"/decline decision Stage 1's own Decision Logic defines — unnecessary friction not specified anywhere in the design. | Full transcript review of the Pilot-audit-5 Charter-proposal run. | Revise Stage 1's "present the draft Charter" activity: never ask separate clarifying questions before ratification. Propose a reasonable default for every ambiguity, flag the assumption *inside* the Charter text (already done well for the org-name/CR-001 cases), and let one ratify/edit/run/decline response resolve it — "edit" is the correct override channel. |
+
+### C. Evidence-quality issues found in example data (not tool defects — a recurring pattern worth watching)
+
+Both un-caught by the engine's own Stage 3 in the runs where they appeared — noted here because the
+*pattern* (two sections of the same document silently disagreeing with each other) is exactly the
+kind of thing IEM-PM exists to catch, and missing it twice is worth tracking as its own signal.
+
+| # | Date/time found | Document | The contradiction |
+|---|---|---|---|
+| 12 | 2026-08-01 ~23:50 | Pilot-audit-2's `Project_Status_Report` (via manual review, not the audit itself) | Cost Status table's own "Total" row ($241,400) omits the Contingency Reserve line entirely — doesn't reconcile against the Charter/PMP's approved $265,540 baseline. |
+| 13 | 2026-08-02 ~01:10 | Pilot-audit-5's `07_Cost_Baseline` | §1's summary table shows CA-05 (Contingency) as $8,320; §4's own detailed breakdown of "Contingency Reserve (CA-05)" totals $24,140 by itself, itemized five ways. Both can't be right. |
+
+### Open items summary (as of this log)
+
+- Registry derivation: **7 of 29** PMI standards now deep-dived (`requirementsmgmt_pg.json` added this
+  session), all on-demand from real audits, none pre-batched. 22 remain — see §5's strategy note.
+- Items #10 and #11 above (cross-audit contamination scoping; ratification interaction) — suggested,
+  not implemented. Awaiting a decision on whether/when to apply.
+- SKILL.md conciseness pass (<500-line guidance), bulk registry derivation, `.claude-plugin/` packaging,
+  CI — all still open, unchanged by this session's work. See §5.
+
 # Status update : Table
 
 | Status | Item                                                                                                                                 | Source                |
