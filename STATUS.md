@@ -59,6 +59,25 @@
 > real data-reading mistakes surfaced in the same run (a Cost Tracker column swap; an undercounted,
 > incomplete Task Board finding). `references/audit-stages.md` is now `version: 1.1.0`; `SKILL.md` is
 > now `version: 1.9.1`.
+>
+> **2026-08-02, later the same day — `knowledge/PMI/` reorganized; hardcoded folder-name table
+> replaced with a dynamic index.** The user split `knowledge/PMI/`'s 30 files into `PMI/` (14 core
+> delivery/measurement standards) plus three new sibling folders — `PMI-AI/` (3), `PMI-Other/` (8,
+> including `Governance_PG.pdf`), `PMI-Sustainability/` (3) — and `Agile/` gained its first real
+> content. This exposed that `SKILL.md` §13.2's Knowledge Base Reading Guide hardcoded a fixed,
+> already-stale set of folder names (`PMBOK/`, `MSP/`, `ISO21502/` never actually existed; the real
+> `PRINCE2/`/`PMI/`/`Agile/`/`Organizational/` folders did, but the reorg's new categories weren't,
+> and couldn't be, listed). Since any organization can structure `knowledge/` however it likes, a
+> fixed table can never stay correct. Fix: `baseline.py` now calls the previously-standalone
+> `derive_knowledge_index.py`'s scan as part of Stage 0 itself, writing `knowledge_index.json` (the
+> actual current folder/category structure, whatever it's named, with document counts) alongside the
+> skeleton map and registries in one run — verified live, correctly found all 6 real categories with
+> zero hardcoded names. `SKILL.md` §13.2 and §4.1 now point to that dynamic index instead of the
+> fixed table; the one remaining heuristic (the org's own internal-process documents override generic
+> standards) is identified by content/category name, not a required exact folder name.
+> `references/audit-stages.md` Stage 0 gained a matching Activity/Output. `audit-stages.md` is now
+> `version: 1.2.0`; `SKILL.md` is now `version: 1.9.2`. 6/6 regression tests still pass. Committed and
+> pushed as `6663688`.
 
 ---
 
@@ -68,7 +87,7 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.9.1 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Now 901 lines — grew back above the trimmed figure by design: §5's 8 Phases each carry a real inline pointer into `audit-stages.md`'s now-complete Stages, promoting it from excluded to actively-read (see §5 below). Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections, not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.9.2 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Now 901 lines — grew back above the trimmed figure by design: §5's 8 Phases each carry a real inline pointer into `audit-stages.md`'s now-complete Stages, promoting it from excluded to actively-read (see §5 below). Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections, not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. §13.2/§4.1 (2026-08-02): replaced a hardcoded, already-stale `knowledge/` folder-name table with a pointer to the dynamically-generated `knowledge_index.json` — no folder name is assumed to exist anymore. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
 | `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score (Weighted Gap Profile **v1.1.0** — severity/density deduction caps widened 2026-08-02, see intro). No maturity/OPM3 modeling — scrapped, see §2.2. Two real parsing bugs found and fixed 2026-08-02 (comma-splitting on multi-comma standard titles; Field Coverage prose misread as a raw-count percentage) — see intro and `test_pipeline.py`. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |
@@ -77,6 +96,7 @@
 | `skills/intelligence-engine/scripts/derive_knowledge_index.py` | ✅ Built — catalogs `knowledge/` (filenames/sizes only, no content) into `knowledge_index.json`.    |
 | `skills/intelligence-engine/knowledge/`             | Baseline drop-zone (gitignored) — **29 real PMI standards now present** in `knowledge/PMI/` (PMBOK 8th Ed., Practice Standard for Scheduling 3rd Ed., Standard for Risk Management, Governance of Portfolios/Programs/Projects Practice Guide, and others). Used for the real pilot audit in `examples/pilot-audit/`. |
 | `skills/intelligence-engine/registries/`            | Derived-at-runtime registry output (gitignored except README). Mechanism complete and specified in SKILL.md Phase 0b; `skeleton_map.json` fixed (25/29 real skeletons, up from 2/29 — see §2 locked decisions / §4 build order item 7). **6 of 29** standards now have real deep-dived registries (`ps_scheduling_3rd.json`, `standard_earned_value_management.json`, `ps_wbs_thirded.json`, `thestandardforriskmgmt.json`, `governance_pg.json`, `practice_standard_project_configuration_management.json` — 18 items total), all derived on demand by real audits (Stage 2), none pre-emptively batched; the other 23 are not yet derived — deliberately deferred, not blocked. See §5's strategy note. |
+| `skills/intelligence-engine/knowledge_index.json`   | ✅ Built 2026-08-02 (gitignored, derived output) — the dynamic folder/category scan of `knowledge/`'s actual current structure (`derive_knowledge_index.py`'s logic, now called from `baseline.py` as part of Stage 0, not a separate manual step). Replaces a hardcoded folder-name table in SKILL.md §13.2 that couldn't survive the user reorganizing `knowledge/PMI/` into `PMI/`+`PMI-AI/`+`PMI-Other/`+`PMI-Sustainability/`. Zero hardcoded category names anywhere in the mechanism — verified live against the real reorg (found all 6 real categories correctly). |
 | `_archive/`                                          | Superseded: old `pmo-data-gap-audit` skill, old `IEM-PM_BLUEPRINT.md`, `remit/` — history only            |
 | `stakeholder/`                                       | PMI volunteer copyrighted material — **never touch, never publish, never build on**                       |
 | `LICENSE`, `README.md`, `requirements.txt`           | ✅ Built — MIT license, visitor-facing README, pinned deps (jsonschema, jinja2, pypdf, cryptography, openpyxl). Packaging *prerequisites* — not the skill package itself (see §4 item 11). |
@@ -232,6 +252,12 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   reading mistakes (a spreadsheet column misread; an undercounted finding that also missed an entire
   affected subtree) prompted two new Stage 3 rules: align values to headers by column index, and
   enumerate matching rows exhaustively rather than sampling when a finding cites a count.
+  **2026-08-02, later the same day, `version: 1.2.0`:** Stage 0 gained a new Activity/Output —
+  building `knowledge_index.json` (the actual `knowledge/` folder/category structure this run,
+  whatever it's named) via `baseline.py` now calling `derive_knowledge_index.py`'s scan internally.
+  Prompted by the user reorganizing `knowledge/PMI/` into 4 folders, which exposed that SKILL.md
+  §13.2 hardcoded a fixed folder-name table that could never survive an org restructuring its own
+  `knowledge/` layout. See the intro for the full account.
 - **`allowed-tools:` frontmatter field** — open, low priority. Not part of the general Agent Skills
   spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
   Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
@@ -455,6 +481,7 @@ memory.
 | done   | Fixed an ambiguous `reports/` output-location convention that had caused a real misplaced-file mistake; now explicit (repo-root only) in `file-naming.md`, `SKILL.md` §10.6, and `audit-stages.md` Stage 1/7. | STATUS.md |
 | done   | Added a Stage 1 checksum-based check for a prior audit of the same evidence, and two Stage 3 evidence-reading rules (column-index alignment; exhaustive row counting) — both prompted by real mistakes caught on the same live run. | STATUS.md |
 | next   | Reconcile why `Pilot-audit-3` and `Pilot-audit-2` (v2.0.0)'s independent PMI-scoped audits of the same evidence produced 6 vs. 14 findings — not yet investigated. | STATUS.md |
+| done   | Reorganized `knowledge/PMI/` into `PMI/`+`PMI-AI/`+`PMI-Other/`+`PMI-Sustainability/`; replaced SKILL.md's hardcoded, already-stale `knowledge/` folder-name table with a dynamically-generated `knowledge_index.json` (now built by `baseline.py` as part of Stage 0) so no folder name is ever assumed to exist. | STATUS.md |
 | next   | User to add further pilot runs. | STATUS.md |
 | next   | Further SKILL.md conciseness edit (§2/§5/§6/§9 — core, per-invocation content) to bring the body closer to Anthropic's <500-line guidance — separate, slower pass; may not land exactly under 500 without cutting real operational guidance. | STATUS.md             |
 | next   | Run bulk Stage 0 criteria-derivation across the remaining 23 real standards (6 of 29 now deep-dived, all on-demand — see §5 strategy note).                             | STATUS.md             |
