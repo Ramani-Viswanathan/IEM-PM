@@ -131,12 +131,19 @@ class ManifestParser:
         return header
 
     def _parse_standards(self, text: str) -> List[str]:
-        """Parse comma-separated standards list."""
-        return [s.strip() for s in text.split(",") if s.strip()]
+        """Parse semicolon-separated standards list.
+
+        Full standard titles routinely contain commas of their own (e.g. "Standard
+        for Risk Management in Portfolios, Programs, and Projects"), so splitting on
+        "," shreds a single title into several bogus entries. ";" is the Manifest's
+        declared separator (AUDIT_MANIFEST_template.md Sec 10.2.1) precisely to avoid
+        that collision.
+        """
+        return [s.strip() for s in text.split(";") if s.strip()]
 
     def _parse_scope(self, text: str) -> List[str]:
-        """Parse comma-separated scope list."""
-        return [s.strip() for s in text.split(",") if s.strip()]
+        """Parse semicolon-separated scope list. See _parse_standards for why ';'."""
+        return [s.strip() for s in text.split(";") if s.strip()]
 
     # ─── Artifact Parsing ───
 
@@ -263,24 +270,33 @@ class ManifestParser:
 
     def _compute_ris(self, findings: List[Dict]) -> Dict[str, Any]:
         """
-        Reporting Integrity Score v1.0.0 — deterministic.
+        Reporting Integrity Score v1.1.0 — deterministic.
         Formula:
         - Base: 100
-        - Deduct severity points: sum(severity * 2) capped at 60
-        - Deduct density penalty: (findings / artifacts) * 10, capped at 20
+        - Deduct severity points: sum(severity) capped at 50 (saturates at total
+          severity 50 — e.g. ~17 Critical findings, not ~6)
+        - Deduct density penalty: (findings / artifacts) * 5, capped at 20
+          (saturates at density 4/artifact, not 2/artifact)
         - Deduct root cause diversity penalty: unique origins > 4 ? 10 : 0
         - Deduct Missing gap penalty: count(Missing) * 3, capped at 20
+
+        v1.0.0's severity/density caps saturated too easily — a routine,
+        moderately-thorough audit (e.g. 14 findings, avg severity ~2.6) already
+        hit both caps and floored at 0, identical to a genuinely catastrophic
+        audit. These weights are widened so the score keeps discriminating
+        between "flawed" and "catastrophic" instead of both reading as the same
+        zero.
         """
         if not findings:
-            return {"score": 100.0, "methodology": "Weighted Gap Profile v1.0.0", "version": "1.0.0"}
+            return {"score": 100.0, "methodology": "Weighted Gap Profile v1.1.0", "version": "1.1.0"}
 
         total_severity = sum(f["severity"] for f in findings)
-        severity_deduction = min(total_severity * 2, 60)
+        severity_deduction = min(total_severity, 50)
 
         # Artifact count from manifest or default to 1
         art_count = max(len(self._parse_artifacts()), 1)
         density = len(findings) / art_count
-        density_deduction = min(density * 10, 20)
+        density_deduction = min(density * 5, 20)
 
         origins = {f["root_origin"] for f in findings}
         diversity_deduction = 10 if len(origins) > 4 else 0
@@ -292,8 +308,8 @@ class ManifestParser:
 
         return {
             "score": round(score, 2),
-            "methodology": "Weighted Gap Profile v1.0.0",
-            "version": "1.0.0"
+            "methodology": "Weighted Gap Profile v1.1.0",
+            "version": "1.1.0"
         }
 
     def _compute_evidence_summary(self, artifacts: List[Dict]) -> Dict[str, Any]:
@@ -332,11 +348,24 @@ class ManifestParser:
 
     @staticmethod
     def _parse_percentage(text: Optional[str]) -> Optional[float]:
-        """Parse '85%' or '85' into 85.0. Returns None if unparseable."""
+        """Parse a Field Coverage value into a 0-100 float.
+
+        Accepts an explicit percentage ("85%", "(100%)") or the "N of M declared
+        columns present" count the Manifest template actually asks for
+        (AUDIT_MANIFEST_template.md Sec 10.2.2), computing N/M*100 in that case.
+        The "%" sign is required for the bare-number form -- without it, any number
+        in the Observations-style text (a row count, a dollar figure) would be
+        silently misread as a percentage. Returns None if neither form is present;
+        a field this stage cannot confidently parse must be omitted, not guessed.
+        """
         if not text:
             return None
-        match = re.search(r'(\d+(?:\.\d+)?)\s*%?', text)
-        return float(match.group(1)) if match else None
+        of_match = re.search(r'(\d+)\s+of\s+(\d+)', text, re.IGNORECASE)
+        if of_match:
+            n, m = int(of_match.group(1)), int(of_match.group(2))
+            return round((n / m) * 100, 1) if m else None
+        pct_match = re.search(r'(\d+(?:\.\d+)?)\s*%', text)
+        return float(pct_match.group(1)) if pct_match else None
 
     @staticmethod
     def _parse_date(text: Optional[str]) -> Optional[datetime]:

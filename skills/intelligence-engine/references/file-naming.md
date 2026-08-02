@@ -30,7 +30,11 @@ IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>
 | HTML report               | `.html`   | `render.py`                            |
 | TXT report                | `.txt`    | `render.py`                            |
 
-All four live in `reports/` (gitignored, local-only — see repo `.gitignore`).
+All four live in the **repository root's** `reports/` folder — e.g. `IEM-PM/reports/`, sibling to
+`skills/`, never inside the example or evidence folder being audited (`examples/<name>/reports/` is
+not a valid output location, even for a run scoped to that example). `scripts/paths.py`'s
+`REPORTS_DIR` is the single source of truth for this path; it resolves relative to the scripts'
+own location, not the current working directory. Gitignored, local-only — see repo `.gitignore`.
 
 **Example**, for an audit dated `2026-07-27T14:30:00Z`:
 

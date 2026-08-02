@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.9.0
+version: 1.9.1
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -765,9 +765,11 @@ Do not put these in the Manifest:
 
 ## 10.6 Output Location
 
-Write the Manifest to `reports/`, named per Appendix G (`references/file-naming.md`):
-`IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, where the date/time is this audit's own Date — the same
-value you put in the header's `**Date:**` field, not an arbitrary filename.
+Write the Manifest to the **repository root's** `reports/` folder (e.g. `IEM-PM/reports/`, sibling
+to `skills/` — never inside the example or evidence folder being audited), named per Appendix G
+(`references/file-naming.md`): `IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, where the date/time is this
+audit's own Date — the same value you put in the header's `**Date:**` field, not an arbitrary
+filename.
 This is your only write target. Everything else is software's job.
 
 ---
@@ -894,7 +896,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.9.0**
+This skill file version: **1.9.1**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 

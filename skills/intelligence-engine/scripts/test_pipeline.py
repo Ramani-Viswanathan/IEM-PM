@@ -85,8 +85,20 @@ def test_manifest_to_findings():
         }, f"artifact names not resolved correctly: {names}"
 
         # Field coverage averaged from the manifest's declared per-artifact
-        # values (85%, 92%, 78% -> 85.0). Regression: used to be hardcoded 0.0.
+        # values (85%, 92%, "39 of 50" -> 78% -> 85.0). Regression: used to be
+        # hardcoded 0.0; later regression: "N of M" prose was misread as the
+        # raw column count (39) instead of computing 39/50*100.
         assert data["evidence_summary"]["coverage_percentage"] == 85.0
+
+        # Standards Baseline / Scope split on ";", not ",". Regression: a
+        # comma-splitter shreds any standard title that contains a comma of
+        # its own (e.g. "...in Portfolios, Programs, and Projects") into
+        # bogus fragments.
+        assert data["baseline"]["standards_declared"] == [
+            "PMBOK 8th Edition",
+            "Standard for Risk Management in Portfolios, Programs, and Projects",
+        ], f"standards_declared corrupted by comma-splitting: {data['baseline']['standards_declared']}"
+        assert data["baseline"]["scope"] == ["Projects", "Programs"]
 
         # Indicator order must be canonical and stable (regression: used to be
         # a Python set, so iteration order was randomized per process).

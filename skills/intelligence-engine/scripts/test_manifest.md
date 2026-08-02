@@ -2,8 +2,8 @@
 
 **Audit ID:** IEM-20260726-TEST01
 **Charter Version:** v1.0.0
-**Standards Baseline:** PMBOK 8th Edition, Org-PMM-v2.3
-**Scope:** Projects, Programs
+**Standards Baseline:** PMBOK 8th Edition; Standard for Risk Management in Portfolios, Programs, and Projects
+**Scope:** Projects; Programs
 **Analyst:** IEM-PM Intelligence Engine
 **Date:** 2026-07-26T11:30:00-05:00
 **Status:** RATIFIED
@@ -32,7 +32,7 @@
 **Path:** /data/governance/pack.pdf
 **Checksum:** c3d4e5f6g7h8
 **Status:** Examined
-**Field Coverage:** 78%
+**Field Coverage:** 39 of 50 declared columns present
 **Observations:** Governance pack produced monthly. Baseline approval section is blank.
 
 ### FINDING: FIND-0001

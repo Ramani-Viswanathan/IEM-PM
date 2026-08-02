@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -124,15 +124,29 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
 ### Activities
 
 1. **Inventory the data** — list every supplied artifact (name, type, format, size, record count where readable). Read to identify, not yet to audit.
-2. **Propose Artifact Declaration (function 1)** — from the data: classify each supplied artifact by type (risk register, schedule, status report, …).
-3. **Propose Field Semantics Map (function 2)** — from the data: for each significant field, propose its business meaning, flagging every assumption.
-4. **Propose Materiality & Scope (function 3)** — from the applicability map: which artifact types, governance levels, thresholds, and time period the _standards_ expect to be in evidence.
-5. **Surface candidate Missing gaps** — every artifact the applicability map expects but the upload lacks is listed for the human to **supply, confirm as a finding, or explicitly waive**.
-6. **Present the draft Charter** for ratification: the three proposals, all assumptions, and the candidate-Missing list, each marked with what it was derived from (data vs. standards).
-7. **Record the outcome and write the Charter** to the run's `reports/` folder — ratified (with ratifier and date) or PROVISIONAL.
+2. **Check for a prior audit of this evidence** — compute the checksum of every supplied artifact
+   and scan the repository-root `reports/` folder's existing Manifests (`## ARTIFACT:` blocks) for a
+   matching set of checksums. If a prior audit already covers this same evidence, surface it to the
+   human **before** drafting a new Charter — do not silently re-derive a Charter and re-run the full
+   pipeline against evidence that already has a report. This is a visibility step, not a block: the
+   human may still choose to re-audit (e.g. against a different standard baseline), but that should
+   be a deliberate choice, not a discovery made by accident after the fact.
+3. **Propose Artifact Declaration (function 1)** — from the data: classify each supplied artifact by type (risk register, schedule, status report, …).
+4. **Propose Field Semantics Map (function 2)** — from the data: for each significant field, propose its business meaning, flagging every assumption.
+5. **Propose Materiality & Scope (function 3)** — from the applicability map: which artifact types, governance levels, thresholds, and time period the _standards_ expect to be in evidence.
+6. **Surface candidate Missing gaps** — every artifact the applicability map expects but the upload lacks is listed for the human to **supply, confirm as a finding, or explicitly waive**.
+7. **Present the draft Charter** for ratification: the three proposals, all assumptions, and the candidate-Missing list, each marked with what it was derived from (data vs. standards).
+8. **Record the outcome and write the Charter** to the repository root's `reports/` folder (e.g.
+   `IEM-PM/reports/`, sibling to `skills/` — never inside the example/evidence folder being audited;
+   `references/file-naming.md`) — ratified (with ratifier and date) or PROVISIONAL.
 
 ### Decision Logic
 
+- IF a prior audit of this same evidence (matching checksums) already exists in `reports/` → present
+  it to the human alongside the draft Charter proposal (Activity 2) rather than proceeding silently.
+  A different standard baseline, a re-scoped Charter, or evidence that has since changed are all
+  legitimate reasons to re-audit — but the human should decide that knowingly, not learn about the
+  prior run only after a second full pipeline has already run.
 - IF the human **ratifies** → Charter becomes the immutable interpretation contract for the run.
 - IF the human **edits** → incorporate the edits and re-present; only the human-approved version is ratified.
 - IF the human says **"just run it"** → proceed with a **PROVISIONAL Charter** (§4.2 function 4); the flag is carried in the Charter and every finding in the run inherits the unratified-interpretation caveat.
@@ -142,7 +156,8 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
 
 ### Outputs
 
-Written to the run's `reports/` folder:
+Written to the repository root's `reports/` folder (never inside the example/evidence folder being
+audited — see Activity 8):
 
 1. **The PMO Data Charter** — ratified (ratifier + date) or marked PROVISIONAL.
 2. **Candidate Missing gap dispositions** — each standards-expected absence with its outcome: supplied / confirmed (carried into Stage 3 as a finding seed) / waived (with the human's stated reason).
@@ -311,6 +326,12 @@ Evaluate every applicable registry criterion against the delivery evidence; each
 
 1. **Read the evidence** — read every delivery artifact declared in the Charter, to observe, not
    yet to judge. Do not interpret any field the Charter's Field Semantics Map has not defined.
+   For tabular artifacts (spreadsheets, exports), map each value to its header **by column index**,
+   not by visual position or memory — a header row and a data row read separately are easy to
+   misalign by one column, and a misaligned read produces a confidently wrong number, not an
+   obviously wrong one. When a finding's evidence depends on a count of matching rows (e.g. "N rows
+   have no schedule data"), enumerate every row against the actual condition rather than sampling or
+   estimating — an undercount is a citation error like any other, even though it feels like a detail.
 2. **Evaluate each applicable criterion** — for every registry criterion Stage 2 resolved as
    applicable to a given artifact, apply that criterion's `Evaluation Method` (`registry-format.md`,
    Appendix E) against the observed evidence in that artifact.
@@ -782,8 +803,10 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
    Referenced.
 7. **Run Final Validation** — check the completed Manifest against all 9 checks in SKILL.md §12.1
    before declaring it done.
-8. **Save the Manifest** — to `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` (Appendix G,
-   `references/file-naming.md`), using this audit's own Date — not wall-clock run time.
+8. **Save the Manifest** — to the repository root's `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`
+   (e.g. `IEM-PM/reports/...`, sibling to `skills/` — never inside the example/evidence folder being
+   audited; Appendix G, `references/file-naming.md`), using this audit's own Date — not wall-clock
+   run time.
 9. **Print the Handover Message** (§12.3) and stop. Do not run scripts, calculate the Reporting
    Integrity Score, or render reports.
 

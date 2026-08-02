@@ -1,6 +1,6 @@
 # IEM-PM — Project Status
 
-> Last updated: 2026-07-29. This file is the single save-point: decisions, current state, next actions.
+> Last updated: 2026-08-02. This file is the single save-point: decisions, current state, next actions.
 > (Previous 2026-07-05 version had SKILL.md, the schema, validator, manifest parser, and renderer
 > listed as "next" — all five are now written and were verified end-to-end on 2026-07-26, then
 > committed and pushed as `df71e85`. Since then: a real pilot audit ran against real PMI standards
@@ -25,12 +25,40 @@
 > a new cross-cutting rule, Terminology Discipline (`references/terminology.md`, SKILL.md §6.7),
 > added to keep all free-text narrative in the standard's own PM vocabulary rather than synonyms or
 > vendor jargon — SKILL.md was v1.8.0 at that point. All of the above is pushed to `origin/master`.
-> **Not yet committed:** `references/audit-stages.md` completed end to end — all 11 stages, zero
-> `TODO(you)`, `version: 1.0.0` — with several real corrections along the way (Stage 6's wrong claim
+> `references/audit-stages.md` was then completed end to end — all 11 stages, zero `TODO(you)`,
+> `version: 1.0.0` at the time — with several real corrections along the way (Stage 6's wrong claim
 > to compute the RIS; the four-part diagnostic restored; Stage 7 hardened with a real
 > chain-verification check and a new `CHAIN_INTEGRITY_LOST` hard stop; stale script/path references
 > fixed); then wired into SKILL.md for real — every §5 Phase now points into its matching Stage,
-> promoting the file from excluded to actively-read — SKILL.md now v1.9.0.)
+> promoting the file from excluded to actively-read — SKILL.md reached v1.9.0.)
+>
+> **2026-08-02 — real bugs found and fixed on a live re-run.** Re-ran `examples/Pilot-audit-2/`
+> against the PMI baseline (a second, independent Charter/audit, alongside the existing
+> `examples/Pilot-audit-3/` PMI run — see §8), which surfaced two genuine defects in
+> `manifest_to_findings.py`, missed by the existing test fixtures because none of them exercised a
+> standard title containing its own comma, or a "Field Coverage" line written as prose instead of a
+> bare percentage: (1) `_parse_standards`/`_parse_scope` split on `,`, shredding any standard title
+> with an internal comma (several real PMI titles have one) into bogus fragments — fixed, now splits
+> on `;` per `AUDIT_MANIFEST_template.md`'s declared convention; (2) `_parse_percentage` accepted a
+> bare number with no `%` sign, so "27 of 27 declared columns present" was misread as "27%" instead
+> of 100% — fixed, now parses the "N of M" form and requires an explicit `%` for the bare-number
+> form. Both covered by new regression assertions in `test_pipeline.py` (still 6/6) and verified
+> against the real, re-generated Pilot-audit-2 output. Also: the Reporting Integrity Score formula's
+> severity/density deduction caps saturated too easily — a routine 14-finding audit already floored
+> at 0.0, indistinguishable from a genuinely catastrophic one — widened by decision (severity caps at
+> total severity 50, not 30; density caps at 4/artifact, not 2), methodology bumped to v1.1.0;
+> Pilot-audit-2 went from 0.0 to 21.5 under the new formula. Separately, the same live run exposed a
+> real output-location bug (the Manifest was written to `examples/Pilot-audit-2/reports/` instead of
+> the actual convention, repo-root `reports/`, discovered only by chasing a file path) and a
+> missed-context gap (the run independently re-derived a full Charter and audit without knowing
+> `Pilot-audit-3` already covered the same evidence against PMI) — both now closed at the process
+> level: `references/file-naming.md`, `SKILL.md` §10.6, and `audit-stages.md` Stage 1/7 all now state
+> the repo-root location explicitly, and a new Stage 1 Activity checks evidence checksums against
+> existing `reports/` Manifests before drafting a new Charter. Stage 3 also picked up two
+> evidence-reading rules (column-index alignment; exhaustive row counting, not sampling) after two
+> real data-reading mistakes surfaced in the same run (a Cost Tracker column swap; an undercounted,
+> incomplete Task Board finding). `references/audit-stages.md` is now `version: 1.1.0`; `SKILL.md` is
+> now `version: 1.9.1`.
 
 ---
 
@@ -40,21 +68,21 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.9.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Now 901 lines — grew back above the trimmed figure by design: §5's 8 Phases each carry a real inline pointer into `audit-stages.md`'s now-complete Stages, promoting it from excluded to actively-read (see §5 below). Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections, not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.9.1 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Now 901 lines — grew back above the trimmed figure by design: §5's 8 Phases each carry a real inline pointer into `audit-stages.md`'s now-complete Stages, promoting it from excluded to actively-read (see §5 below). Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections, not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
-| `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score. No maturity/OPM3 modeling — scrapped, see §2.2. |
+| `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score (Weighted Gap Profile **v1.1.0** — severity/density deduction caps widened 2026-08-02, see intro). No maturity/OPM3 modeling — scrapped, see §2.2. Two real parsing bugs found and fixed 2026-08-02 (comma-splitting on multi-comma standard titles; Field Coverage prose misread as a raw-count percentage) — see intro and `test_pipeline.py`. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |
 | `skills/intelligence-engine/scripts/findings.schema.json` | ✅ Built — Draft-07 schema, all 5 contract objects modeled.                                            |
 | `skills/intelligence-engine/scripts/baseline.py`     | ✅ Built (Stage 0 mechanics) — fingerprints `knowledge/`, extracts PDF/MD skeletons, diffs against prior run. |
 | `skills/intelligence-engine/scripts/derive_knowledge_index.py` | ✅ Built — catalogs `knowledge/` (filenames/sizes only, no content) into `knowledge_index.json`.    |
 | `skills/intelligence-engine/knowledge/`             | Baseline drop-zone (gitignored) — **29 real PMI standards now present** in `knowledge/PMI/` (PMBOK 8th Ed., Practice Standard for Scheduling 3rd Ed., Standard for Risk Management, Governance of Portfolios/Programs/Projects Practice Guide, and others). Used for the real pilot audit in `examples/pilot-audit/`. |
-| `skills/intelligence-engine/registries/`            | Derived-at-runtime registry output (gitignored except README). Mechanism complete and specified in SKILL.md Phase 0b; `skeleton_map.json` fixed (25/29 real skeletons, up from 2/29 — see §2 locked decisions / §4 build order item 7). One real registry derived as proof (`ps_scheduling_3rd.json`, 3 items); the other 28 standards are not yet derived — deliberately deferred, not blocked. |
+| `skills/intelligence-engine/registries/`            | Derived-at-runtime registry output (gitignored except README). Mechanism complete and specified in SKILL.md Phase 0b; `skeleton_map.json` fixed (25/29 real skeletons, up from 2/29 — see §2 locked decisions / §4 build order item 7). **6 of 29** standards now have real deep-dived registries (`ps_scheduling_3rd.json`, `standard_earned_value_management.json`, `ps_wbs_thirded.json`, `thestandardforriskmgmt.json`, `governance_pg.json`, `practice_standard_project_configuration_management.json` — 18 items total), all derived on demand by real audits (Stage 2), none pre-emptively batched; the other 23 are not yet derived — deliberately deferred, not blocked. See §5's strategy note. |
 | `_archive/`                                          | Superseded: old `pmo-data-gap-audit` skill, old `IEM-PM_BLUEPRINT.md`, `remit/` — history only            |
 | `stakeholder/`                                       | PMI volunteer copyrighted material — **never touch, never publish, never build on**                       |
 | `LICENSE`, `README.md`, `requirements.txt`           | ✅ Built — MIT license, visitor-facing README, pinned deps (jsonschema, jinja2, pypdf, cryptography, openpyxl). Packaging *prerequisites* — not the skill package itself (see §4 item 11). |
 | `references/file-naming.md` (Appendix G)             | ✅ Built — `IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`, timestamp sourced from the audit's own Date, not wall-clock run time. Wired into `manifest_to_findings.py` and `render.py` as the default. |
 | `references/error-codes.md` (Appendix H)             | ✅ Built — `E-BASE-*`/`E-PARSE-*`/`E-VALID-*`/`E-RENDER-*` prefix every validation failure across `baseline.py`/`schema.py`/`manifest_to_findings.py`/`render.py`. |
-| `examples/Pilot-audit-2/`, `examples/Pilot-audit-3/` | ✅ Two real, ratified production audits — real ClientOrg Consulting evidence (not synthetic), same project measured against two different baselines (org process flow, then PMI standards). Committed (evidence files included — repo is **private**). See §8. |
+| `examples/Pilot-audit-2/`, `examples/Pilot-audit-3/` | ✅ Real, ratified production audits — real ClientOrg Consulting evidence (not synthetic). `Pilot-audit-2` now carries **two** independent ratified Charters/audits of the same evidence: v1.0.0 (org process flow, 6 findings) and a 2026-08-02 v2.0.0 PMI-scoped re-run (14 findings) — the latter run independently, without knowledge that `Pilot-audit-3` already covered the same evidence against PMI (6 findings). Both kept deliberately; reconciling the finding-count gap between the two PMI-scoped runs is an open item, not yet done. Committed (evidence files included — repo is **private**). See §8. |
 | `skills/intelligence-engine/scripts/paths.py`        | ✅ Built 2026-07-27 — single source of truth for `SCRIPTS_DIR`/`ENGINE_DIR`/`REPO_ROOT`/`KNOWLEDGE_DIR`/`REGISTRIES_DIR`/`ASSETS_DIR`/`REPORTS_DIR`/`DEFAULT_TEMPLATE`. Fixes a real inconsistency: `manifest_to_findings.py`/`render.py` had duplicated a fragile `Path(__file__).resolve().parents[3]` in two places, different from `baseline.py`/`derive_knowledge_index.py`/`test_pipeline.py`'s `.parent.parent` style. All 5 scripts now import from here; verified working from both `scripts/` and the repo root, 5/5 regression tests still pass. |
 
 ## 2. Locked decisions (do not re-litigate)
@@ -91,8 +119,14 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
    re-derive — see §Phase 0b), and `references/registry-format.md` documents the file-wrapper
    schema with a real worked example. One real registry derived end-to-end as proof
    (`registries/ps_scheduling_3rd.json`, 3 items from PS_Scheduling_3rd.pdf) — gitignored,
-   local-only, not committed by design. Bulk derivation across the other 28 standards is
-   intentionally deferred as a separate, deliberately-run job, not part of this fix.
+   local-only, not committed by design. **Update 2026-08-02:** the real PMI re-audit of
+   Pilot-audit-2 organically deep-dived 5 more standards on demand (Stage 2, as designed) —
+   `standard_earned_value_management.json` (5 items), `ps_wbs_thirded.json` (3),
+   `thestandardforriskmgmt.json` (3), `governance_pg.json` (3),
+   `practice_standard_project_configuration_management.json` (1) — so **6 of 29** standards now
+   have real deep-dived registries (18 items total, ~1,004 of ~5,265 total pages). Bulk derivation
+   across the other 23 standards (~4,261 pages) is intentionally deferred as a separate,
+   deliberately-run job, not part of this fix — see §5 for the strategy question.
 8. ✅ Renderer — `scripts/render.py` written and verified.
 9. ✅ Report template — `assets/report_template.html` written (377 lines).
 10. ✅ Regression tests — `scripts/test_pipeline.py` rebuilt against real fixtures (5 tests: Manifest→JSON, Schema Validation, JSON→Reports, Knowledge Index, Duplicate Detection), 5/5 passing, committed. Not pytest-based (stdlib only, by design), but no longer manual/informal.
@@ -104,8 +138,34 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
 - ~~The gaps→OPM3 bridge~~ — **scrapped 2026-07-27**, not an open item anymore. See locked decision #2.
 - ~~Registry derivation mechanism~~ — **complete 2026-07-27**. Procedure specified in SKILL.md
   Phase 0b, file format in `references/registry-format.md`, and a real `baseline.py` bug fixed
-  (25/29 skeletons were silently stuck empty). Proven on one standard. Bulk derivation across the
-  remaining 28 standards is the next open item, not this one.
+  (25/29 skeletons were silently stuck empty). Proven on one standard, and since 2026-08-02 organic
+  on-demand derivation (Stage 2, real audits) has taken it to **6 of 29** standards deep-dived (see
+  Build Order item 7). Bulk derivation across the remaining **23** standards is the next open item,
+  not this one — whether it's worth doing as a dedicated batch job at all, versus continuing to let
+  Stage 2 derive on demand per audit, is itself an open question (see the strategy note added
+  2026-08-02 below).
+- **Bulk registry derivation strategy (added 2026-08-02, not started)** — 23 of 29 PMI standards
+  (~4,261 pages) remain skeleton-only. Recommendation: do **not** run this as one blind top-to-bottom
+  batch. (1) The engine's own design already derives on demand (Stage 2) — every standard deep-dived
+  so far, all 6, was driven by a real audit actually citing it, not a pre-emptive batch. Bulk-deriving
+  all 23 up front pre-pays for standards that may never get cited by a real audit (e.g. the two
+  Sustainability standards, AI Essentials) while the on-demand path has zero waste. (2) If a batch is
+  still wanted (e.g. to remove Stage 2's first-audit latency for common standards), prioritize by
+  expected citation frequency, not page count or file order: PMBOK 8th Ed. (401pp, cross-cutting,
+  Stage 2 already falls back to it whenever a domain-specific standard doesn't fully cover a
+  criterion — see `AUDIT_MANIFEST_template.md` §7.1 usage in Pilot-audit-2), the Portfolio (140pp)
+  and Program (262pp) Management standards, and `pmo_practiceguide_eng.pdf` (342pp) are far more
+  likely to be cited across future audits than the AI/Sustainability/Business-Analysis standards.
+  (3) Deep-diving is deliberately slow by design (Principle 3 — paraphrase + citation anchor, never
+  verbatim; each item needs to be individually checked against the real PDF text, not skimmed) —
+  tonight's 5 standards (~782 pages, 15 items) were derived as a side effect of one live audit
+  session, not a dedicated timed run, so there's no clean per-page throughput number yet. A realistic
+  dedicated pass would batch 3-5 standards per session grouped by size (small <100pp, medium
+  100-250pp, large 250-500pp), verify each against `registry-format.md`'s Appendix E structure and
+  the No-Verbatim rule before moving to the next, and treat page count as a rough proxy for effort,
+  not a precise one — a dense standard with many distinct normative statements takes longer per page
+  than a narrative practice guide. Estimate: roughly 6-8 dedicated sessions for the remaining 23,
+  not a single run.
 - **Severity bands (Appendix D)** — done: `references/severity-matrix.md` (153 lines) + SKILL.md §9.1.
   Wired in 2026-07-29 as an explicit calibration-reference pointer from §9.1 (was previously
   unreferenced anywhere in SKILL.md despite formalizing the same Decision Impact/Spread/Persistence
@@ -155,13 +215,23 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   0–6 write nothing to disk except the Charter, a chain-verification check (confirming every finding
   actually carries its full Stage 3–6 contributions) now runs before writing begins, with its own
   hard-stop code (`CHAIN_INTEGRITY_LOST`) for genuinely unrecoverable memory loss.
-  **Now wired into SKILL.md (v1.9.0):** promoted from "excluded" (§13.3, "you do not need to open
+  **Wired into SKILL.md (v1.9.0):** promoted from "excluded" (§13.3, "you do not need to open
   these") to **actively read** — each §5 Phase now carries a real inline pointer into its matching
   Stage, same pattern already used for `gap-taxonomy.md`/`root-origins.md` (read on demand, not
   preloaded). §5 stays the concise index; `audit-stages.md` is the engine — the tier Claude actually
   executes from. This also closes the real regression flagged when this item was opened: Phase 5's
   pointer to Stage 6 means the four-part diagnostic is no longer silently missing from the live
   path.
+  **2026-08-02, `version: 1.1.0`:** a live PMI re-run of `Pilot-audit-2` surfaced three more real
+  gaps in this file, now fixed — see the intro for the full account: (1) the `reports/` output
+  location was ambiguous ("the run's `reports/` folder") and the run actually wrote to the wrong
+  place; Stage 1 and Stage 7 now both state the repo-root location explicitly, matching
+  `scripts/paths.py`'s `REPORTS_DIR`. (2) Nothing checked whether the evidence being audited already
+  had a prior audit on file; Stage 1 gained a new Activity that checksum-matches supplied evidence
+  against existing `reports/` Manifests before a new Charter is drafted. (3) Two real evidence-
+  reading mistakes (a spreadsheet column misread; an undercounted finding that also missed an entire
+  affected subtree) prompted two new Stage 3 rules: align values to headers by column index, and
+  enumerate matching rows exhaustively rather than sampling when a finding cites a count.
 - **`allowed-tools:` frontmatter field** — open, low priority. Not part of the general Agent Skills
   spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
   Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
@@ -256,13 +326,15 @@ decision #2), so there is nothing left to design. What actually happened this we
   that froze 27 of 29 real standards at an empty skeleton from an earlier failed extraction) — Done
 - Registry derivation mechanism — now fully specified (SKILL.md Phase 0b, file format in
   `references/registry-format.md`) and proven on one real standard
-  (`registries/ps_scheduling_3rd.json`) — Done. Bulk derivation across the other 28 standards —
-  Upcoming
+  (`registries/ps_scheduling_3rd.json`) — Done. As of 2026-08-02, on-demand derivation from real
+  audits has taken this to 6 of 29 standards. Bulk derivation across the other 23 standards —
+  Upcoming, strategy noted in §5
 
 **Week 6 (Aug 3–9) — Registry & Renderer — In progress.**
 - ⚠️ "Registry complete ('no baseline, no audit') — only skeleton-level derivation exists so far" →
-  the *mechanism* is complete and proven on 1 of 29 standards (see Week 5); full derivation across
-  all 29 remains — In progress, not Upcoming
+  the *mechanism* is complete; as of 2026-08-02, on-demand derivation from real audits has deep-dived
+  6 of 29 standards (see §5's strategy note); full derivation across all 29 remains — In progress,
+  not Upcoming
 - Deterministic renderer & report template — LLM judges, code renders — Done
 - Regression tests across the audit state machine — Done (`test_pipeline.py`, 6/6 passing —
   originally 5/5, committed in `1c68116`; a 6th test for the Scope Limitation Notice renderer added
@@ -317,14 +389,25 @@ full Charter propose→ratify, not a shortcut:
 
 | Audit | Baseline measured against | Findings | Reporting Integrity Score | Charter |
 | ------- | ---------------------------- | ---------- | ---------------------------- | --------- |
-| `examples/Pilot-audit-2/` | ClientOrg's own Sales-PMO-Operations process flow | 6 | 41.0/100 | Ratified |
+| `examples/Pilot-audit-2/` (v1.0.0) | ClientOrg's own Sales-PMO-Operations process flow | 6 | 41.0/100 | Ratified |
 | `examples/Pilot-audit-3/` | 4 PMI standards (Scheduling, Risk Mgmt, EVM, Governance PG) | 6 | 34.0/100 | Ratified |
+| `examples/Pilot-audit-2/` (v2.0.0, 2026-08-02) | 6 PMI standards (adds WBS, full Risk Mgmt Standard, Governance PG, Config Mgmt to Pilot-audit-3's set) | 14 | 21.5/100 (was 0.0 under the pre-fix RIS formula, see intro) | Ratified |
 
 Same underlying evidence, deliberately re-audited against a stricter external baseline instead of
 the org's own process — RIS dropped as expected. One real standard document
 (`ClientOrg_PMO_Process_AND_GUIDELINES.pdf`) turned out to be scanned screenshots with no text layer;
 formally waived out of both Charters rather than guessed at — a real "can't read this" case the
 engine had not hit before.
+
+**2026-08-02:** `Pilot-audit-2` was independently re-audited against PMI a second time (v2.0.0
+Charter), without the session first checking whether this evidence had already been PMI-audited —
+`Pilot-audit-3` already had, at the time this row was added three weeks earlier. The two runs used
+different standard subsets (v2.0.0 pulled in two more PMI documents) and produced more than double
+the findings (14 vs. 6) against materially the same evidence. Both outputs were kept, per user
+decision, rather than reconciled or deleted — understanding why they diverge that much is a real
+open item (different registry depth, different judgment calls, or a genuine gap in one run), not
+yet investigated. The missing prior-audit check that let this happen is now fixed — see the
+`audit-stages.md` entry in §5.
 
 **Real bug found during these runs:** reading `.xlsx` evidence required `openpyxl`, installed ad
 hoc mid-session and initially **not** added to `requirements.txt` — caught only when asked directly
@@ -366,8 +449,15 @@ memory.
 | done   | Reviewed SKILL.md against Anthropic's official skill-authoring best practices; moved §4.2's Charter spec verbatim into references/charter-spec.md; added Tables of Contents to the three reference/asset files over the 100-line threshold (severity-matrix.md, audit-stages.md, AUDIT_MANIFEST_template.md). SKILL.md body: 1,071 → 968 lines. | STATUS.md             |
 | done   | Branched §11 Report Generation out to references/report-generation.md; found and fixed a real gap where the move had left no pointer behind in SKILL.md at all; reordered the Example Finding Block into its correct place in AUDIT_MANIFEST_template.md and added it to that file's TOC. SKILL.md body: 968 → 864 lines. | STATUS.md             |
 | done   | Linked SKILL.md's main Table of Contents; added Name/description/version headers to every references/*.md file (charter-spec, error-codes, file-naming, registry-format, report-generation, severity-matrix, audit-stages); added the two still-missing sub-TOCs (charter-spec.md, report-generation.md, both >100 lines). | STATUS.md             |
+| done   | Completed and committed `references/audit-stages.md` (v1.1.0, all 11 stages, zero `TODO(you)`) and wired it into SKILL.md v1.9.1 as actively-read, not excluded documentation. | STATUS.md |
+| done   | Found and fixed two real parsing bugs in `manifest_to_findings.py` on a live PMI re-run of Pilot-audit-2: comma-splitting corrupting multi-comma standard titles, and Field Coverage prose misread as a raw-count percentage. Added regression coverage for both (still 6/6). | STATUS.md |
+| done   | Widened the Reporting Integrity Score formula's severity/density deduction caps (v1.0.0 → v1.1.0) — the prior caps saturated at 0.0 for any moderately-thorough audit, losing the ability to distinguish "flawed" from "catastrophic." | STATUS.md |
+| done   | Fixed an ambiguous `reports/` output-location convention that had caused a real misplaced-file mistake; now explicit (repo-root only) in `file-naming.md`, `SKILL.md` §10.6, and `audit-stages.md` Stage 1/7. | STATUS.md |
+| done   | Added a Stage 1 checksum-based check for a prior audit of the same evidence, and two Stage 3 evidence-reading rules (column-index alignment; exhaustive row counting) — both prompted by real mistakes caught on the same live run. | STATUS.md |
+| next   | Reconcile why `Pilot-audit-3` and `Pilot-audit-2` (v2.0.0)'s independent PMI-scoped audits of the same evidence produced 6 vs. 14 findings — not yet investigated. | STATUS.md |
+| next   | User to add further pilot runs. | STATUS.md |
 | next   | Further SKILL.md conciseness edit (§2/§5/§6/§9 — core, per-invocation content) to bring the body closer to Anthropic's <500-line guidance — separate, slower pass; may not land exactly under 500 without cutting real operational guidance. | STATUS.md             |
-| next   | Run bulk Stage 0 criteria-derivation across the remaining 28 real standards (mechanism proven on 1 of 29).                             | STATUS.md             |
+| next   | Run bulk Stage 0 criteria-derivation across the remaining 23 real standards (6 of 29 now deep-dived, all on-demand — see §5 strategy note).                             | STATUS.md             |
 | next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done. Verify the `allowed-tools:` frontmatter field against Claude Code's own skill-packaging docs when this starts. | STATUS.md             |
 | next   | Add CI (GitHub Actions) running test_pipeline.py + a clean-room requirements.txt install on every push.                                | STATUS.md             |
 | open   | UI/UX for non-technical PMs — parked, brainstormed only, no decision. See §5 Open design items.                                        | STATUS.md             |

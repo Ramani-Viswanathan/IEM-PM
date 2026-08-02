@@ -18,11 +18,16 @@ Follow these rules exactly. Software parses this file with regex and markdown pa
 
 **Audit ID:** IEM-YYYYMMDD-XXXXXX
 **Charter Version:** vX.X.X
-**Standards Baseline:** [Standard1, Standard2, ...]
-**Scope:** [Projects, Programs, Portfolios, PMO]
+**Standards Baseline:** [Standard1; Standard2; ...]
+**Scope:** [Projects; Programs; Portfolios; PMO]
 **Analyst:** IEM-PM Intelligence Engine
 **Date:** [ISO-8601]
 **Status:** [RATIFIED / PROVISIONAL]
+
+Separate list items with `;`, not `,` — full standard titles routinely contain commas of their
+own (e.g. "Standard for Risk Management in Portfolios, Programs, and Projects"), and a
+comma-separated list cannot be split back apart unambiguously once that happens. The parser
+(`manifest_to_findings.py`) splits both fields on `;`.
 
 ### 10.2.2 Per-Artifact Evidence Log Template
 
@@ -34,8 +39,12 @@ For every artifact declared in the Charter, write:
 **Path:** [file path]
 **Checksum:** [SHA-256 or "computed"]
 **Status:** [Examined / Partial / Corrupted / Empty]
-**Field Coverage:** [X%]
+**Field Coverage:** [N of M declared columns present (X%)]
 **Observations:** [Narrative of what you found, field completeness, anomalies]
+
+The `(X%)` figure is mandatory, not optional narration — the parser needs an explicit percentage
+(or an "N of M" count it can compute one from) to populate `field_coverage_pct`. A prose-only
+count with no percentage and no "of" phrasing cannot be parsed and will be dropped.
 
 ### 10.2.3 Finding Block Template
 
