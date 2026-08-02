@@ -24,7 +24,13 @@
 > fresh-session Pilot-audit-4 run, and evidence-sufficiency.md's Category B wording fixed (`caa158b`);
 > a new cross-cutting rule, Terminology Discipline (`references/terminology.md`, SKILL.md §6.7),
 > added to keep all free-text narrative in the standard's own PM vocabulary rather than synonyms or
-> vendor jargon — SKILL.md now v1.8.0. All pushed to `origin/master`.)
+> vendor jargon — SKILL.md was v1.8.0 at that point. All of the above is pushed to `origin/master`.
+> **Not yet committed:** `references/audit-stages.md` completed end to end — all 11 stages, zero
+> `TODO(you)`, `version: 1.0.0` — with several real corrections along the way (Stage 6's wrong claim
+> to compute the RIS; the four-part diagnostic restored; Stage 7 hardened with a real
+> chain-verification check and a new `CHAIN_INTEGRITY_LOST` hard stop; stale script/path references
+> fixed); then wired into SKILL.md for real — every §5 Phase now points into its matching Stage,
+> promoting the file from excluded to actively-read — SKILL.md now v1.9.0.)
 
 ---
 
@@ -34,7 +40,7 @@
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | **`IEM-PM BLUEPRINT-1.md`**                         | ✅ **THE approved blueprint** (19 sections, Praxen-shaped, surgically aligned)                            |
 | `PRAXEN-BLUEPRINT.md`                               | Reference — how the model project (Praxen) is built                                                       |
-| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.8.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections (§2, §5, §6, §9), not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) now active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. |
+| `skills/intelligence-engine/SKILL.md`               | ✅ **Complete**, v1.9.0 — all 13 sections written, no `TODO(you)` markers. Checked against Anthropic's official skill-authoring best practices 2026-07-29: body trimmed 1,071 → 862 lines (Charter spec → `references/charter-spec.md`; Report Generation → `references/report-generation.md`, both as pointer stubs matching the §7/§8 pattern); main TOC linked; every `references/*.md` file now has a `Name`/`description`/`version` header and a TOC where >100 lines. Now 901 lines — grew back above the trimmed figure by design: §5's 8 Phases each carry a real inline pointer into `audit-stages.md`'s now-complete Stages, promoting it from excluded to actively-read (see §5 below). Still above the documented <500-line guidance — the remaining gap needs an actual conciseness edit of core sections, not more relocation; open, see §5. Halt Condition 6 (Minimum Evidence Sufficiency) active, with a working HTML renderer. §6.7 Terminology Discipline added — free-text prose must use the declared standard's own vocabulary. |
 | `skills/intelligence-engine/scripts/schema.py`       | ✅ Built — validates closed taxonomies, no-duplicate rule, evidence coverage. Passes on test fixture.      |
 | `skills/intelligence-engine/scripts/manifest_to_findings.py` | ✅ Built — Manifest → canonical JSON, computes Reporting Integrity Score. No maturity/OPM3 modeling — scrapped, see §2.2. |
 | `skills/intelligence-engine/scripts/render.py`       | ✅ Built — canonical JSON → HTML (Jinja2) + TXT. Verified byte-reproducible on test fixture.               |
@@ -135,13 +141,27 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   cutting along a heading boundary — deliberately scoped as its own, slower, separate pass. Ground
   rule: never cut or relocate content that's read every invocation just to hit the line count —
   quality/correctness outranks the metric. May land around 500–650 rather than exactly under 500.
-- **`references/audit-stages.md` incomplete** — open, 2026-07-29 (`version: 0.2.0-incomplete`).
-  44 `TODO(you)` markers across Stages 2–10 (Stage 0/1 fully written). See §7 Week 3–4 correction
-  for detail and how it was found. Does not block or affect real audits — Claude's operational path
-  never reads this file (SKILL.md marks it "Human developer" reference). Next step: fill the
-  `Inputs`/`Activities`/`Decision Logic`/`Outputs`/`Failure Conditions`/`Completion Criteria` stubs
-  for Stages 2–10, cross-referencing SKILL.md §5 and the already-complete `gap-taxonomy.md`/
-  `root-origins.md`/`error-codes.md`/`file-naming.md` for equivalent detail.
+- **`references/audit-stages.md` — complete and wired in, 2026-07-29** (`version: 1.0.0`, was
+  `0.2.0-incomplete`). All 11 stages fully written — zero `TODO(you)` markers, full
+  Precondition→Transition chain verified unbroken end to end. Beyond filling blanks: Stage 6's
+  Purpose was factually wrong (claimed to compute the Reporting Integrity Score, contradicting
+  §9.2/§9.5 — fixed); the four-part diagnostic (Evidence · Impact · Why/Who/Scope · Fix-at-source),
+  present in the original archived blueprint but absent from SKILL.md's live path, is now written
+  in and mapped onto the real Finding Block fields; Stages 8–9's headings and Purpose falsely
+  claimed their scripts didn't exist (both have existed and passed regression since earlier in the
+  build — fixed); every stale `reports/<run>/...` path replaced with the real Appendix G naming
+  convention; a dead `PENDING_BRIDGE` precondition (leftover from the scrapped OPM3 plan) removed
+  from Stage 7. Stage 7's own Preconditions was hardened beyond a bare `SCORED` flag: since Stages
+  0–6 write nothing to disk except the Charter, a chain-verification check (confirming every finding
+  actually carries its full Stage 3–6 contributions) now runs before writing begins, with its own
+  hard-stop code (`CHAIN_INTEGRITY_LOST`) for genuinely unrecoverable memory loss.
+  **Now wired into SKILL.md (v1.9.0):** promoted from "excluded" (§13.3, "you do not need to open
+  these") to **actively read** — each §5 Phase now carries a real inline pointer into its matching
+  Stage, same pattern already used for `gap-taxonomy.md`/`root-origins.md` (read on demand, not
+  preloaded). §5 stays the concise index; `audit-stages.md` is the engine — the tier Claude actually
+  executes from. This also closes the real regression flagged when this item was opened: Phase 5's
+  pointer to Stage 6 means the four-part diagnostic is no longer silently missing from the live
+  path.
 - **`allowed-tools:` frontmatter field** — open, low priority. Not part of the general Agent Skills
   spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
   Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when

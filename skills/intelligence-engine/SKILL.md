@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.8.0
+version: 1.9.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -379,6 +379,12 @@ read, not a substitute for reading it.
 
 **Hard stop if:** No standards in `knowledge/`, or Charter is unratified and the user has not authorized a PROVISIONAL run.
 
+**Full detail:** Read `references/audit-stages.md`, Stage 0, for the complete Decision Logic,
+Failure Conditions (exact printed messages), and Completion Criteria behind this phase. Stage 2 in
+the same file is the full expansion of 0b's derivation work above. Charter ratification (Contract 2,
+§4.2) happens between this phase and Phase 1, even though it isn't its own numbered Phase here —
+read Stage 1 for its full Decision Logic and Failure Conditions.
+
 ---
 
 ## Phase 1 — Evidence
@@ -391,6 +397,9 @@ Read every delivery artifact declared in the Charter. Schedules, RAID logs, gove
 **Output:** Mental notes of Observed Delivery.
 
 **Rule:** Do not interpret fields that the Charter has not defined. Flag unmapped fields and move on.
+
+**Full detail:** Read `references/audit-stages.md`, Stage 3 (Activity 1), for how this reading step
+connects into Measure.
 
 ---
 
@@ -405,6 +414,10 @@ For each criterion derived from the baseline, check whether the evidence satisfi
 
 **Rule:** If you suspect a gap but cannot cite evidence, it is not a raw gap. It is a candidate for the Synthesis narrative only.
 
+**Full detail:** Read `references/audit-stages.md`, Stage 3, for the complete Decision Logic
+(evidence citation rules, the no-duplicate consolidation rule, unreadable-artifact handling) and
+Failure Conditions before measuring.
+
 ---
 
 ## Phase 3 — Classify
@@ -415,6 +428,10 @@ Read Section 7 before classifying. The seven types are a closed list. No overlap
 
 **Inputs:** Raw gaps from Phase 2.
 **Output:** Classified gaps.
+
+**Full detail:** Read `references/audit-stages.md`, Stage 4, for the complete Decision Logic —
+including what happens if Stage 5 (Trace) later finds a classification inconsistent with the gap's
+true root cause.
 
 ---
 
@@ -427,6 +444,10 @@ Read Section 8 before tracing. The seven origins are a closed list. You must ide
 **Inputs:** Classified gaps from Phase 3.
 **Output:** Gaps with root origins.
 
+**Full detail:** Read `references/audit-stages.md`, Stage 5, for the complete Decision Logic,
+including the Earliest Point rule and the reconciliation path back to Stage 4 when a trace reveals
+the gap type doesn't actually hold.
+
 ---
 
 ## Phase 5 — Score
@@ -437,6 +458,10 @@ For each gap, assign severity 1–5 based on its threat to delivery capability. 
 
 **Inputs:** Classified and traced gaps from Phase 4.
 **Output:** Scored findings with recommended actions.
+
+**Full detail:** Read `references/audit-stages.md`, Stage 6, for the four-part diagnostic method
+(Evidence · Impact · Why/Who/Scope · Fix-at-source) and the severity-matrix band-to-1–5 bridge —
+this phase's summary above does not repeat that detail. Do not assign severity without it.
 
 ---
 
@@ -461,6 +486,12 @@ This is your **only output**. Write one markdown file containing:
 
 **Rule:** Write the Manifest as you go, or write it all at the end — but never hold findings in memory without recording them. The Manifest must be complete and self-contained.
 
+**Full detail:** Read `references/audit-stages.md`, Stage 7, **before** writing anything. It
+specifies a chain-verification check that must run first — confirming every finding actually
+carries its full Stage 3–6 contributions before you trust the working memory behind it — plus the
+exact Failure Conditions and Completion Criteria for this gate. This is the compaction-survival
+checkpoint; do not skip the verification to save time.
+
 ---
 
 ## Phase 7 — Handover
@@ -476,6 +507,11 @@ Your work ends at the Audit Manifest. You do not:
 - Manage file names or directories
 
 ## The human runs `manifest_to_findings.py` and `render.py` after you finish. Your job is judgment through Phase 6 only.
+
+**Full detail:** Read `references/audit-stages.md`, Stages 8–10, if you want to understand what
+happens after you stop — you do not execute any of it, but knowing the exact RIS formula, the
+render determinism guarantee, and the final console summary helps you write a Manifest that serves
+that deterministic tail well, rather than treating Phase 6 as the true end of the process.
 
 ---
 
@@ -845,16 +881,20 @@ These files exist in the repository for software and human operators. You do not
 | `render.py`                  | JSON → HTML/TXT renderer  | Software / Human |
 | `report_template.html`       | HTML report layout        | Software         |
 | `build.sh`                   | Build verification script | Human            |
-| `references/audit-stages.md` | Full system architecture  | Human developer  |
 
 You do not need to open these. Your interface is:
 
 - **Input:** `knowledge/` + ratified Charter + delivery artifacts
 - **Output:** Audit Manifest
 
+`references/audit-stages.md` is **not** in this list. As of v1.9.0 it is an actively-read
+reference, pointed to inline from every Phase in Section 5 — it carries the full Decision Logic,
+Failure Conditions (exact printed messages), and Completion Criteria that each Phase's summary
+above compresses. Read the Stage matching your current Phase; do not skip it to save time.
+
 ## 13.4 Version
 
-This skill file version: **1.8.0**
+This skill file version: **1.9.0**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 
