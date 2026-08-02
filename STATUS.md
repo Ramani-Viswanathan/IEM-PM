@@ -444,9 +444,10 @@ memory.
 
 ## 9. Errors Found & Fixed — Consolidated Log (for write-ups)
 
-**Compiled 2026-08-02 01:13 CDT.** Every real defect found in this project, how it was found, the
-fix, and its commit — in one place. Distinct from the narrative in §1/§5/§7/§8 above, which is
-scattered by topic; this is chronological and exhaustive, kept up to date going forward.
+**Compiled 2026-08-02 01:13 CDT, updated 2026-08-02 01:31 CDT.** Every real defect found in this
+project, how it was found, the fix, and its commit — in one place. Distinct from the narrative in
+§1/§5/§7/§8 above, which is scattered by topic; this is chronological and exhaustive, kept up to
+date going forward.
 
 ### A. Engine/process defects — found and fixed
 
@@ -461,19 +462,14 @@ scattered by topic; this is chronological and exhaustive, kept up to date going 
 | 7 | 2026-08-02 00:00–00:15 | `manifest_to_findings.py`: (a) `_parse_standards`/`_parse_scope` split on `,`, shredding any standard title with its own internal comma (several real PMI titles have one) into bogus fragments. (b) `_parse_percentage` accepted a bare number with no `%`, so "27 of 27 declared columns present" was misread as 27% instead of 100%. (c) RIS formula's severity/density deduction caps saturated too easily — a routine 14-finding audit already floored at 0.0, indistinguishable from a catastrophic one. (d) `reports/` output location was ambiguous in prose and the Manifest was actually written to the wrong place (`examples/Pilot-audit-2/reports/` instead of repo-root). (e) No check for whether evidence had already been audited — `Pilot-audit-2` was independently re-audited against PMI without knowing `Pilot-audit-3` already covered the same evidence. (f) Two real evidence-reading mistakes: a Cost Tracker column misread (Total Variance/Remaining Budget values swapped), and Task Board FIND-0010 undercounted affected rows (13 claimed vs. 17 actual) while missing an entire 4th affected subtree entirely. | Live PMI re-run of Pilot-audit-2, then rigorous verification of the output against the real `.xlsx` evidence (checksums, cell-by-cell reads) rather than trusting the Manifest's prose. | (a)/(b) fixed with new regression assertions. (c) Caps widened by user decision, methodology → v1.1.0. (d) `file-naming.md`/SKILL.md §10.6/`audit-stages.md` Stage 1+7 now state repo-root explicitly. (e) New Stage 1 Activity: checksum-match supplied evidence against existing `reports/` Manifests before drafting a new Charter. (f) Two new Stage 3 rules: column-index alignment, exhaustive row counting. `audit-stages.md` → v1.1.0, SKILL.md → v1.9.1. | `e3afc76` |
 | 8 | 2026-08-02 ~00:20 | SKILL.md §13.2's Knowledge Base Reading Guide hardcoded a fixed, already-stale folder-name table (`PMBOK/`, `MSP/`, `ISO21502/` never existed; real folders existed but weren't all listed) — any org restructuring `knowledge/` breaks it. | User reorganized `knowledge/PMI/`'s 30 files into `PMI/`+`PMI-AI/`+`PMI-Other/`+`PMI-Sustainability/`, immediately breaking the table. | `baseline.py` now calls `derive_knowledge_index.py`'s scan as part of Stage 0 itself, writing `knowledge_index.json` (actual current folder/category structure, whatever it's named) every run. SKILL.md §13.2/§4.1 now point to that dynamic index; zero hardcoded folder names anywhere in the mechanism. `audit-stages.md` → v1.2.0, SKILL.md → v1.9.2. | `6663688` |
 | 9 | 2026-08-02 00:49 | STATUS.md itself had drifted stale in 5+ places (registry-derivation count stuck at "1 of 29" through several real derivations; version numbers; the PMI folder reorg undocumented). | Direct review while answering a registry-derivation question. | All stale references corrected; new rows added throughout. | `2c94a58` |
+| 14 | 2026-08-02 ~00:30 | (Was item #10/#11 below, now fixed.) (a) Cross-audit contamination: Stage 1's prior-audit checksum check (fix #7e) was worded loosely enough that a `Pilot-audit-5` Charter-proposal run read *content* from unrelated `Pilot-audit-2/3` evidence and asserted a fabricated vendor-name match ("Rhombus/TD Synnex/Amazon/IDN/RingCentral") as corroboration for the organization's identity — "Rhombus" is actually part of a different project's *name*, not a vendor, and doesn't appear anywhere in Pilot-audit-5's own evidence. (b) The same run's Charter-ratification step asked 3 separate clarifying questions (org name, CR-001 exclusion, candidate-Missing disposition) before reaching the single ratify/edit/"just run it"/decline decision Stage 1's own Decision Logic defines — unspecified friction. | (a) `grep -il "Rhombus\|TD Synnex\|RingCentral\|Amazon\|IDN\|ClientOrg" examples/Pilot-audit-5/*.md` → no output. (b) Full transcript review of the Charter-proposal run. | (a) Stage 1 Activity 2 narrowed to a strict checksum lookup — explicitly forbids opening or reasoning about another audit's content. (b) Stage 1 Activity 7 now requires proposing a default for every ambiguity and flagging it in the Charter text itself, resolved by the single ratification response — no separate question rounds. `audit-stages.md` → v1.3.0. | *(this commit)* |
+| 15 | 2026-08-02 ~01:10 | Stage 3 had no systematic self-consistency check — a document could be marked 100% field-coverage while two of its own sections silently disagreed on the same figure, and Synthesis could assert "traces consistently" without that specific claim ever having been verified. This is exactly how findings #12 and #13 below both got past the engine. | Independent review (a "second opinion" audit of the audit) surfaced the same pattern twice across two unrelated evidence sets — a validated recurring miss, not a one-off. | New Stage 3 Activity 3: for every artifact, identify any figure stated more than once and verify the restatements agree; a mismatch is a raw `Untrusted` gap on its own, independent of any registry criterion. New Decision Logic rule ties it to the taxonomy. Stage 7 Activity 5 and SKILL.md §9.3 now require positive Synthesis claims ("traces consistently," "figures match") to be grounded in what Activity 3 actually checked, not asserted as general impression. `audit-stages.md` → v1.3.0, SKILL.md → v1.9.3. | *(this commit)* |
 
-### B. Found and reported — **not yet fixed** (suggested only, per explicit instruction)
+### C. Evidence-quality issues found in example data (not tool defects — the pattern that drove fix #15)
 
-| # | Date/time found | What broke | Evidence | Suggested fix (not applied) |
-|---|---|---|---|---|
-| 10 | 2026-08-02 ~00:30 | Cross-audit contamination: a fresh Charter-proposal run for `Pilot-audit-5` asserted "the hardware vendors 'Rhombus/TD Synnex/Amazon/IDN/RingCentral' match" as corroborating evidence that the evidence belongs to ClientOrg Consulting. Grepped all 11 Pilot-audit-5 files for those terms — zero matches. "Rhombus" is actually part of a *different project's name* from the unrelated Pilot-audit-2/3 evidence. The new Stage 1 prior-audit check (fix #7e above) appears to have led the model to read *content* from other audits' folders, not just compare checksums. | `grep -il "Rhombus\|TD Synnex\|RingCentral\|Amazon\|IDN\|ClientOrg" examples/Pilot-audit-5/*.md` → no output. | Narrow Stage 1 Activity 2's wording to be strictly mechanical: compare checksums only, never open or reason about *content* from another audit's evidence/Charter/Manifest. Consider a standalone "Evidence Isolation" principle near Evidence Discipline in SKILL.md. |
-| 11 | 2026-08-02 ~00:30 | Charter ratification interaction asked 3 separate clarifying questions (org-name confirmation, CR-001 exclusion, candidate-Missing disposition) *before* reaching the single ratify/edit/"just run it"/decline decision Stage 1's own Decision Logic defines — unnecessary friction not specified anywhere in the design. | Full transcript review of the Pilot-audit-5 Charter-proposal run. | Revise Stage 1's "present the draft Charter" activity: never ask separate clarifying questions before ratification. Propose a reasonable default for every ambiguity, flag the assumption *inside* the Charter text (already done well for the org-name/CR-001 cases), and let one ratify/edit/run/decline response resolve it — "edit" is the correct override channel. |
-
-### C. Evidence-quality issues found in example data (not tool defects — a recurring pattern worth watching)
-
-Both un-caught by the engine's own Stage 3 in the runs where they appeared — noted here because the
-*pattern* (two sections of the same document silently disagreeing with each other) is exactly the
-kind of thing IEM-PM exists to catch, and missing it twice is worth tracking as its own signal.
+Both un-caught by the engine's Stage 3 *at the time they appeared* — the underlying gap (no
+systematic self-consistency check) is now fixed by #15 above; these two rows stay as the historical
+record of what got missed and why the fix mattered.
 
 | # | Date/time found | Document | The contradiction |
 |---|---|---|---|
@@ -482,12 +478,15 @@ kind of thing IEM-PM exists to catch, and missing it twice is worth tracking as 
 
 ### Open items summary (as of this log)
 
+- All items previously listed as "suggested, not fixed" (#10/#11, folded into #14) and the
+  self-consistency gap that let #12/#13 through (#15) are now fixed — see table A.
 - Registry derivation: **7 of 29** PMI standards now deep-dived (`requirementsmgmt_pg.json` added this
   session), all on-demand from real audits, none pre-batched. 22 remain — see §5's strategy note.
-- Items #10 and #11 above (cross-audit contamination scoping; ratification interaction) — suggested,
-  not implemented. Awaiting a decision on whether/when to apply.
 - SKILL.md conciseness pass (<500-line guidance), bulk registry derivation, `.claude-plugin/` packaging,
   CI — all still open, unchanged by this session's work. See §5.
+- Not yet re-run: no audit has exercised fix #15 (the self-consistency check) live yet — its first
+  real test will be the next audit run, ideally against evidence containing a genuine repeated-figure
+  mismatch to confirm it actually fires.
 
 # Status update : Table
 

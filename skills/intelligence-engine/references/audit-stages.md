@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.2.0
+version: 1.3.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -136,17 +136,30 @@ The input split _is_ the anti-mirror guard: input 1 may only inform functions 1�
 
 1. **Inventory the data** — list every supplied artifact (name, type, format, size, record count where readable). Read to identify, not yet to audit.
 2. **Check for a prior audit of this evidence** — compute the checksum of every supplied artifact
-   and scan the repository-root `reports/` folder's existing Manifests (`## ARTIFACT:` blocks) for a
-   matching set of checksums. If a prior audit already covers this same evidence, surface it to the
-   human **before** drafting a new Charter — do not silently re-derive a Charter and re-run the full
-   pipeline against evidence that already has a report. This is a visibility step, not a block: the
-   human may still choose to re-audit (e.g. against a different standard baseline), but that should
-   be a deliberate choice, not a discovery made by accident after the fact.
+   and compare it **only** against the checksums already recorded in existing `reports/` Manifests'
+   `## ARTIFACT:` blocks (`**Checksum:**` field). This is a checksum lookup, nothing more: do not
+   open, read, or reason about the *content* of another audit's evidence, Charter, or Manifest as
+   part of this check — a match is reported by checksum alone. Reading another audit's content here
+   is how unrelated details (a different project's name, a different org's vendor list) leak into
+   this run's reasoning; the isolation is the point. If a prior audit already covers this same
+   evidence, surface the match (audit ID, date, file) to the human **before** drafting a new
+   Charter — do not silently re-derive a Charter and re-run the full pipeline against evidence that
+   already has a report. This is a visibility step, not a block: the human may still choose to
+   re-audit (e.g. against a different standard baseline), but that should be a deliberate choice,
+   not a discovery made by accident after the fact.
 3. **Propose Artifact Declaration (function 1)** — from the data: classify each supplied artifact by type (risk register, schedule, status report, …).
 4. **Propose Field Semantics Map (function 2)** — from the data: for each significant field, propose its business meaning, flagging every assumption.
 5. **Propose Materiality & Scope (function 3)** — from the applicability map: which artifact types, governance levels, thresholds, and time period the _standards_ expect to be in evidence.
 6. **Surface candidate Missing gaps** — every artifact the applicability map expects but the upload lacks is listed for the human to **supply, confirm as a finding, or explicitly waive**.
-7. **Present the draft Charter** for ratification: the three proposals, all assumptions, and the candidate-Missing list, each marked with what it was derived from (data vs. standards).
+7. **Present the draft Charter** for ratification: the three proposals, all assumptions, and the
+   candidate-Missing list, each marked with what it was derived from (data vs. standards). Present
+   this as **one** ratification decision, not a multi-round Q&A: for every ambiguity encountered
+   while drafting (an inferred organization name, a template row that looks illustrative rather than
+   real, how to disposition a candidate-Missing item), propose a reasonable default and flag the
+   assumption directly in the Charter text — do not stop to ask a separate clarifying question for
+   each one before the human can even reach a ratification decision. The single ratify / edit / "just
+   run it" / decline response (Decision Logic) is the resolution mechanism; "edit" is how the human
+   overrides any default that's wrong.
 8. **Record the outcome and write the Charter** to the repository root's `reports/` folder (e.g.
    `IEM-PM/reports/`, sibling to `skills/` — never inside the example/evidence folder being audited;
    `references/file-naming.md`) — ratified (with ratifier and date) or PROVISIONAL.
@@ -346,18 +359,28 @@ Evaluate every applicable registry criterion against the delivery evidence; each
 2. **Evaluate each applicable criterion** — for every registry criterion Stage 2 resolved as
    applicable to a given artifact, apply that criterion's `Evaluation Method` (`registry-format.md`,
    Appendix E) against the observed evidence in that artifact.
-3. **Record a raw gap on failure** — where the evidence does not satisfy a criterion, cite the exact
-   evidence (a quote, field value, or explicit statement of absence, per Evidence Discipline §6.1)
-   and record one raw gap: which criterion failed, the citation, and a one-line description of the
-   variance. Where the evidence satisfies the criterion, record nothing — a pass is not a finding.
-4. **Resolve Stage 2's carried-forward items** — evaluate every unresolved companion-data request
+3. **Cross-check repeated figures within each artifact** — independent of any registry criterion: for
+   every artifact, identify any figure that is stated more than once (a total that also appears in a
+   summary table, a budget line repeated in a detail section, a count restated elsewhere) and verify
+   the restatements agree. This is not optional or criterion-triggered — run it on every artifact
+   that has more than one place a number could be stated. A mismatch is evidence on its own, whether
+   or not any standard's criterion happens to cover that field: two "100% field coverage" documents
+   have both concealed exactly this kind of internal contradiction in real audits (see
+   `gap-taxonomy.md`'s `Untrusted` type — data that conflicts with itself or other data).
+4. **Record a raw gap on failure** — where the evidence does not satisfy a criterion, or Activity 3
+   finds a figure that disagrees with its own restatement, cite the exact evidence (a quote, field
+   value, or explicit statement of absence, per Evidence Discipline §6.1) and record one raw gap:
+   which criterion failed (or which figures disagree), the citation, and a one-line description of
+   the variance. Where the evidence satisfies the criterion and every repeated figure agrees, record
+   nothing — a pass is not a finding.
+5. **Resolve Stage 2's carried-forward items** — evaluate every unresolved companion-data request
    and Field Semantics cross-check flag from Stage 2 as its own candidate gap: a genuinely
    standards-required absence becomes a raw gap (Missing-Data Rules, §6.2); anything the standards
    don't actually require is dropped, with the reason recorded.
-5. **Do not classify or trace yet** — a raw gap records only the failed criterion, its cited
+6. **Do not classify or trace yet** — a raw gap records only the failed criterion, its cited
    evidence, and the variance description. Gap type (Stage 4) and root origin (Stage 5) are not
    assigned here.
-6. **Consolidate the raw gap list** — ordered by artifact, then criterion, for Stage 4 to consume.
+7. **Consolidate the raw gap list** — ordered by artifact, then criterion, for Stage 4 to consume.
 
 ### Decision Logic
 
@@ -365,6 +388,10 @@ Evaluate every applicable registry criterion against the delivery evidence; each
   finding.
 - IF the evidence does not satisfy a criterion AND citable evidence exists for the variance (a
   quote, field value, or explicit absence) → record exactly one raw gap.
+- IF Activity 3's cross-check finds two statements of the same figure that disagree → record exactly
+  one raw gap citing both locations and both values, regardless of whether any registry criterion
+  covers that field. Marking an artifact's field coverage as complete is about presence, not
+  agreement — do not let a "100%" coverage figure stand in for having actually reconciled it.
 - IF a variance is suspected but no evidence can be cited for it → do **not** record a raw gap
   (§6.1). Note it only as a candidate for the Synthesis narrative in Stage 7 — never in the raw gap
   list.
@@ -809,7 +836,11 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
    Dimensions, plus at least one evidence bullet.
 5. **Write the Synthesis section** (§10.2.4) — narrative diagnostics for all 7 Intelligence
    Indicators, drawing on the Intelligence Dimensions tags assigned in Stage 6. Qualitative only,
-   never scored or graded.
+   never scored or graded. A *positive* claim about an artifact (data "traces consistently," figures
+   "match," a linkage "holds") is a factual assertion like any other — do not write one unless Stage
+   3's Activity 3 actually checked that specific figure. Where coverage was checked but reconciliation
+   wasn't, say so precisely ("no discrepancy found in the fields checked") rather than a blanket claim
+   of consistency the artifact wasn't actually tested against.
 6. **Write the Appendix** (§10.2.5) — Schema Version, Total Findings, Artifacts Examined, Standards
    Referenced.
 7. **Run Final Validation** — check the completed Manifest against all 9 checks in SKILL.md §12.1

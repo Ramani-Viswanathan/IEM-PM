@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.9.2
+version: 1.9.3
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -685,6 +685,9 @@ In the Synthesis section of your Audit Manifest, provide qualitative diagnostics
 - These are **narrative only**. Never assign scores, percentages, grades, or color codes.
 - One paragraph per dimension. Specific observations from your findings.
 - If a dimension has no relevant findings, state: "No significant evidence observed."
+- A positive claim ("X traces consistently," "figures match") needs the same grounding a Finding
+  does — only assert it for what Stage 3's self-consistency check (`audit-stages.md` Stage 3
+  Activity 3) actually verified, not as a general impression of a well-formed artifact.
 
 ---
 
@@ -898,7 +901,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.9.2**
+This skill file version: **1.9.3**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 
