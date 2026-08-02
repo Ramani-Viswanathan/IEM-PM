@@ -16,9 +16,11 @@ from pathlib import Path
 
 try:
     from paths import KNOWLEDGE_DIR, REGISTRIES_DIR
+    from derive_knowledge_index import scan_knowledge_base, INDEX_PATH
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from paths import KNOWLEDGE_DIR, REGISTRIES_DIR
+    from derive_knowledge_index import scan_knowledge_base, INDEX_PATH
 
 MANIFEST_PATH = REGISTRIES_DIR / "derivation_manifest.json"
 SKELETON_PATH = REGISTRIES_DIR / "skeleton_map.json"
@@ -125,6 +127,14 @@ def main() -> int:
         {"fingerprints": fingerprints, "orphans_removed": orphans}, indent=2
     ))
 
+    # Folder/category index -- knowledge/'s actual subfolder structure, whatever
+    # it's named. Never hardcode a fixed set of category names here or in
+    # SKILL.md: the org is free to organize knowledge/ however it likes (see
+    # SKILL.md Sec 13.2), and this index is how Stage 0 tells the rest of the
+    # audit what categories actually exist this run, instead of assuming one.
+    knowledge_index = scan_knowledge_base()
+    INDEX_PATH.write_text(json.dumps(knowledge_index, indent=2))
+
     print(f"BASELINE_READY — {len(sources)} document(s) in knowledge/: "
           f"{len(reused_docs)} reused, {len(new_docs)} new, {len(changed_docs)} changed, "
           f"{len(orphans)} orphaned, {len(unparseable)} unparseable.")
@@ -138,6 +148,8 @@ def main() -> int:
         print(f"  [E-BASE-002] unparseable (skipped, not guessed): {unparseable}")
     print(f"  skeleton_map -> {SKELETON_PATH}")
     print(f"  derivation_manifest -> {MANIFEST_PATH}")
+    print(f"  knowledge_index ({len(knowledge_index['categories'])} categor"
+          f"{'y' if len(knowledge_index['categories']) == 1 else 'ies'}) -> {INDEX_PATH}")
     return 0
 
 

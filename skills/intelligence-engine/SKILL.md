@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.9.1
+version: 1.9.2
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -247,10 +247,10 @@ IEM-PM is built around five immutable contracts — because PMO data is not self
 
 Standards are the **baseline** — the ruler you measure delivery against.
 
-- They live in `knowledge/` as files the organization drops in: PMBOK guides, OPM3 references, PRINCE2 manuals, internal methodology documents, governance frameworks.
+- They live in `knowledge/` as files the organization drops in: PMBOK guides, OPM3 references, PRINCE2 manuals, internal methodology documents, governance frameworks — organized into whatever subfolder structure the org chooses (see §13.2; `knowledge_index.json` is the source of truth for what actually exists this run, not any fixed folder-name list).
 - You read them to understand what is required. You do not modify them.
 - If no standards are present in `knowledge/`, you halt. No baseline = no audit.
-- If multiple standards conflict, `knowledge/Organizational/` overrides generic standards (e.g., internal methodology overrides PMBOK).
+- If multiple standards conflict, the organization's own internal/organizational-methodology documents override generic standards (e.g., internal methodology overrides PMBOK) — identified by content and category, not a fixed folder name (§13.2).
 
 You reference standards using only: **name · clause · identifier · short paraphrase**. Never reproduce full text.
 
@@ -852,21 +852,23 @@ Do not look elsewhere for these. They are defined in this file:
 
 ## 13.2 Knowledge Base Reading Guide
 
-Standards live in `knowledge/`. Read only what applies to this audit.
+Standards live in `knowledge/`. There is no fixed set of subfolder names — the organization is free
+to structure `knowledge/` however it likes (`PMI/`, `PMI-AI/`, `PMI-Other/`, a single flat folder,
+anything), and that structure can change between runs. Never assume a specific folder exists, or
+guess what's in `knowledge/` from memory of a prior run.
 
-| Directory                   | Read When                               | Priority                                         |
-| --------------------------- | --------------------------------------- | ------------------------------------------------ |
-| `knowledge/Organizational/` | **First** — before any generic standard | Highest — overrides generics where they conflict |
-| `knowledge/PMBOK/`          | If org declares PMBOK                   | Standard                                         |
-| `knowledge/PRINCE2/`        | If org declares PRINCE2                 | Standard                                         |
-| `knowledge/PMI/`            | If org declares PMI practice guides     | Standard                                         |
-| `knowledge/Agile/`          | If org declares Agile/hybrid            | Standard                                         |
-| `knowledge/MSP/`            | If org declares MSP                     | Standard                                         |
-| `knowledge/ISO21502/`       | If org declares ISO21502                | Standard                                         |
+Stage 0 (`baseline.py`) scans `knowledge/` recursively and writes the actual, current structure to
+`knowledge_index.json` (categories = whatever top-level folders exist, with their document counts
+and filenames) — this is the source of truth for what's present this run, not a fixed table.
 
 **Rules:**
 
-- Read `Organizational/` first. Internal methodology overrides generic standards.
+- Read `knowledge_index.json` first to see which categories actually exist before deciding what to
+  read — do not assume any category from a prior audit is still there, or that a new one isn't.
+- Identify the organization's own internal/organizational-methodology documents by their content and
+  category name (e.g. a category named `Organizational`, `Internal`, or similar) and read these
+  **first** — they override generic industry standards where they conflict. This is a judgment call
+  based on what the documents actually are, not a match against a fixed folder name.
 - Do not read all files at once. Read only what the Charter and scope indicate.
 - Read for understanding, not memorization. Extract criteria as you need them.
 - Never reproduce full text. Paraphrase and cite (clause · identifier · summary).
@@ -896,7 +898,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.9.1**
+This skill file version: **1.9.2**
 Schema version: **1.1.0**
 Manifest format version: **1.1.0**
 

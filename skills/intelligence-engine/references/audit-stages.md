@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -62,7 +62,14 @@ None — Stage 0 is the entry point. It runs at the start of every audit.
 3. **Skeleton scan** — for each document, extract the table of contents / bookmarks / heading structure only. Record: document ID, title, edition, structure map with section numbers and page anchors. Do **not** read body text at this stage.
 4. **Derive registry items** — from the skeletons, create or update registry items in Appendix E format: paraphrased checkable criteria + stable citation anchors (section + page). **Never verbatim text** (Principle 3). Depth here is skeleton-level; deep dives happen on demand in Stage 2.
 5. **Build the applicability map** — artifact type → governing document(s) and section(s) (e.g., risk register → Standard for Risk Management §4.3, Risk Practice Guide §X2.2). This map is what Stage 1 uses to propose scope and what makes Missing gaps detectable.
-6. **Write** the registry files to `registries/` with a derivation timestamp and a fingerprint (hash) of each source document.
+6. **Build the folder/category index** — scan `knowledge/`'s actual subfolder structure and record
+   it to `knowledge_index.json` (category = whatever top-level folder name exists, with its document
+   count and filenames). Never assume a fixed set of category names (`PMI`, `Agile`, `Organizational`,
+   ...) — the organization may structure `knowledge/` however it likes, and that structure can change
+   between runs. This is the mechanism behind SKILL.md §13.2's reading guide.
+7. **Write** the registry files to `registries/` with a derivation timestamp and a fingerprint
+   (hash) of each source document; write `knowledge_index.json` to
+   `skills/intelligence-engine/knowledge_index.json`.
 
 ### Decision Logic
 
@@ -81,6 +88,8 @@ Written to `registries/` (local-only, gitignored):
 2. **Registry items** — the checkable criteria (Appendix E format).
 3. **Applicability map** — artifact type → governing standards/sections.
 4. **Derivation manifest** — timestamp + source fingerprints (drives the reuse decision next run).
+5. **Folder/category index** (`knowledge_index.json`) — the actual subfolder structure found this
+   run, whatever it's named. Read by SKILL.md §13.2 before deciding what to read next.
 
 ### Failure Conditions
 
@@ -96,6 +105,8 @@ Written to `registries/` (local-only, gitignored):
 - Every registry item carries a citation anchor (document ID + section + page) and contains no verbatim standard text.
 - The applicability map is non-empty.
 - The derivation manifest records a fingerprint for every source document.
+- `knowledge_index.json` reflects the actual current subfolder structure — regenerated every run,
+  never assumed unchanged from a prior one.
 
 ### Transition
 
