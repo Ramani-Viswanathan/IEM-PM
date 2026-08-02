@@ -862,6 +862,101 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
               <p style="margin-top:0.6rem;">So the check is: standard's required data element → present in evidence? → if yes, is it trustworthy, connected, used, correctly classified, and consistent with the standard's process? Every "no" is one finding, one gap type, traced to a root cause.</p>
             </dd>
           </div>
+          <div class="faq-item">
+            <dt>What does IEM-PM actually do, end to end?</dt>
+            <dd>
+              <ul>
+                <li><strong>You:</strong> create <code>Audit/&lt;Project&gt;/evidence/</code>, drop artifacts in; make sure <code>knowledge/PMI/</code> has real standard documents.</li>
+                <li><strong>Stage 0 — Baseline:</strong> scans <code>knowledge/</code>, builds a skeleton index; halts if empty ("no baseline, no audit").</li>
+                <li><strong>Stage 1 — Charter:</strong> proposes scope + standards from the standard, not the data; checksum-checks for a prior audit of the same evidence; you ratify, edit, or decline.</li>
+                <li><strong>Stage 2 — Define:</strong> derives checkable registry criteria from the ratified standard, on demand.</li>
+                <li><strong>Stage 3 — Measure:</strong> reads evidence artifact by artifact against each criterion; cross-checks repeated figures for self-consistency.</li>
+                <li><strong>Stage 4 — Classify:</strong> each unmet criterion becomes one of the 7 gap types.</li>
+                <li><strong>Stage 5 — Trace:</strong> each gap is traced to one of the 7 root origins.</li>
+                <li><strong>Stage 6 — Engineer &amp; Score:</strong> four-part diagnostic (Evidence · Impact · Why/Who/Scope · Fix-at-source) plus the Reporting Integrity Score (0–100).</li>
+                <li><strong>Stage 7 — Synthesize:</strong> writes the Audit Manifest — the LLM↔code boundary.</li>
+                <li><strong>Stage 8 — Findings JSON:</strong> <code>manifest_to_findings.py</code> parses and validates the Manifest against the schema.</li>
+                <li><strong>Stage 9 — Render:</strong> <code>render.py</code> produces the HTML/TXT reports, byte-identical from the same JSON.</li>
+                <li><strong>Stage 10 — Final Summary:</strong> a plain-language wrap-up back to you.</li>
+                <li><strong>Output:</strong> everything lands in <code>Audit/&lt;Project&gt;/reports/</code> — nothing else on disk is touched.</li>
+              </ul>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>What mandatory evidence is required before it will audit at all?</dt>
+            <dd>
+              <p>The Minimum Evidence Sufficiency Gate — 3 cumulative rules, all must pass:</p>
+              <ul>
+                <li><strong>Rule 1 — Mandatory, non-waivable:</strong> Category A (Authorization) and Category E (Risk) must each have at least one artifact; plus at least 2 of Categories B/C/D (Scope, Cost, Schedule). Miss any of this and it halts immediately, no exceptions.</li>
+                <li><strong>Rule 2 — Minimum breadth:</strong> at least 4 of the 7 categories (A–G) must be represented overall.</li>
+                <li><strong>Rule 3 — Minimum artifact count:</strong> at least 3 distinct artifacts — one "kitchen-sink" document can't satisfy the gate alone.</li>
+              </ul>
+              <p style="margin-top:0.6rem;">The 7 categories (PMI mapping): A — Authorization (Charter) · B — Scope (WBS/baseline) · C — Cost (financial authority/control) · D — Schedule (baselined) · E — Risk (identified/analyzed/owned) · F — Change Control (traceable deviations) · G — Performance Monitoring (actuals vs. baseline).</p>
+              <p style="margin-top:0.4rem;">Fail any rule and there's no Charter, no audit — it writes a Scope Limitation Notice instead (Coverage Analysis table + exactly what's missing), not a partial report.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>When will it refuse to audit and give me a Scope Limitation Notice instead?</dt>
+            <dd>
+              <p>Only for one specific halt condition — evidence that's readable and ratifiable but too thin. Specifically, when any of the 3 sufficiency rules above fails: mandatory categories missing, fewer than 4 of 7 categories represented, or fewer than 3 distinct artifacts supplied.</p>
+              <p style="margin-top:0.6rem;">Other halt conditions stop the run but do <strong>not</strong> produce a Scope Limitation Notice — they just report to you directly, no file:</p>
+              <ul>
+                <li>No standards in <code>knowledge/</code> → "no baseline, no audit."</li>
+                <li>Charter proposed but not ratified, and no PROVISIONAL run authorized.</li>
+                <li>No delivery artifacts supplied at all.</li>
+                <li>Every artifact supplied is unreadable (corrupt/encrypted/unsupported).</li>
+                <li>You ask it to modify delivery data — it's read-only.</li>
+              </ul>
+              <p style="margin-top:0.6rem;">In short: too thin → Notice; anything else wrong → plain halt, no report artifact.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>What can I actually say to Claude Code to start an audit?</dt>
+            <dd>
+              <p>A few examples:</p>
+              <ul>
+                <li><strong>Full audit, PMI baseline:</strong> "Run the intelligence-engine skill (<code>skills/intelligence-engine/SKILL.md</code>) to audit <code>Audit/Acme-Q3-2026/evidence/</code> against the PMI standards in <code>knowledge/PMI/</code>. Start from Stage 0 and follow the process exactly — including the Minimum Evidence Sufficiency check before proposing a Charter."</li>
+                <li><strong>Provisional/quick-look run:</strong> "Run a PROVISIONAL audit of <code>Audit/Acme-Q3-2026/evidence/</code> against PMI — I understand findings will carry the unratified-Charter caveat. Propose the Charter, then proceed without waiting for me to ratify it."</li>
+                <li><strong>Scoped to specific standards:</strong> "Audit <code>Audit/Acme-Q3-2026/evidence/</code> against only the Risk Management and Scheduling standards in <code>knowledge/PMI/</code> — propose a Charter scoped to those two before doing anything else."</li>
+              </ul>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>What artifacts does it deliver after a successful audit?</dt>
+            <dd>
+              <ul>
+                <li>Audit Manifest (<code>.md</code>) — the LLM-written findings, human-readable.</li>
+                <li>Canonical Findings JSON (<code>.json</code>) — schema-validated, machine-readable.</li>
+                <li>HTML report — the executive deliverable.</li>
+                <li>TXT report — plain-text version.</li>
+              </ul>
+              <p style="margin-top:0.6rem;">All four share one filename stem (Appendix G naming). If it halts on evidence sufficiency instead, you get a Scope Limitation Notice (<code>.md</code> + <code>.html</code>) — no JSON/TXT, since there's no findings data.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>Where are these artifacts stored?</dt>
+            <dd><code>Audit/&lt;ProjectName&gt;/reports/</code> — always a sibling of <code>Audit/&lt;ProjectName&gt;/evidence/</code>. Gitignored, local-only, one folder per project.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>Will it make any changes to my uploaded evidence?</dt>
+            <dd>No. Read-only by design (Operating Principle 4). It only reads standards, Charter, and evidence, and only ever writes into your project's own <code>reports/</code> folder.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>What if I don't have PMI standards in <code>knowledge/</code>?</dt>
+            <dd>If <code>knowledge/</code> has zero real standard content of any kind, it halts outright — "no baseline, no audit." But it doesn't have to be PMI specifically — any real standard (PRINCE2, ISO 21502, an Agile framework, your own internal methodology) satisfies the baseline requirement.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>Can it audit against other standards? Which ones?</dt>
+            <dd>Yes — standard-agnostic by design. Confirmed working today: PMI (PMBOK, Practice Standards, Risk, Governance, etc.), plus Agile and Organizational/internal standards. The evidence-sufficiency mapping also explicitly supports PRINCE2 and ISO 21502, mapped to their own native domain model (e.g., PRINCE2 Themes).</dd>
+          </div>
+          <div class="faq-item">
+            <dt>Can I ask it to audit against my own organizational standard?</dt>
+            <dd>Yes, fully supported. Drop your org's real methodology document into <code>knowledge/</code> (e.g. <code>knowledge/Organizational/</code>) and ask it to audit against that. Same 11-stage process — the registry is just derived from your document instead of PMI.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>What happens if I ask it to audit with no standards present at all?</dt>
+            <dd>It refuses outright — Halt Condition 1. It will not fall back on its own training knowledge or "best guess" at what a standard requires. It stops and tells you to add a baseline first; that's the cornerstone rule, "no baseline, no audit."</dd>
+          </div>
         </dl>
 
         <h3 style="margin-top:1.8rem;">If something fails</h3>
