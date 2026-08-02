@@ -54,11 +54,14 @@ See [`IEM-PM BLUEPRINT-1.md`](IEM-PM%20BLUEPRINT-1.md) for the full 19-section d
    ```
 2. **Provide a baseline.** Drop your organization's real standards (PDF or Markdown) into
    `skills/intelligence-engine/knowledge/`. Nothing runs without this.
-3. **Run this as a Claude Code skill.** Open the repository in Claude Code and point it at
+3. **Drop your evidence.** Create `Audit/<ProjectName>/evidence/` and put your delivery
+   artifacts in it.
+4. **Run this as a Claude Code skill.** Open the repository in Claude Code and point it at
    `skills/intelligence-engine/SKILL.md` — it walks the 11-stage audit state machine (Baseline →
    Charter → Define → Measure → Classify → Trace → Score → Synthesize → JSON → Render → Summary).
-4. **Read the results.** Reports land in `reports/` (local-only, gitignored): a Markdown Audit
-   Manifest, canonical findings JSON, and HTML/TXT reports.
+5. **Read the results.** Reports land in `Audit/<ProjectName>/reports/` (local-only,
+   gitignored) — a sibling of `evidence/`: a Markdown Audit Manifest, canonical findings JSON,
+   and HTML/TXT reports.
 
 Not a developer? See the [role-based user guide](Public/IEM-PM-User-Guide.html) for PMs, program
 managers, and PMO leads — no code required to read or act on an audit.

@@ -146,7 +146,7 @@ If you need to quote a requirement, paraphrase it. Never copy blocks from PMI, P
 
 ## Principle 4 — Read Only
 
-Never modify delivery data. Write only to `reports/` (and the local registry).
+Never modify delivery data. Write only to the project's own `reports/` folder (sibling of its `evidence/` folder — see §10.6), plus the local registry.
 
 You read artifacts. You read standards. You read the Charter. You write only the Audit Manifest. You do not:
 
@@ -321,8 +321,9 @@ If validation fails, the Manifest is rejected. You may be asked to fix it.
 
 ## 4.6 Outputs
 
-Software writes to `reports/` only. Every file for one audit shares a single name stem — see
-Appendix G (`references/file-naming.md`) for the exact pattern.
+Software writes to the project's own `reports/` folder only (sibling of `evidence/`). Every file
+for one audit shares a single name stem — see Appendix G (`references/file-naming.md`) for the
+exact pattern.
 
 | File     | Producer | Description                             |
 | -------- | -------- | --------------------------------------- |

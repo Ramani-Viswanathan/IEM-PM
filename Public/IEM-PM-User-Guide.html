@@ -624,7 +624,7 @@
             <div>
               <span class="who">Claude Code runs</span>
               <h3>The audit itself</h3>
-              <p>Ask Claude Code to run the <code>intelligence-engine</code> skill against your Charter and evidence. It reads everything, compares it to your standards, and writes exactly one file: <code>Audit/&lt;YourProjectName&gt;/reports/audit_manifest.md</code>.</p>
+              <p>Ask Claude Code to run the <code>intelligence-engine</code> skill against your Charter and evidence. It reads everything, compares it to your standards, and writes exactly one file: <code>Audit/&lt;YourProjectName&gt;/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md</code>.</p>
               <details class="prompts">
                 <summary>Exact wording, if you'd rather paste than describe</summary>
                 <div class="prompt-set">
@@ -660,7 +660,8 @@ the Audit Manifest as you go.</pre>
                   </div>
                   <div class="prompt">
                     <span class="prompt-label">6 · Save</span>
-                    <pre>Save the complete Audit Manifest to Audit/&lt;YourProjectName&gt;/reports/audit_manifest.md.</pre>
+                    <pre>Save the complete Audit Manifest to Audit/&lt;YourProjectName&gt;/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md
+(DDMMYY_HHMM comes from the audit's own Date field, not wall-clock time).</pre>
                   </div>
                 </div>
               </details>
@@ -675,8 +676,8 @@ the Audit Manifest as you go.</pre>
               <p>Ask Claude Code to turn the Manifest into your report — it runs the two conversion steps for you. If you'd rather do it yourself, the commands are underneath.</p>
               <div class="aside">
                 For reference — two commands, run from <code>skills/intelligence-engine/scripts/</code> (both scripts default their output next to the input file you give them, inside your project's own <code>reports/</code> folder, so <code>--output</code>/<code>--output-html</code>/<code>--output-txt</code> are optional):
-                <code>python manifest_to_findings.py --manifest ../../../Audit/&lt;YourProjectName&gt;/reports/audit_manifest.md
-python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json --template ../assets/report_template.html</code>
+                <code>python manifest_to_findings.py --manifest ../../../Audit/&lt;YourProjectName&gt;/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md
+python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json</code>
               </div>
             </div>
           </div>
@@ -760,7 +761,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             <div class="num">W4</div>
             <div>
               <h3>Re-audit with the same Charter</h3>
-              <p>Same Charter, same standards, fresh evidence. Save the new run as <code>audit_manifest_v2.md</code> → <code>findings_v2.json</code> → <code>report_v2.html</code>, so nothing overwrites the baseline you're measuring against.</p>
+              <p>Same Charter, same standards, fresh evidence. The new run's own Date becomes its filename's timestamp (<code>IEMPM_AuditGap_Report_DDMMYY_HHMM.*</code>), so it naturally lands next to the baseline run in the same <code>reports/</code> folder without overwriting it.</p>
             </div>
           </div>
         </div>
@@ -829,7 +830,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
           </div>
           <div class="faq-item">
             <dt>Is there a live dashboard I should be looking for?</dt>
-            <dd>No, and there isn't meant to be. <code>report.html</code> is the whole interface — open it, read it, share the file itself with whoever needs it.</dd>
+            <dd>No, and there isn't meant to be. The rendered <code>IEMPM_AuditGap_Report_DDMMYY_HHMM.html</code> file is the whole interface — open it, read it, share the file itself with whoever needs it.</dd>
           </div>
           <div class="faq-item">
             <dt>I'm new — how do I audit a project's artifacts against PMI standards?</dt>

@@ -69,7 +69,7 @@ iem-pm/
 ├── docs/
 ├── examples/
 ├── tests/
-├── reports/
+├── Audit/<Project>/reports/   (per-project, sibling of Audit/<Project>/evidence/)
 └── assets/
 ```
 
@@ -278,8 +278,10 @@ The engine never modifies delivery data.
 It only writes
 
 ```
-reports/
+Audit/<Project>/reports/
 ```
+
+— per-project, always a sibling of that project's own `Audit/<Project>/evidence/`.
 
 ---
 

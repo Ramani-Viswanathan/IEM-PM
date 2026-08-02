@@ -110,7 +110,7 @@ This is **the most important step.** The Charter is a contract between you and t
 **Save the ratified Charter as:**
 
 ```
-reports/PMO_DATA_CHARTER_ratified.md
+Audit/<ProjectName>/reports/PMO_DATA_CHARTER_ratified.md
 ```
 
 ---
@@ -146,7 +146,7 @@ Confirm: which standards govern this audit?
 ### Prompt 2: Load the Charter
 
 ```
-Read the ratified PMO Data Charter at reports/PMO_DATA_CHARTER_ratified.md.
+Read the ratified PMO Data Charter at Audit/<ProjectName>/reports/PMO_DATA_CHARTER_ratified.md.
 Confirm: which artifacts are in scope? What do the fields mean?
 Do not proceed until you confirm the Charter is ratified.
 ```
@@ -193,7 +193,7 @@ Then print the Handover Message.
 
 ```
 Save the complete Audit Manifest to:
-reports/audit_manifest.md
+Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md
 ```
 
 **Claude will now write the Manifest.** This takes 2–10 minutes depending on artifact count. Let it finish.
@@ -204,23 +204,23 @@ reports/audit_manifest.md
 
 Claude has finished. Its job is done. Now **you** run the software.
 
-**Open your terminal in the `scripts/` folder:**
+**Open your terminal in the `skills/intelligence-engine/scripts/` folder.** Both scripts default
+their output next to the file you give them — i.e. into that project's own `Audit/<ProjectName>/
+reports/` folder — so `--output`/`--output-html`/`--output-txt` are optional:
 
 ```bash
 # Step 6a: Manifest → Canonical JSON
 python manifest_to_findings.py \
-  --manifest ../reports/audit_manifest.md \
-  --charter ../reports/PMO_DATA_CHARTER_ratified.md \
-  --output ../reports/findings.json
+  --manifest ../../../Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md \
+  --charter ../../../Audit/<ProjectName>/reports/PMO_DATA_CHARTER_ratified.md
 ```
 
 **Expected output:**
 
 ```
-Canonical findings written to ../reports/findings.json
+Canonical findings written to ...Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json
 Total findings: [N]
 Reporting Integrity Score: [X]
-OPM3 Position: PENDING_BRIDGE
 ```
 
 If you see `VALIDATION FAILED`, read the errors. They usually mean:
@@ -235,24 +235,21 @@ Fix the Manifest (or ask Claude to fix it), then re-run.
 ```bash
 # Step 6b: JSON → Reports
 python render.py \
-  --canonical ../reports/findings.json \
-  --template ../assets/report_template.html \
-  --output-html ../reports/audit_report.html \
-  --output-txt ../reports/audit_report.txt
+  --canonical ../../../Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json
 ```
 
 **Expected output:**
 
 ```
-TXT report: ../reports/audit_report.txt
-HTML report: ../reports/audit_report.html
+TXT report: ...Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt
+HTML report: ...Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html
 ```
 
 ---
 
 ## Step 7: Read Your Report
 
-Open `reports/audit_report.html` in your browser. This is your executive deliverable.
+Open `Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html` in your browser. This is your executive deliverable.
 
 **How to read it:**
 
@@ -289,9 +286,10 @@ The report is not the end. It is the beginning.
 **Re-audit command:**
 
 ```bash
-# Same pipeline, new manifest
-python manifest_to_findings.py --manifest ../reports/audit_manifest_v2.md --output ../reports/findings_v2.json
-python render.py --canonical ../reports/findings_v2.json --template ../assets/report_template.html --output-html ../reports/audit_report_v2.html --output-txt ../reports/audit_report_v2.txt
+# Same pipeline, new manifest — both scripts default output next to their input, in
+# that project's own Audit/<ProjectName>/reports/ folder
+python manifest_to_findings.py --manifest ../../../Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md
+python render.py --canonical ../../../Audit/<ProjectName>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json
 ```
 
 ---
@@ -314,7 +312,7 @@ python render.py --canonical ../reports/findings_v2.json --template ../assets/re
 1. **No ratified Charter → no audit.** Never let Claude guess what your data means.
 2. **Every finding needs evidence.** If Claude cannot cite a quote or an absence, it is not a finding.
 3. **The AI judges. You run the software.** Claude writes the Manifest. You run `manifest_to_findings.py` and `render.py`.
-4. **Read-only.** Never let Claude edit your source files. Only the Manifest and `reports/` are written.
+4. **Read-only.** Never let Claude edit your source files. Only the Manifest and your project's own `reports/` folder (`Audit/<ProjectName>/reports/`) are written.
 5. **Local first.** No cloud APIs, no databases. Everything stays on your machine.
 
 ---
