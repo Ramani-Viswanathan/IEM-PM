@@ -474,6 +474,7 @@ date going forward.
 | 21 | 2026-08-02 ~13:00 | *(Not a defect — content addition, logged for continuity.)* Same FAQ gap for a further round of quick questions: end-to-end flow, mandatory evidence, when a Scope Limitation Notice fires instead of a report, example prompts to start an audit, what artifacts are delivered and where, read-only guarantee, and what happens with no/non-PMI/organizational standards in `knowledge/`. | User asked 11 more quick questions (Q3–Q13) across several turns, then requested them all added to the guide's FAQ in one surgical update. | 11 new `<dl class="faq">` entries added to `Public/IEM-PM-User-Guide.html`'s `#faq` section, appended in order after the two from fix #20: "What does IEM-PM actually do, end to end?"; "What mandatory evidence is required before it will audit at all?"; "When will it refuse to audit and give me a Scope Limitation Notice instead?"; "What can I actually say to Claude Code to start an audit?"; "What artifacts does it deliver after a successful audit?"; "Where are these artifacts stored?"; "Will it make any changes to my uploaded evidence?"; "What if I don't have PMI standards in `knowledge/`?"; "Can it audit against other standards? Which ones?"; "Can I ask it to audit against my own organizational standard?"; "What happens if I ask it to audit with no standards present at all?" All content matches the answers given in chat, cross-checked against `evidence-sufficiency.md`, `SKILL.md` §6.6, and `file-naming.md` before writing. No code, no other file touched. | `c72de42` |
 | 22 | 2026-08-02 ~13:15 | Two stale-documentation gaps flagged by a "how close to production-ready" review: (a) `IEM-PM BLUEPRINT-1.md`, `README.md`, `Public/AUDIT_PLAYBOOK.md`, and `SKILL.md` §Principle 4/§4.6 still described a single repo-root `reports/` folder — the convention fix #18 (2026-08-02) replaced with per-project `Audit/<Project>/reports/`. (b) `Public/IEM-PM-User-Guide.html`'s Step 4/5/6, the re-audit workflow section, and one FAQ answer still used simplified placeholder filenames (`audit_manifest.md`, `report.html`, `audit_manifest_v2.md`/`findings_v2.json`/`report_v2.html`) instead of the real Appendix G convention (`IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`) every actual audit run produces. | User requested a quick fix for exactly these two items, previously flagged (not fixed) in fix #18's log and reiterated in this session's production-readiness review. | **Docs-only, no code.** `IEM-PM BLUEPRINT-1.md`: directory tree + §4 Read Only both now show `Audit/<Project>/reports/`. `README.md`: Quickstart gained an explicit evidence step and the results step now names `Audit/<ProjectName>/reports/`. `Public/AUDIT_PLAYBOOK.md`: every `reports/...` path (Charter save/read, Manifest save, both pipeline commands, report-open instruction, re-audit commands, Golden Rule 4) updated to the real per-project path and, where applicable, the real Appendix G filename; incidentally removed one now-false `OPM3 Position: PENDING_BRIDGE` line from an expected-output block (OPM3 was scrapped 2026-07-27, locked decision #2 — leaving it would have been actively wrong, not just stale). `SKILL.md` §Principle 4 and §4.6: both bare `reports/` mentions now say "the project's own `reports/` folder (sibling of `evidence/`)". `Public/IEM-PM-User-Guide.html`: Step 4's writes-one-file line, prompt 6 (Save), Step 5's two-command reference, the FAQ "live dashboard" answer, and the re-audit workflow card all updated to `IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`; the re-audit card's guidance corrected to explain the timestamp already comes from the run's own Date (no manual `_v2` suffix needed). HTML tag balance verified (div/dl/pre/code all matched) and 7/7 regression suite reconfirmed passing (docs-only change, nothing expected to break). | `f77acd7` |
 | 23 | 2026-08-02 ~13:30 | *(Not a defect — size reduction, logged for continuity.)* `SKILL.md` was 929 lines, 429 over Anthropic's ~500-line skill-authoring guidance. Root cause: §5 Thinking Phases (~198 lines, Phase 0–7) fully duplicated content already authoritative in `references/audit-stages.md` (Stages 0–10) — each Phase restated Inputs/Output/Rule detail the matching Stage already specifies in full (Decision Logic, Failure Conditions, Completion Criteria), plus Gap-Type/Root-Origin "closed list" language already stated independently in §7/§8, and Manifest-structure detail already stated independently in §10.1/§10.3. | Quick-analysis review flagged this as the single largest lever for the least risk — same branch-out pattern already applied to `charter-spec.md`/`report-generation.md`, just not yet applied to §5. User confirmed: do it, no content or functionality loss. | Verified every fact removed from §5 has a live equivalent elsewhere (§7/§8/§9/§10 or the named `audit-stages.md` Stage) before cutting — nothing is lost, only de-duplicated. §5 rewritten from 11 per-phase prose blocks (~198 lines) to a single 8-row index table (phase → one-line purpose → which Stage to read before acting), matching §11's existing pointer style. No other section touched; no TOC anchor broken (`#5-thinking-phases` heading text unchanged, no sub-anchors existed to link elsewhere — confirmed via repo-wide grep). `SKILL.md`: 929 → 755 lines (174-line cut, more than the ~150 estimated) — still ~255 over the 500-line guidance; further cuts (§2/§9/§6, per the prior analysis) would need to be staged separately since they carry more unique operational content, not pure duplication. Version → 1.11.0. 7/7 regression suite reconfirmed passing (docs-only). | `0c169e2` |
+| 24 | 2026-08-03 | *(Not a defect — new content, logged for continuity.)* No human-facing guide existed for filling out `assets/PMO_DATA_CHARTER_template.md` — the User Guide covers running an audit end-to-end but treats Charter completion as a single step (Step 2), not its own walkthrough. | User request: a step-by-step guide for humans filling the Charter template, in the same style as `IEM-PM-User-Guide.html`. | New file `Public/PMO-Data-Charter-Guide.html` — same design system/CSS reused verbatim from the User Guide (paper/red/gold Palatino theme, light+dark aware) for visual consistency across `Public/`. Content walks the template's own 7 numbered sections in order (Metadata; §1 Artifact Declaration incl. 1.2 Waivers; §2 Field Semantics Map incl. 2.5 Unmapped; §3 Materiality &amp; Scope; §4 Propose→Ratify; §5/§6 read-only — nothing to fill in; §7 Appendix), a "who fills what" table clarifying machine-proposed vs. human-set per section (grounded in `charter-spec.md`'s Anti-Mirror Guard — Artifact Declaration/Field Semantics from data, Materiality/Scope from standards only), a worked example row, 6 common-mistake cards, an FAQ, and a 5-rules capstone. All content cross-checked directly against `PMO_DATA_CHARTER_template.md` and `references/charter-spec.md` before writing — no invented fields or steps. Footer cross-links to `IEM-PM-User-Guide.html` as a companion page. | `(uncommitted)` |
 
 ### C. Evidence-quality issues found in example data (not tool defects — the pattern that drove fix #15)
 
@@ -496,14 +497,55 @@ record of what got missed and why the fix mattered.
   session), all on-demand from real audits, none pre-batched. 22 remain — see §5's strategy note.
 - SKILL.md conciseness pass (<500-line guidance), bulk registry derivation, `.claude-plugin/` packaging,
   CI — all still open, unchanged by this session's work. See §5.
-- Not yet re-run: no audit has exercised fix #15 (the self-consistency check), fix #17 (Principle 8),
-  or fix #18 (the new `Audit/` structure) live yet — first real test is the next audit run.
+- **2026-08-03/04: fix #15, #17, #18 all exercised live for the first time** — real audit of
+  `Audit/PCS-EXAMPLE-001/` (9 evidence files, a genuine crisis-week scenario). Fix #18's folder
+  structure and fix #17's Evidence Isolation both held correctly (Charter explicitly excluded
+  `examples/Pilot-audit-5/-6` per Principle 8; reports landed in the correct per-project folder).
+  Fix #15's self-consistency check worked but was found incomplete — see the new open item below
+  for the real bug identified and the planned fix. Independently verified by hand (not just trusted):
+  4 of the audit's 10 findings were real, precise cross-document/self-contradictions with correct
+  arithmetic (CR-005 cost breakdown off by exactly $5,000; a contingency reserve labeled both 78.1%
+  and 106% depleted in the same document; 4 milestone dates off by 5–7 days between two artifacts;
+  a risk dashboard undercounting its own entries by 1). Real SHA-256 checksums (fix #16) also
+  reconfirmed correct via direct recomputation against the evidence files.
 - **Noted, deliberately not fixed as part of #18** (out of scope, flagged for transparency):
   `Public/IEM-PM-User-Guide.html`'s workflow section already used simplified filenames
   (`audit_manifest.md`, `report.html`) that predate the real Appendix G naming convention every
   actual audit uses (`IEMPM_AuditGap_Report_DDMMYY_HHMM.<ext>`). Fix #18 corrected the *folder*
   references throughout that section but left this separate, pre-existing naming inconsistency
-  alone rather than expanding scope.
+  alone rather than expanding scope. **Since fixed — see #22.**
+- **New open item (2026-08-03), not started:** program/portfolio-scale rollup. IEM-PM today runs one
+  Charter against one project's evidence at a time — reusing the same Charter across N projects
+  already works (N independent runs, N reports), but nothing aggregates the resulting N
+  `findings.json` files into a single portfolio-level view (root-origin frequency across projects,
+  RIS distribution, systemic-vs-one-off gaps). Scoped as a pure addition: one new deterministic
+  script (e.g. `scripts/rollup.py`) + one new template, reusing `schema.py`'s existing validator to
+  read already-scored JSON — no existing script, SKILL.md phase, or per-project audit logic would
+  need to change. Estimated ~150–250 lines, half a day including a regression test. Not built.
+- **New open item (2026-08-03), bug identified, fix drafted, not yet applied — planned for
+  2026-08-04:** Stage 3 Activity 3's self-consistency check (fix #15) is real but incomplete. Found
+  during the `PCS-EXAMPLE-001` live run (see above): the audit caught 4 genuine cross-document
+  contradictions correctly (independently hand-verified), but missed 5 more, equally real and
+  independently hand-verified: (1) `ART-001`'s own SPI stated as both 0.68 and 0.85 within the same
+  document; (2) `ART-006`'s executive summary states a third AC value ($226,550) that agrees with
+  neither its own detailed table ($220,750) nor `ART-001`'s figure ($218,650) — a 3-way split, only
+  2 of the 3 values were flagged; (3) Risk ID R-017 exists in the Risk Register but is silently
+  absent from the Status Report's own risk summary table — a dropped-entry gap, not a value
+  mismatch; (4) an incident timestamp ("TAC engineer remotes in") is stated as 15:45 in one document
+  and 15:15 in two others; (5) `ART-008`'s own intro paragraph states a day-count that contradicts
+  its own schedule-comparison table a few paragraphs later. **Root cause:** not a missing rule —
+  Activity 3 existed and worked, but was scoped to "figures" (totals/budget lines/counts) as one
+  loose heuristic, so it reliably caught same-shape numeric restatements while missing
+  same-document summary-vs-body splits, ID-list completeness across artifacts, and prose-restated
+  facts (timestamps) that don't read as "a figure." **Planned fix** (drafted, reviewed with user,
+  not yet applied): split Stage 3 Activity 3 into 4 explicit mandatory sub-checks instead of one
+  heuristic — (a) same-document header/summary vs. body, (b) cross-document same-fact restatement
+  [existing check, unchanged], (c) enumerated ID-list completeness across artifacts (risk/CR/issue/
+  milestone IDs), (d) narrative facts (timestamps, dates, named events) restated in prose. Matching
+  updates to the Decision Logic bullet and Activity 4's wording (both currently say "figure," need
+  to cover (c)/(d) too). **Caveat to keep on record:** this raises the floor, not a guarantee — still
+  LLM judgment over long documents, not a deterministic parser; a tightened rule reduces miss rate,
+  it doesn't eliminate it. **User decision: implement 2026-08-04, not today.**
 
 # Status update : Table
 
@@ -550,6 +592,7 @@ record of what got missed and why the fix mattered.
 | next   | Run bulk Stage 0 criteria-derivation across the remaining 23 real standards (6 of 29 now deep-dived, all on-demand — see §5 strategy note).                             | STATUS.md             |
 | next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done. Verify the `allowed-tools:` frontmatter field against Claude Code's own skill-packaging docs when this starts. | STATUS.md             |
 | next   | Add CI (GitHub Actions) running test_pipeline.py + a clean-room requirements.txt install on every push.                                | STATUS.md             |
+| next   | Portfolio/program rollup — aggregate N projects' `findings.json` into one portfolio view (root-origin frequency, RIS distribution). Scoped as a pure addition, no existing files touched — see §9 "Open items summary." | STATUS.md             |
 | open   | UI/UX for non-technical PMs — parked, brainstormed only, no decision. See §5 Open design items.                                        | STATUS.md             |
 
 # 6-Week Plan
