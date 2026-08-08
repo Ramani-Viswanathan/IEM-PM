@@ -543,8 +543,8 @@
           <li>
             <span class="box"></span>
             <div>
-              <strong>Claude Code, open in this repository</strong>
-              <span class="note">This is how you actually run the audit — there's no separate app to install.</span>
+              <strong>Claude Code, with this skill available</strong>
+              <span class="note">Two ways to get there: open Claude Code inside this cloned repository (works immediately, no install step), or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> once per machine so it's available in every project as <code>/iem-pm:intelligence-engine</code>. Either way, there's no separate app to install.</span>
             </div>
           </li>
         </ul>
@@ -833,6 +833,19 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             <dd>No, and there isn't meant to be. The rendered <code>IEMPM_AuditGap_Report_DDMMYY_HHMM.html</code> file is the whole interface — open it, read it, share the file itself with whoever needs it.</dd>
           </div>
           <div class="faq-item">
+            <dt>How do I set this up on a different machine?</dt>
+            <dd>
+              <p>You need, once per machine:</p>
+              <ul>
+                <li>Git, to clone the repository (or copy the files another way).</li>
+                <li>Python 3.10+, then <code>pip install -r requirements.txt</code> in the repo root.</li>
+                <li>Claude Code, installed and signed in.</li>
+                <li>Your own copy of your organization's real PM standards, dropped into <code>skills/intelligence-engine/knowledge/</code> — never shipped with the repo.</li>
+              </ul>
+              <p style="margin-top:0.6rem;">Then either open Claude Code inside the cloned repository and go, or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> to make it available in every project on that machine, invocable directly as <code>/iem-pm:intelligence-engine</code>. Either way <code>knowledge/</code> and <code>registries/</code> stay wherever you put that folder — nothing is copied into a cache, so nothing is at risk when the tool updates.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
             <dt>I'm new — how do I audit a project's artifacts against PMI standards?</dt>
             <dd>
               <ul>
@@ -871,7 +884,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
                 <li><strong>Stage 0 — Baseline:</strong> scans <code>knowledge/</code>, builds a skeleton index; halts if empty ("no baseline, no audit").</li>
                 <li><strong>Stage 1 — Charter:</strong> proposes scope + standards from the standard, not the data; checksum-checks for a prior audit of the same evidence; you ratify, edit, or decline.</li>
                 <li><strong>Stage 2 — Define:</strong> derives checkable registry criteria from the ratified standard, on demand.</li>
-                <li><strong>Stage 3 — Measure:</strong> reads evidence artifact by artifact against each criterion; cross-checks repeated figures for self-consistency.</li>
+                <li><strong>Stage 3 — Measure:</strong> reads evidence artifact by artifact against each criterion; runs four self-consistency sub-checks (same-document header vs. body, cross-document restatement, ID-list completeness, narrative facts) independent of any criterion.</li>
                 <li><strong>Stage 4 — Classify:</strong> each unmet criterion becomes one of the 7 gap types.</li>
                 <li><strong>Stage 5 — Trace:</strong> each gap is traced to one of the 7 root origins.</li>
                 <li><strong>Stage 6 — Engineer &amp; Score:</strong> four-part diagnostic (Evidence · Impact · Why/Who/Scope · Fix-at-source) plus the Reporting Integrity Score (0–100).</li>
