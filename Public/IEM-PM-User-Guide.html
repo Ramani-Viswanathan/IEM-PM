@@ -843,6 +843,14 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
                 <li>Your own copy of your organization's real PM standards, dropped into <code>skills/intelligence-engine/knowledge/</code> — never shipped with the repo.</li>
               </ul>
               <p style="margin-top:0.6rem;">Then either open Claude Code inside the cloned repository and go, or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> to make it available in every project on that machine, invocable directly as <code>/iem-pm:intelligence-engine</code>. Either way <code>knowledge/</code> and <code>registries/</code> stay wherever you put that folder — nothing is copied into a cache, so nothing is at risk when the tool updates.</p>
+              <p style="margin-top:0.6rem;">A fresh clone gives you the engine, not the baseline — <code>knowledge/</code> and <code>registries/</code> are gitignored and never travel with the repo. You start with an empty registry on every new machine unless you copy it over by hand; see the next question for what that means in practice.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>Does the registry rebuild from scratch every time, or does it get deeper over time?</dt>
+            <dd>
+              <p>It gets deeper over time, automatically, with no extra step from you. The first time you run an audit against a standard, <strong>Stage 0</strong> scans <code>knowledge/</code> and builds a shallow, skeleton-level registry from every document's table of contents — enough to know what sections exist, not yet checkable criteria. Then <strong>Stage 2</strong> deep-dives only the specific sections that audit's evidence actually cites, derives real checkable criteria from them, and saves the result back into <code>registries/</code>. The next audit that touches the same section reuses what's already there instead of re-deriving it. Run enough audits against enough standards and the registry converges toward full coverage — driven by what you actually audit, not a blind upfront pass over every standard you own.</p>
+              <p style="margin-top:0.6rem;"><strong>On a new machine:</strong> since <code>registries/</code> is gitignored, a fresh clone starts with none of that accumulated depth — Stage 0/Stage 2 rebuild it from your <code>knowledge/</code> standards the same way, audit by audit. If you don't want to rebuild it from zero, copy the <code>registries/</code> folder itself to the new machine by hand (zip, USB, cloud drive — anything except git), alongside <code>knowledge/</code>. Nothing automatic does that copy for you; it's a deliberate file transfer if you want to carry the depth forward instead of regrowing it.</p>
             </dd>
           </div>
           <div class="faq-item">
