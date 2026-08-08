@@ -80,7 +80,7 @@
   .shell {
     max-width: 100%;
     margin: 0 auto;
-    padding: 0 clamp(1.5rem, 4vw, 4rem) 5rem;
+    padding: 0 25px 5rem;
   }
 
   /* ── Top bar ────────────────────────────────────────── */
@@ -94,7 +94,7 @@
   .topbar-inner {
     max-width: 100%;
     margin: 0 auto;
-    padding: 0.9rem clamp(1.5rem, 4vw, 4rem);
+    padding: 0.9rem 25px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -128,7 +128,7 @@
 
   /* ── Masthead ───────────────────────────────────────── */
   .masthead {
-    max-width: 780px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 3.2rem 0 2.2rem;
     border-bottom: 1px solid var(--line);
@@ -166,7 +166,7 @@
   .masthead p.lede {
     font-size: 1.1rem;
     color: var(--muted);
-    max-width: 56ch;
+    max-width: 100%;
     margin: 0;
   }
   .time-note {
@@ -327,8 +327,8 @@
     margin: 0 0 0.4rem;
     color: var(--gold);
   }
-  p { max-width: 68ch; }
-  p.intro { color: var(--muted); font-size: 1.02rem; max-width: 62ch; margin-top: -0.3rem; }
+  p { max-width: 100%; }
+  p.intro { color: var(--muted); font-size: 1.02rem; max-width: 100%; margin-top: -0.3rem; }
   code { overflow-wrap: break-word; word-break: break-word; }
 
   /* ── Callout ────────────────────────────────────────── */
@@ -338,7 +338,7 @@
     border-radius: 4px;
     padding: 1.1rem 1.3rem;
     box-shadow: var(--shadow);
-    max-width: 68ch;
+    max-width: 100%;
   }
   .callout.gold { border-left: 3px solid var(--gold); }
   .callout.accent { border-left: 3px solid var(--accent); }
@@ -346,7 +346,7 @@
   .callout p + p { margin-top: 0.6rem; }
 
   /* ── Checklist ──────────────────────────────────────── */
-  .checklist { list-style: none; margin: 1.2rem 0 0; padding: 0; max-width: 62ch; }
+  .checklist { list-style: none; margin: 1.2rem 0 0; padding: 0; max-width: 100%; }
   .checklist li {
     display: flex;
     gap: 0.75rem;
@@ -367,7 +367,7 @@
   .checklist span.note { display: block; color: var(--muted); font-size: 0.92rem; margin-top: 0.15rem; }
 
   /* ── Stage list (the 6 steps — order carries meaning) ─ */
-  .stages { position: relative; margin-top: 1.6rem; max-width: 62ch; }
+  .stages { position: relative; margin-top: 1.6rem; max-width: 100%; }
   .stage {
     position: relative;
     display: grid;
@@ -509,7 +509,7 @@
     border-radius: 4px;
     padding: 1.2rem 1.4rem;
     box-shadow: var(--shadow);
-    max-width: 68ch;
+    max-width: 100%;
   }
   .rules-box ol { margin: 0; padding-left: 1.2rem; }
   .rules-box li { margin-bottom: 0.6rem; font-size: 0.97rem; }
@@ -580,7 +580,7 @@
   .role-card li:last-child { margin-bottom: 0; }
 
   /* ── FAQ ────────────────────────────────────────────── */
-  .faq { max-width: 68ch; margin-top: 1.2rem; }
+  .faq { max-width: 100%; margin-top: 1.2rem; }
   .faq-item { padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
   .faq-item:first-child { padding-top: 0; }
   .faq-item dt {
@@ -601,9 +601,9 @@
     font-size: 0.85rem;
   }
   footer .footer-inner {
-    max-width: 68ch;
+    max-width: 100%;
     margin: 0 auto;
-    padding: 2.2rem clamp(1.5rem, 4vw, 4rem);
+    padding: 2.2rem 25px;
     text-align: center;
   }
   footer code { font-family: var(--font-mono); }
