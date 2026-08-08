@@ -151,8 +151,25 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
 8. ✅ Renderer — `scripts/render.py` written and verified.
 9. ✅ Report template — `assets/report_template.html` written (377 lines).
 10. ✅ Regression tests — `scripts/test_pipeline.py` rebuilt against real fixtures (5 tests: Manifest→JSON, Schema Validation, JSON→Reports, Knowledge Index, Duplicate Detection), 5/5 passing, committed. Not pytest-based (stdlib only, by design), but no longer manual/informal.
-11. ⚠️ Package as Claude Code skill — prerequisites done (LICENSE, README, requirements.txt); the
-    actual package (`.claude-plugin/plugin.json`, `marketplace.json`) not started.
+11. ✅ Package as Claude Code skill — `skills/intelligence-engine/.claude-plugin/plugin.json`
+    written (name `iem-pm`, v1.0.0). Deliberately **no `marketplace.json`**: researched the current
+    Claude Code plugin docs (they'd moved since this item was first written) and found marketplace
+    installs copy a plugin into a versioned cache directory Anthropic's own docs call ephemeral —
+    that would silently orphan a user's hand-curated `knowledge/`/`registries/` on every plugin
+    update. Skills-directory loading (clone the repo, or copy/symlink
+    `skills/intelligence-engine/` into `~/.claude/skills/`) loads in place with no copy step, so
+    the local baseline is never at risk — confirmed the right call with the user before building.
+    Real, not just JSON-schema, verification: `claude plugin validate --strict` passes clean; a
+    live `claude --plugin-dir` session confirms the skill loads as `iem-pm:intelligence-engine`,
+    `claude plugin details` shows the correct 1-skill/0-agent/0-hook inventory, a `--debug` run
+    shows zero load warnings, and two live invocations confirm the skill's own content and its
+    relative-path pointer into `references/audit-stages.md` both resolve correctly when run through
+    the plugin loader, not just when run as a bare project skill. `test_pipeline.py` reconfirmed
+    7/7 passing (unaffected — the manifest doesn't touch the Python pipeline). `allowed-tools:` was
+    checked against the docs and deliberately left unset in `SKILL.md` — every field it already has
+    (`name`, `description`, `version`, `compatibility`) is either a recognized Claude Code field or
+    part of the Agent Skills spec; adding `allowed-tools` would only pre-approve specific tool calls
+    without asking, which isn't needed here.
 
 ## 5. Open design items
 
@@ -259,10 +276,14 @@ States: `BASELINE_READY/ABSENT → CHARTER_RATIFIED → INTENT_DEFINED → GAPS_
   Prompted by the user reorganizing `knowledge/PMI/` into 4 folders, which exposed that SKILL.md
   §13.2 hardcoded a fixed folder-name table that could never survive an org restructuring its own
   `knowledge/` layout. See the intro for the full account.
-- **`allowed-tools:` frontmatter field** — open, low priority. Not part of the general Agent Skills
-  spec documented at docs.claude.com (only `name`/`description`/`compatibility` are); likely a
-  Claude Code–specific packaging field. Verify against Claude Code's own skill-packaging docs when
-  Build Order item 11 (`.claude-plugin/plugin.json`) is actually started — not blocking anything now.
+- ~~**`allowed-tools:` frontmatter field**~~ — **closed 2026-08-08.** Checked against the real
+  Claude Code skill-packaging docs when Build Order item 11 was built (see §9 fix #26): the
+  Agent Skills spec's six portable fields are `name`/`description`/`license`/`compatibility`/
+  `metadata`/`allowed-tools`. `SKILL.md`'s own `version:` field isn't in Claude Code's documented
+  frontmatter table, but real usage across every pilot audit already proves it's harmless (Claude
+  Code ignores unrecognized frontmatter rather than failing to load). Left `allowed-tools` unset by
+  decision — it only pre-approves specific tool calls without prompting during the invoking turn,
+  which this skill doesn't need.
 - **Minimum Evidence Sufficiency gate (`references/evidence-sufficiency.md`, SKILL.md §6.6 condition
   6)** — spec **finalized 2026-07-29**, `version: 1.0.0`, zero `TODO(you)` markers, Halt Condition 6
   now **active** in SKILL.md (was "DRAFT, not yet active" until this). Halt Conditions 1–5 were all
@@ -376,7 +397,7 @@ decision #2), so there is nothing left to design. What actually happened this we
 - Terminology Discipline (SKILL.md §6.7, `references/terminology.md`) — controlled PM vocabulary for
   all free-text narrative, cross-mapped across PMI/PRINCE2/ISO 21502 — Done, `059d8f8`
 
-**Week 7 (Aug 10–16) — Pilot & Package — Upcoming.**
+**Week 7 (Aug 10–16) — Pilot & Package — Completed, three weeks ahead of schedule (2026-08-08).**
 - Role-based user guide published for PMs, program managers, and PMO leads — Done
   (`Public/IEM-PM-User-Guide.html`)
 - ⚠️ "End-to-end pilot audit against a real baseline" → **Done**, not Upcoming — it ran 2026-07-27,
@@ -388,8 +409,10 @@ decision #2), so there is nothing left to design. What actually happened this we
   `evidence-sufficiency.md`'s Category B definition, and a missing HTML renderer for the Scope
   Limitation Notice — both fixed same day (`caa158b`). This is the mechanism working as intended:
   real cold-session runs keep finding real gaps.
-- Package as an open-source Claude Code skill — Upcoming, not started (no `.claude-plugin/plugin.json`
-  or `marketplace.json`)
+- Package as an open-source Claude Code skill — **Done**, three weeks ahead of schedule (2026-08-08,
+  see §9 fix #26). `skills/intelligence-engine/.claude-plugin/plugin.json` written and verified with
+  `claude plugin validate` and a live `--plugin-dir` session; no `marketplace.json` by deliberate
+  decision (see §4 item 11)
 
 **Week 8 (Aug 17–23) — White Paper — Upcoming.** Unchanged.
 
@@ -476,6 +499,7 @@ date going forward.
 | 23 | 2026-08-02 ~13:30 | *(Not a defect — size reduction, logged for continuity.)* `SKILL.md` was 929 lines, 429 over Anthropic's ~500-line skill-authoring guidance. Root cause: §5 Thinking Phases (~198 lines, Phase 0–7) fully duplicated content already authoritative in `references/audit-stages.md` (Stages 0–10) — each Phase restated Inputs/Output/Rule detail the matching Stage already specifies in full (Decision Logic, Failure Conditions, Completion Criteria), plus Gap-Type/Root-Origin "closed list" language already stated independently in §7/§8, and Manifest-structure detail already stated independently in §10.1/§10.3. | Quick-analysis review flagged this as the single largest lever for the least risk — same branch-out pattern already applied to `charter-spec.md`/`report-generation.md`, just not yet applied to §5. User confirmed: do it, no content or functionality loss. | Verified every fact removed from §5 has a live equivalent elsewhere (§7/§8/§9/§10 or the named `audit-stages.md` Stage) before cutting — nothing is lost, only de-duplicated. §5 rewritten from 11 per-phase prose blocks (~198 lines) to a single 8-row index table (phase → one-line purpose → which Stage to read before acting), matching §11's existing pointer style. No other section touched; no TOC anchor broken (`#5-thinking-phases` heading text unchanged, no sub-anchors existed to link elsewhere — confirmed via repo-wide grep). `SKILL.md`: 929 → 755 lines (174-line cut, more than the ~150 estimated) — still ~255 over the 500-line guidance; further cuts (§2/§9/§6, per the prior analysis) would need to be staged separately since they carry more unique operational content, not pure duplication. Version → 1.11.0. 7/7 regression suite reconfirmed passing (docs-only). | `0c169e2` |
 | 24 | 2026-08-03 | *(Not a defect — new content, logged for continuity.)* No human-facing guide existed for filling out `assets/PMO_DATA_CHARTER_template.md` — the User Guide covers running an audit end-to-end but treats Charter completion as a single step (Step 2), not its own walkthrough. | User request: a step-by-step guide for humans filling the Charter template, in the same style as `IEM-PM-User-Guide.html`. | New file `Public/PMO-Data-Charter-Guide.html` — same design system/CSS reused verbatim from the User Guide (paper/red/gold Palatino theme, light+dark aware) for visual consistency across `Public/`. Content walks the template's own 7 numbered sections in order (Metadata; §1 Artifact Declaration incl. 1.2 Waivers; §2 Field Semantics Map incl. 2.5 Unmapped; §3 Materiality &amp; Scope; §4 Propose→Ratify; §5/§6 read-only — nothing to fill in; §7 Appendix), a "who fills what" table clarifying machine-proposed vs. human-set per section (grounded in `charter-spec.md`'s Anti-Mirror Guard — Artifact Declaration/Field Semantics from data, Materiality/Scope from standards only), a worked example row, 6 common-mistake cards, an FAQ, and a 5-rules capstone. All content cross-checked directly against `PMO_DATA_CHARTER_template.md` and `references/charter-spec.md` before writing — no invented fields or steps. Footer cross-links to `IEM-PM-User-Guide.html` as a companion page. | `8ef41ba` |
 | 25 | 2026-08-08 | Stage 3 Activity 3's self-consistency check (fix #15) was scoped to "figures stated more than once" only. A live audit of `Audit/PCS-EXAMPLE-001/` (2026-08-03) had already shown this missing 5 of 9 real contradictions — same-document summary-vs-body splits, a 3-way cross-document figure split, ID-list dropout across artifacts, and narrative/prose-restated facts (timestamps). The fix was drafted and reviewed with the user 2026-08-03, decision "implement 2026-08-04, not today" — but was never actually applied. | A packaging-readiness review (2026-08-08) checked `audit-stages.md` directly against the drafted fix: still v1.4.0, none of the planned sub-check wording present, no commit since 2026-08-02 (`d6caebf`) had touched the file. | Activity 3 rewritten from one heuristic into 4 explicit mandatory sub-checks: (a) same-document header/summary vs. body, (b) cross-document same-fact restatement (existing check, unchanged), (c) enumerated ID-list completeness across artifacts, (d) narrative facts restated in prose. Activity 4, the Decision Logic bullet, and the Stage 10 Intelligence Indicators rule all generalized from "figure" to cover all four sub-checks. `audit-stages.md` → v1.5.0. | `29adfe0` |
+| 26 | 2026-08-08 | *(Not a defect — new packaging, logged for continuity.)* Build Order item 11 ("Package as Claude Code skill") had been open since the item was first written, before this session actually researched the current Claude Code plugin docs. | User asked to build it, "high quality, no bugs, test thoroughly." | Researched `code.claude.com/docs/en/plugins-reference`, `/skills`, and `/plugin-marketplaces` directly rather than guessing the schema. Found a real architectural conflict: marketplace-installed plugins copy into a versioned cache Anthropic's own docs call ephemeral, which would silently orphan a user's hand-curated `knowledge/`/`registries/` on every update — confirmed with the user before building, who chose skills-directory-only (no `marketplace.json`). Wrote `skills/intelligence-engine/.claude-plugin/plugin.json` (name `iem-pm`, v1.0.0, author/license/repo pulled from the real `LICENSE`/`git remote`, not invented). Verified for real, not just schema-checked: `claude plugin validate ./skills/intelligence-engine --strict` passes with zero warnings; `claude --plugin-dir ./skills/intelligence-engine plugin list --json` shows it loading in place (`installPath` = the actual skill folder, not a cache copy); `claude plugin details` shows the correct inventory (1 skill, 0 agents, 0 hooks); a `--debug` session shows zero load warnings; two live `-p` invocations confirm both the skill's own content and its relative-path pointer into `references/audit-stages.md` resolve correctly through the plugin loader (the second one, forced via the Read tool, quoted fix #25's exact new heading back verbatim). `test_pipeline.py` reconfirmed 7/7 passing (manifest is inert w.r.t. the Python pipeline). README's Quickstart step 4 gained a short paragraph on the `~/.claude/skills/` install path. | *(uncommitted)* |
 
 ### C. Evidence-quality issues found in example data (not tool defects — the pattern that drove fix #15)
 
@@ -587,7 +611,7 @@ record of what got missed and why the fix mattered.
 | next   | User to add further pilot runs. | STATUS.md |
 | next   | Further SKILL.md conciseness edit (§2/§5/§6/§9 — core, per-invocation content) to bring the body closer to Anthropic's <500-line guidance — separate, slower pass; may not land exactly under 500 without cutting real operational guidance. | STATUS.md             |
 | next   | Run bulk Stage 0 criteria-derivation across the remaining 23 real standards (6 of 29 now deep-dived, all on-demand — see §5 strategy note).                             | STATUS.md             |
-| next   | Package as Claude Code skill (.claude-plugin/plugin.json, marketplace.json) — prerequisites (LICENSE/README/requirements.txt) done. Verify the `allowed-tools:` frontmatter field against Claude Code's own skill-packaging docs when this starts. | STATUS.md             |
+| done   | Packaged as a Claude Code plugin — `skills/intelligence-engine/.claude-plugin/plugin.json` (name `iem-pm`, v1.0.0), validated with `claude plugin validate --strict` and a live `--plugin-dir` session. No `marketplace.json` by deliberate decision (see §4 item 11) — skills-directory install keeps `knowledge/`/`registries/` safe from the ephemeral plugin cache. | STATUS.md             |
 | next   | Add CI (GitHub Actions) running test_pipeline.py + a clean-room requirements.txt install on every push.                                | STATUS.md             |
 | next   | Portfolio/program rollup — aggregate N projects' `findings.json` into one portfolio view (root-origin frequency, RIS distribution). Scoped as a pure addition, no existing files touched — see §9 "Open items summary." | STATUS.md             |
 | open   | UI/UX for non-technical PMs — parked, brainstormed only, no decision. See §5 Open design items.                                        | STATUS.md             |
@@ -601,7 +625,7 @@ record of what got missed and why the fix mattered.
 | Week 3 | Validator        | Build schema.py to validate findings JSON against the schema and closed taxonomies.                                  | done   |
 | Week 4 | Audit Manifest   | Create the Audit Manifest template that converts LLM analysis into a parser-friendly structure.                      | done   |
 | Week 5 | SKILL.md         | Write the skill sections and lock the core logic, inputs, and stage flow.                                            | done   |
-| Week 6 | Reports + Tests  | Build the renderer, report template, and regression tests; package the skill.                                        | in progress — renderer, report template, regression tests, and packaging prerequisites (LICENSE/README/requirements.txt) done; the actual .claude-plugin package remains |
+| Week 6 | Reports + Tests  | Build the renderer, report template, and regression tests; package the skill.                                        | done — renderer, report template, regression tests, and the `.claude-plugin/plugin.json` package all built and verified |
 
 # mapping of the five Claude Certified Architect Foundations domains to your IEM-PM modules.
 

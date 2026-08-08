@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "iem-pm",
+  "displayName": "IEM-PM — Intelligence Engineering Methodology",
+  "version": "1.0.0",
+  "description": "Audits delivery evidence against an organization's own PM standards (PMBOK, PRINCE2, ISO 21502, or internal methodology), classifies gaps into 7 types, traces each to a root origin, and scores a deterministic Reporting Integrity Score. Ships zero standard text -- no baseline, no audit.",
+  "author": {
+    "name": "Ramani Viswanathan"
+  },
+  "homepage": "https://github.com/Ramani-Viswanathan/IEM-PM",
+  "repository": "https://github.com/Ramani-Viswanathan/IEM-PM",
+  "license": "MIT",
+  "keywords": [
+    "pmo",
+    "project-management",
+    "audit",
+    "pmbok",
+    "gap-analysis",
+    "governance",
+    "compliance"
+  ]
+}

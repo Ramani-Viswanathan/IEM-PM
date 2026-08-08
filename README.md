@@ -59,6 +59,12 @@ See [`IEM-PM BLUEPRINT-1.md`](IEM-PM%20BLUEPRINT-1.md) for the full 19-section d
 4. **Run this as a Claude Code skill.** Open the repository in Claude Code and point it at
    `skills/intelligence-engine/SKILL.md` — it walks the 11-stage audit state machine (Baseline →
    Charter → Define → Measure → Classify → Trace → Score → Synthesize → JSON → Render → Summary).
+
+   To make it available in every project instead of just this repo, copy or symlink
+   `skills/intelligence-engine/` to `~/.claude/skills/intelligence-engine/` — it carries its own
+   `.claude-plugin/plugin.json`, so Claude Code loads it as the `iem-pm` plugin (invoke directly
+   with `/iem-pm:intelligence-engine`) without copying it into a versioned cache. `knowledge/` and
+   `registries/` stay wherever you put the folder, so nothing is at risk on a future update.
 5. **Read the results.** Reports land in `Audit/<ProjectName>/reports/` (local-only,
    gitignored) — a sibling of `evidence/`: a Markdown Audit Manifest, canonical findings JSON,
    and HTML/TXT reports.
