@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.4.0
+version: 1.5.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -364,20 +364,35 @@ Evaluate every applicable registry criterion against the delivery evidence; each
 2. **Evaluate each applicable criterion** — for every registry criterion Stage 2 resolved as
    applicable to a given artifact, apply that criterion's `Evaluation Method` (`registry-format.md`,
    Appendix E) against the observed evidence in that artifact.
-3. **Cross-check repeated figures within each artifact** — independent of any registry criterion: for
-   every artifact, identify any figure that is stated more than once (a total that also appears in a
-   summary table, a budget line repeated in a detail section, a count restated elsewhere) and verify
-   the restatements agree. This is not optional or criterion-triggered — run it on every artifact
-   that has more than one place a number could be stated. A mismatch is evidence on its own, whether
-   or not any standard's criterion happens to cover that field: two "100% field coverage" documents
-   have both concealed exactly this kind of internal contradiction in real audits (see
-   `gap-taxonomy.md`'s `Untrusted` type — data that conflicts with itself or other data).
-4. **Record a raw gap on failure** — where the evidence does not satisfy a criterion, or Activity 3
-   finds a figure that disagrees with its own restatement, cite the exact evidence (a quote, field
-   value, or explicit statement of absence, per Evidence Discipline §6.1) and record one raw gap:
-   which criterion failed (or which figures disagree), the citation, and a one-line description of
-   the variance. Where the evidence satisfies the criterion and every repeated figure agrees, record
-   nothing — a pass is not a finding.
+3. **Run four self-consistency sub-checks within each artifact** — independent of any registry
+   criterion: run all four on every artifact; none is optional or criterion-triggered.
+   1. **Same-document header/summary vs. body** — where a document states its own summary or
+      executive-summary figure for a value, verify it agrees with that same document's detailed
+      table/section for the same value.
+   2. **Cross-document same-fact restatement** — identify any figure that is stated more than once
+      across artifacts (a total that also appears in a summary table, a budget line repeated in a
+      detail section, a count restated elsewhere) and verify the restatements agree.
+   3. **Enumerated ID-list completeness across artifacts** — for any ID that should carry forward
+      between artifacts (risk, change-request, issue, or milestone IDs), verify every ID present in
+      its source artifact (e.g., the Risk Register) also appears, or is explicitly accounted for, in
+      every downstream artifact that should reference it.
+   4. **Narrative facts restated in prose** — verify timestamps, dates, and named events stated as
+      prose text (not only tabular figures) agree with every other statement of the same fact,
+      whether that other statement is tabular or narrative.
+
+   A mismatch under any of the four is evidence on its own, whether or not any standard's criterion
+   happens to cover that field: two "100% field coverage" documents have both concealed exactly this
+   kind of internal contradiction in real audits (see `gap-taxonomy.md`'s `Untrusted` type — data
+   that conflicts with itself or other data). This raises the floor, not a guarantee — still LLM
+   judgment over long documents, not a deterministic parser; running all four reduces the miss rate,
+   it does not eliminate it.
+4. **Record a raw gap on failure** — where the evidence does not satisfy a criterion, or any of
+   Activity 3's four sub-checks finds a disagreement (a figure, an ID, or a narrative fact that
+   doesn't match its own restatement), cite the exact evidence (a quote, field value, or explicit
+   statement of absence, per Evidence Discipline §6.1) and record one raw gap: which criterion
+   failed (or which sub-check found a disagreement, and what disagrees), the citation, and a
+   one-line description of the variance. Where the evidence satisfies the criterion and every
+   sub-check finds agreement, record nothing — a pass is not a finding.
 5. **Resolve Stage 2's carried-forward items** — evaluate every unresolved companion-data request
    and Field Semantics cross-check flag from Stage 2 as its own candidate gap: a genuinely
    standards-required absence becomes a raw gap (Missing-Data Rules, §6.2); anything the standards
@@ -393,10 +408,12 @@ Evaluate every applicable registry criterion against the delivery evidence; each
   finding.
 - IF the evidence does not satisfy a criterion AND citable evidence exists for the variance (a
   quote, field value, or explicit absence) → record exactly one raw gap.
-- IF Activity 3's cross-check finds two statements of the same figure that disagree → record exactly
-  one raw gap citing both locations and both values, regardless of whether any registry criterion
-  covers that field. Marking an artifact's field coverage as complete is about presence, not
-  agreement — do not let a "100%" coverage figure stand in for having actually reconciled it.
+- IF any of Activity 3's four self-consistency sub-checks finds a disagreement (a repeated figure,
+  a cross-document restatement, an ID missing from a downstream artifact, or a narrative fact
+  restated inconsistently) → record exactly one raw gap citing both (or all) locations and values,
+  regardless of whether any registry criterion covers that field. Marking an artifact's field
+  coverage as complete is about presence, not agreement — do not let a "100%" coverage figure stand
+  in for having actually reconciled it.
 - IF a variance is suspected but no evidence can be cited for it → do **not** record a raw gap
   (§6.1). Note it only as a candidate for the Synthesis narrative in Stage 7 — never in the raw gap
   list.
@@ -846,10 +863,11 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
 5. **Write the Synthesis section** (§10.2.4) — narrative diagnostics for all 7 Intelligence
    Indicators, drawing on the Intelligence Dimensions tags assigned in Stage 6. Qualitative only,
    never scored or graded. A *positive* claim about an artifact (data "traces consistently," figures
-   "match," a linkage "holds") is a factual assertion like any other — do not write one unless Stage
-   3's Activity 3 actually checked that specific figure. Where coverage was checked but reconciliation
-   wasn't, say so precisely ("no discrepancy found in the fields checked") rather than a blanket claim
-   of consistency the artifact wasn't actually tested against.
+   "match," a linkage "holds") is a factual assertion like any other — do not write one unless one of
+   Stage 3's Activity 3 sub-checks actually checked that specific figure, ID, or narrative fact.
+   Where coverage was checked but reconciliation wasn't, say so precisely ("no discrepancy found in
+   the fields checked") rather than a blanket claim of consistency the artifact wasn't actually
+   tested against.
 6. **Write the Appendix** (§10.2.5) — Schema Version, Total Findings, Artifacts Examined, Standards
    Referenced.
 7. **Run Final Validation** — check the completed Manifest against all 9 checks in SKILL.md §12.1
