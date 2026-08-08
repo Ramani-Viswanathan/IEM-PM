@@ -3,12 +3,47 @@
 **Intelligence Engineering Methodology for Project, Program, Portfolio & PMO** — an open-source
 reference implementation of **Project Gap Intelligence Engineering**.
 
-## The problem
+## What "Intelligence Engineering" means
 
-Organizations suffer from compromised strategic decision-making and hidden project failures
-because delivery data is missing, ignored, disconnected, untrusted, underutilized, misclassified,
-or divergent across PMO systems. What looks like a delivery problem is often an
-intelligence-integrity problem.
+"Intelligence" here isn't a claim about artificial intelligence — it's used the way "business
+intelligence" is: evidence-based organizational insight (visibility, integrity, connectivity,
+governance, predictability, decision quality) built from your own delivery data. The engine that
+produces it is LLM-native — Claude does the actual reading and judgment, constrained to reason only
+from the real standards and evidence you provide, never from memory or assumption — while a
+separate, deterministic layer only validates and renders, never judges. "Engineering" means this is
+systematic and repeatable, not one-off consulting: the same closed 7-gap/7-root-origin taxonomy,
+every audit. And it isn't tied to one PM methodology — IEM-PM audits against whichever real
+standard your organization actually declares (PMI/PMBOK, PRINCE2, ISO 21502, or your own internal
+methodology), never a generic one it assumes.
+
+## The objective
+
+> Does the organization's delivery data match what its standards require — and where it doesn't, why?
+
+IEM-PM exists to answer that one question with evidence, not opinion — then trace every gap to its
+root origin so the correction happens at the source, not just in a report.
+
+## Discipline
+
+Project Gap Intelligence Engineering
+
+## Definition
+
+The systematic practice of measuring delivery data gaps across project, program, portfolio, and
+PMO systems, tracing discrepancies to their root origins, and engineering corrections at the
+source.
+
+## Problem Statement
+
+Organizations suffer from compromised strategic decision-making and hidden project failures due to
+delivery data that is missing, ignored, disconnected, untrusted, underutilized, misclassified, or
+divergent across PMO systems.
+
+## Manifesto
+
+We relentlessly measure missing, ignored, disconnected, untrusted, underutilized, misclassified,
+and divergent data, and trace it to its root origin — what looks like a delivery problem is often
+an intelligence-integrity problem.
 
 ## What IEM-PM does
 
