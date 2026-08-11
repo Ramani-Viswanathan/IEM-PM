@@ -24,6 +24,14 @@ _archive/
 # PMI volunteer copyrighted material — never publish, never build on
 stakeholder/
 
+# Real client evidence and personal legal drafts — purged from history 2026-08-10,
+# never re-add: worked examples must use synthetic/anonymized data only
+examples/Pilot-audit-2/
+examples/Pilot-audit-3/
+examples/pilot-audit/
+examples/pilot-audit-4/
+Public/WHITEPAPER.md
+
 # Common
 reports/
 .vs/
