@@ -495,6 +495,47 @@ def test_scope_limitation_render():
         print(f"  PASS: HTML notice: {len(html_content):,} chars, 7 categories, mandatory failures rendered")
 
 
+def test_non_art_artifact_id_scheme():
+    """Test: a Charter using a non-ART-NNN ID scheme (e.g. WK8-01, multi-segment) must
+    still parse and validate. Regression for the real bug this fixture exercises: the
+    parser/schema artifact_id pattern used to be hardcoded to ^ART-[0-9]{3}$, which
+    silently dropped any '## ARTIFACT:' block using a different scheme -- caught in a
+    real audit run (STATUS.md fix log), not by this suite, because every prior fixture
+    only ever used ART-NNN IDs."""
+    fixture = REAL_MANIFEST_PATH.read_text(encoding="utf-8")
+    fixture = (
+        fixture.replace("ART-001", "WK8-01")
+        .replace("ART-002", "WK8-02")
+        .replace("ART-003", "WK8-03")
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_dir = Path(tmp)
+        manifest_path = tmp_dir / "test_manifest.md"
+        manifest_path.write_text(fixture, encoding="utf-8")
+
+        findings = _generate_findings(manifest_path, tmp_dir)
+
+        artifact_ids = {a["artifact_id"] for a in findings["baseline"]["artifacts_examined"]}
+        assert artifact_ids == {"WK8-01", "WK8-02", "WK8-03"}, (
+            f"expected all 3 WK8-NN artifacts parsed, got {artifact_ids}"
+        )
+        evidence_ids = {
+            ev["artifact_id"] for f in findings["findings"] for ev in f["evidence"]
+        }
+        assert evidence_ids <= {"WK8-01", "WK8-02", "WK8-03"}
+
+        # Schema validation happens inside manifest_to_findings.py itself (run_script_ok
+        # already asserted a zero exit code) -- also assert on the output directly so a
+        # future change that starts silently swallowing schema errors is still caught.
+        schema = json.loads(
+            (SCRIPTS_DIR / "findings.schema.json").read_text(encoding="utf-8")
+        )
+        import jsonschema
+        jsonschema.validate(findings, schema)
+
+        print(f"  PASS: non-ART-NNN ID scheme (WK8-01 style) parses and validates: {sorted(artifact_ids)}")
+
+
 def main():
     print("=" * 60)
     print("IEM-PM Regression Test Suite")
@@ -512,6 +553,7 @@ def main():
         ("Approval Requires Approver Name", test_approval_requires_approver_name),
         ("Provenance Fallback", test_provenance_fallback),
         ("Scope Limitation Notice Render", test_scope_limitation_render),
+        ("Non-ART Artifact ID Scheme", test_non_art_artifact_id_scheme),
     ]
 
     passed = 0

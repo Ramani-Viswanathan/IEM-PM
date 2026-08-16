@@ -4,7 +4,7 @@ description:
   > The authoritative data-interpretation contract for IEM-PM audits.
   Defines what the data is, what its fields mean, and what matters.
   Machine-proposed, human-ratified. Without ratification, no audit.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # PMO Data Charter
@@ -55,7 +55,9 @@ Every artifact in scope for this audit. The machine proposes this list from the 
 | ART-014     | Stakeholder Register | `/data/stakeholders/` | Excel                     | Medium      | [In Scope / Waived / Missing] |
 | ART-015     | Communication Plan   | `/data/comms/`        | DOCX / PDF                | Low         | [In Scope / Waived / Missing] |
 
-_Add or remove rows as needed. Every artifact in scope must have a unique ART-XXX ID._
+_Add or remove rows as needed. Every artifact in scope must have a unique ID (ART-XXX is the
+convention used below; any PREFIX-SUFFIX scheme is accepted -- e.g. WK8-01, DOC-2026-08 -- as long
+as it's used consistently across this Charter and the resulting Manifest)._
 
 ### 1.2 Artifact Waivers
 

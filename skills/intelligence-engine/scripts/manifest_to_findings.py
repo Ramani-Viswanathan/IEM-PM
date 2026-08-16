@@ -150,7 +150,9 @@ class ManifestParser:
     def _parse_artifacts(self) -> List[Dict[str, Any]]:
         """Extract all ## ARTIFACT: blocks."""
         artifacts = []
-        pattern = r'## ARTIFACT:\s*(ART-\d{3})\n(.*?)(?=## ARTIFACT:|## SYNTHESIS|### FINDING:|$)'
+        # Keep in sync with findings.schema.json's #/definitions/artifact_id -- any
+        # Charter-declared PREFIX-SUFFIX scheme (ART-001, WK8-01, DOC-2026-08, ...).
+        pattern = r'## ARTIFACT:\s*([A-Za-z0-9]{1,10}(?:-[A-Za-z0-9]{1,10}){1,3})\n(.*?)(?=## ARTIFACT:|## SYNTHESIS|### FINDING:|$)'
         for match in re.finditer(pattern, self.raw, re.DOTALL):
             art_id = match.group(1)
             block = match.group(2)
