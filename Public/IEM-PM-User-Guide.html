@@ -1127,6 +1127,47 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             </dd>
           </div>
           <div class="faq-item">
+            <dt>What exactly is the unit of analysis — what is IEM-PM actually measuring?</dt>
+            <dd>
+              <p>Not your whole project, and not a data field in isolation — a <strong>criterion</strong>. Every standard in <code>knowledge/</code> is broken down (Stage 2) into individual checkable criteria; each criterion is checked against the evidence in your declared artifacts (Stage 3). So the atomic unit is: one criterion, checked against the evidence for one artifact, scoped to one project's Audit Scope. A "no" becomes one gap, one finding, one contribution to the Reporting Integrity Score.</p>
+              <p style="margin-top:0.6rem;">It never assesses a whole PMO's capability or organizational maturity — that's a distinct discipline (PMI's OPM3, requiring cross-project calibration and a licensed instrument) that this tool deliberately does not provide.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>Does it tell me if my data is good enough for a decision, or just whether it matches the standard?</dt>
+            <dd>
+              <p>Only the second, today. Every finding measures <strong>conformance</strong> — does the evidence in front of it satisfy what the standard requires. It does not independently assess whether conforming data was actually <strong>adequate</strong> for the decisions made with it, and it doesn't sample real decisions to check whether they were fit for purpose. If your schedule has a baseline (conformant) but the baseline was built on unrealistic assumptions, IEM-PM won't catch that — that's a professional judgment call, not a data gap.</p>
+              <p style="margin-top:0.6rem;">Read the Reporting Integrity Score as a measure of evidence integrity, not decision quality.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>Why does every finding get exactly one root origin? What if a gap really has more than one cause?</dt>
+            <dd>
+              <p>One root origin per finding is enforced by design (a closed, single-value field — the validator rejects anything else) so every finding maps to one ownable fix: who fixes this, and where. In practice, some gaps genuinely have more than one contributing cause. The current version doesn't model that — there's no secondary or contributing-cause field — so you'll be asked to trace back to the single earliest structural point that produced the gap (per <code>root-origins.md</code>'s trace order), even when a second cause clearly played a part.</p>
+              <p style="margin-top:0.6rem;">This is a deliberate, still-open design question, not an oversight — flagged for a future version once there's real audit evidence on how often it actually matters.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>What is the exact Reporting Integrity Score formula, and what does the score predict?</dt>
+            <dd>
+              <p>Score = 100 minus four deductions, floored at 0:</p>
+              <ul>
+                <li><strong>Severity deduction:</strong> sum of every finding's severity (1–5), capped at 50.</li>
+                <li><strong>Density deduction:</strong> (findings ÷ artifacts examined) × 5, capped at 20.</li>
+                <li><strong>Diversity deduction:</strong> 10 points if findings trace to more than 4 distinct root origins, otherwise 0.</li>
+                <li><strong>Missing-gap deduction:</strong> count of <code>Missing</code>-type findings × 3, capped at 20.</li>
+              </ul>
+              <p style="margin-top:0.6rem;">It predicts nothing — it's a descriptive snapshot of the evidence in front of it at the moment of the audit, not a forecast of project outcomes. Every report also states the score's own limitations in plain text (report §7): it hasn't been calibrated across organizations, severity is LLM judgment rather than empirically derived, and scores from two different audits aren't directly comparable unless scope, standards, and materiality all match. Use it to track one project over time, not to rank unrelated projects against each other.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>How do I approve, reject, or edit a finding?</dt>
+            <dd>
+              <p>Approve is the only one of these that's a real, enforced mechanism today. Every Severity 4 (Major) or 5 (Critical) finding is surfaced to you directly during Stage 7, before the Manifest is written — you say yes or no, and your real name/role plus when you said it get recorded (<code>Approved By</code> / <code>Approval Date</code>) alongside the finding. A "yes" the AI writes on its own authority, or a "yes" with no name attached, is rejected outright by the validator.</p>
+              <p style="margin-top:0.6rem;">Reject, formally edit a finding's text, or adjudicate between two reviewers who disagree don't have a structured mechanism yet. Today you do that informally, by telling Claude Code directly before the Manifest is finalized — e.g. "that severity is too high, make it a 3" or "drop that finding, the evidence doesn't support it" — and it isn't captured as a formal revision history. If you're running audits with more than one reviewer, treat that as a real current limitation, not a hidden feature.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
             <dt>What does IEM-PM actually do, end to end?</dt>
             <dd>
               <ul>
