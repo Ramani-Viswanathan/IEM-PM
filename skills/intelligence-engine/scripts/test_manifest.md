@@ -7,6 +7,8 @@
 **Analyst:** IEM-PM Intelligence Engine
 **Date:** 2026-07-26T11:30:00-05:00
 **Status:** RATIFIED
+**Skill Version:** 1.13.0
+**Model:** claude-sonnet-5
 
 ## ARTIFACT: ART-001
 

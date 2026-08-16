@@ -1,12 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "IEM-PM Canonical Findings v1.3.0",
+  "title": "IEM-PM Canonical Findings v1.4.0",
   "description": "Machine-readable single source of truth for PMO Data Gap Audit",
   "type": "object",
   "required": [
     "audit_id",
     "schema_version",
     "charter_version",
+    "skill_version",
+    "model",
     "generated_at",
     "baseline",
     "evidence_summary",
@@ -22,11 +24,19 @@
     },
     "schema_version": {
       "type": "string",
-      "enum": ["1.3.0"]
+      "enum": ["1.4.0"]
     },
     "charter_version": {
       "type": "string",
       "description": "Version of PMO Data Charter used"
+    },
+    "skill_version": {
+      "type": "string",
+      "description": "v1.4.0: the intelligence-engine SKILL.md version that produced this audit. Provenance, not a scoring input -- lets two audits of the same evidence be compared knowing whether a difference in findings is a real inconsistency or just two different skill versions. Falls back to 'unknown' if the Manifest header doesn't state it; never blocks the audit."
+    },
+    "model": {
+      "type": "string",
+      "description": "v1.4.0: the AI model that produced this audit, as it stated about itself. Same provenance rationale as skill_version. Falls back to 'unknown' if the Manifest header doesn't state it; never blocks the audit."
     },
     "generated_at": {
       "type": "string",

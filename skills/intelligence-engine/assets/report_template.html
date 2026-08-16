@@ -159,7 +159,9 @@
     <strong>Audit ID:</strong> {{ audit.audit_id }} &nbsp;|&nbsp;
     <strong>Charter:</strong> {{ audit.charter_version }} &nbsp;|&nbsp;
     <strong>Generated:</strong> {{ generated_at }} &nbsp;|&nbsp;
-    <strong>Schema:</strong> {{ audit.schema_version }}
+    <strong>Schema:</strong> {{ audit.schema_version }} &nbsp;|&nbsp;
+    <strong>Skill Version:</strong> {{ audit.skill_version or "unknown" }} &nbsp;|&nbsp;
+    <strong>Model:</strong> {{ audit.model or "unknown" }}
 </div>
 
 <!-- 1. Executive Summary -->
@@ -384,6 +386,8 @@
         <tr><td>Canonical JSON</td><td><code>findings.json</code></td></tr>
         <tr><td>Audit Manifest</td><td><code>audit_manifest.md</code></td></tr>
         <tr><td>Charter Version</td><td>{{ audit.charter_version }}</td></tr>
+        <tr><td>Skill Version</td><td>{{ audit.skill_version or "unknown" }}</td></tr>
+        <tr><td>Model</td><td>{{ audit.model or "unknown" }}</td></tr>
     </table>
 </div>
 

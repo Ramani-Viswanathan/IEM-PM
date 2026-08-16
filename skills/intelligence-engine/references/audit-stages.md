@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.6.0
+version: 1.7.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -849,7 +849,9 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
    is the substantive check behind the `SCORED` label — nothing before this stage is on disk, so
    this is the only place that label can actually be verified rather than trusted.
 2. **Write the Header Block** (§10.2.1) — Audit ID, Charter Version, Standards Baseline, Scope,
-   Analyst, Date, Status (RATIFIED / PROVISIONAL).
+   Analyst, Date, Status (RATIFIED / PROVISIONAL), Skill Version (read from `SKILL.md` §13.4, not
+   guessed), and Model (what you actually are, per your own system context — write "unknown" rather
+   than fabricate this if it's genuinely not available).
 3. **Write the Per-Artifact Evidence Log** (§10.2.2) — one `## ARTIFACT:` block per artifact
    declared in the Charter, with observations from Stage 3's evidence reading. For `**Checksum:**`,
    compute a real SHA-256 of the artifact file (e.g. a one-line shell/Python command such as

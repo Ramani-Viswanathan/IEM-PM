@@ -8,6 +8,7 @@ v1.2.0: renders the RIS score's components/limitations breakdown and each
 finding's human-approval status, both new in schema v1.2.0.
 v1.3.0: an approved finding now renders who approved it and when, not just
 a bare "Approved" flag.
+v1.4.0: renders skill_version/model provenance in the report header.
 """
 
 import json
@@ -71,6 +72,8 @@ def render_txt(canonical: dict) -> str:
         f"Charter:        {canonical['charter_version']}",
         f"Generated:      {_format_timestamp(canonical.get('generated_at', ''))}",
         f"Schema:         {canonical['schema_version']}",
+        f"Skill Version:  {canonical.get('skill_version', 'unknown')}",
+        f"Model:          {canonical.get('model', 'unknown')}",
         "",
         "1. EXECUTIVE SUMMARY",
         "-" * 40,
@@ -181,6 +184,8 @@ def render_txt(canonical: dict) -> str:
         "10. APPENDIX",
         "-" * 40,
         f"  Schema Version: {canonical['schema_version']}",
+        f"  Skill Version: {canonical.get('skill_version', 'unknown')}",
+        f"  Model: {canonical.get('model', 'unknown')}",
         "  Canonical JSON: (see separate file)",
         "",
         "=" * 80,

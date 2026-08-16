@@ -792,6 +792,9 @@
         <div class="callout accent" style="margin-top:1.4rem;">
           <p><strong>Nothing you hand it gets changed.</strong> IEM-PM only reads your standards, your Charter, and your evidence. The only thing it ever writes is inside your project's own <code>reports/</code> folder, inside <code>Audit/&lt;YourProjectName&gt;/</code> — your source data is never touched.</p>
         </div>
+        <div class="callout" style="margin-top:1rem;">
+          <p><strong>Only audit evidence you trust the source of.</strong> Evidence files are read as data, never as instructions — but there is currently no automated defense that detects a file deliberately crafted to contain hidden text trying to steer the analysis. This is a disclosed, unsolved risk, not a hypothetical one. Don't run IEM-PM against evidence from a source you wouldn't otherwise trust.</p>
+        </div>
       </section>
 
       <section id="workflow">
@@ -1245,6 +1248,27 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
           <div class="faq-item">
             <dt>Will it make any changes to my uploaded evidence?</dt>
             <dd>No. Read-only by design (Operating Principle 4). It only reads standards, Charter, and evidence, and only ever writes into your project's own <code>reports/</code> folder.</dd>
+          </div>
+          <div class="faq-item">
+            <dt>How do I know which AI model or skill version produced a given report?</dt>
+            <dd>
+              <p>Every report's header now shows <code>Skill Version</code> and <code>Model</code> alongside the existing Audit ID/Charter/Schema line, and both are repeated in the Appendix section. This exists so that if two audits of the same evidence produce different findings, you can tell whether that's a real inconsistency or simply two different model/skill versions doing the analysis — it's provenance, not a scoring input.</p>
+              <p style="margin-top:0.6rem;">If a report predates this feature, both fields will read "unknown" rather than a guessed value — that's the intended fallback, not a bug.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>Can a malicious or corrupted evidence file attack the audit itself?</dt>
+            <dd>
+              <p>This is a disclosed, honestly-unsolved risk, not a hypothetical one. Evidence files (Excel exports, PDFs, status reports) are read directly by the AI model doing the audit. In principle, a file could be crafted to contain hidden text that looks like an instruction — "ignore your previous instructions," a fake system message, a request to skip a validation step — attempting to steer the AI's judgment rather than simply being data for it to evaluate.</p>
+              <p style="margin-top:0.6rem;">IEM-PM is instructed to treat all evidence content as data, never as instructions, and to disregard and flag any such attempt rather than comply with it. But there is currently <strong>no automated technical defense</strong> that detects this before the file is read — the instruction to the AI is the only safeguard today. Practical guidance: only run an audit against evidence you'd trust the source of regardless of this tool. This is an open item, not a solved one.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
+            <dt>How long should I keep audit evidence and reports, and how do I delete them?</dt>
+            <dd>
+              <p><code>knowledge/</code>, <code>Audit/&lt;project&gt;/evidence/</code>, and <code>Audit/&lt;project&gt;/reports/</code> are all gitignored and local-only — nothing in them is ever pushed anywhere by this tool. There's no automatic expiry: a project's evidence and reports sit on disk until you remove them yourself.</p>
+              <p style="margin-top:0.6rem;">Recommended practice: delete the whole <code>Audit/&lt;ProjectName&gt;/</code> folder once an engagement ends and you no longer need its evidence or reports. Nothing does this automatically, and nothing forces it on a schedule — it's a manual step, deliberately left to your judgment about what your organization needs to retain. This matters in practice, not just in theory: real client evidence and an unrelated personal document once ended up committed to this project's own git history before being found and purged (see <code>STATUS.md</code> fix #33) — local-only storage prevents that data leaving your machine, but it doesn't by itself prevent it from being accidentally committed if you're working inside a git repository. If your <code>Audit/</code> folder lives inside a git repo, double-check it's gitignored before you commit anything.</p>
+            </dd>
           </div>
           <div class="faq-item">
             <dt>What if I don't have PMI standards in <code>knowledge/</code>?</dt>

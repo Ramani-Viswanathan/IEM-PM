@@ -3,8 +3,10 @@
 IEM-PM Schema Validator — Contract 5
 Validates canonical findings JSON against findings.schema.json.
 Enforces closed taxonomies, evidence discipline, deduplication, coverage,
-(v1.2.0) human approval on Major/Critical findings, and (v1.3.0) that every
-recorded approval names an accountable approver.
+(v1.2.0) human approval on Major/Critical findings, (v1.3.0) that every
+recorded approval names an accountable approver, and (v1.4.0, via
+findings.schema.json's required list) that every audit records its own
+skill_version/model provenance.
 """
 
 import json

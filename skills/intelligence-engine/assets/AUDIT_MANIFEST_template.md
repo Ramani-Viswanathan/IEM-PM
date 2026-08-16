@@ -23,11 +23,19 @@ Follow these rules exactly. Software parses this file with regex and markdown pa
 **Analyst:** IEM-PM Intelligence Engine
 **Date:** [ISO-8601]
 **Status:** [RATIFIED / PROVISIONAL]
+**Skill Version:** [This skill's own version, read directly from SKILL.md §13.4 — never guessed]
+**Model:** [The AI model actually running this audit, per your own system context, e.g. claude-sonnet-5 — never a guess; write "unknown" if you genuinely cannot state it]
 
 Separate list items with `;`, not `,` — full standard titles routinely contain commas of their
 own (e.g. "Standard for Risk Management in Portfolios, Programs, and Projects"), and a
 comma-separated list cannot be split back apart unambiguously once that happens. The parser
 (`manifest_to_findings.py`) splits both fields on `;`.
+
+`Skill Version` and `Model` exist so that if two audits of the same evidence produce different
+findings, it's possible to tell whether that's a real inconsistency or simply two different
+model/skill versions doing the analysis (v1.4.0 — provenance, not a taxonomy or scoring change).
+If either is genuinely unavailable, write "unknown" rather than fabricate a plausible-looking
+value — software falls back to "unknown" itself if the field is missing entirely.
 
 ### 10.2.2 Per-Artifact Evidence Log Template
 

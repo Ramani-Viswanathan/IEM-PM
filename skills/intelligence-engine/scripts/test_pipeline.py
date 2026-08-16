@@ -70,11 +70,16 @@ def test_manifest_to_findings():
     with tempfile.TemporaryDirectory() as tmp:
         data = _generate_findings(REAL_MANIFEST_PATH, Path(tmp))
 
-        assert data["schema_version"] == "1.3.0"
+        assert data["schema_version"] == "1.4.0"
         assert len(data["findings"]) == 2
         assert {f["id"] for f in data["findings"]} == {"FIND-0001", "FIND-0002"}
         assert data["reporting_integrity_score"]["score"] > 0
         assert "maturity_assessment" not in data, "OPM3/maturity modeling was scrapped -- must not reappear"
+
+        # v1.4.0: provenance. Fixture declares both explicitly -- must parse
+        # verbatim, not fall back to "unknown".
+        assert data["skill_version"] == "1.13.0", "skill_version must parse from the Manifest header"
+        assert data["model"] == "claude-sonnet-5", "model must parse from the Manifest header"
 
         # v1.2.0: human approval. FIND-0001 is Severity 4 and the fixture
         # declares "Human Approved: Yes" -- must parse to True, not a string.
@@ -182,6 +187,21 @@ def test_rendering():
         # the field was parsed and stored but never rendered anywhere).
         assert "Test Fixture Approver" in html_content, "approver name missing from HTML report"
         assert "Test Fixture Approver" in txt_content, "approver name missing from TXT report"
+
+        # v1.4.0: provenance must actually render, not just parse into JSON.
+        assert "1.13.0" in html_content, "skill_version missing from HTML report"
+        assert "claude-sonnet-5" in html_content, "model missing from HTML report"
+        assert "1.13.0" in txt_content, "skill_version missing from TXT report"
+        assert "claude-sonnet-5" in txt_content, "model missing from TXT report"
+
+        # Regression: skill_version/model must appear in the TXT Appendix
+        # section specifically, not just the header block above it -- the
+        # HTML Appendix table already had explicit rows for both; the TXT
+        # Appendix was initially missed, contradicting the User Guide's claim
+        # that both fields are "repeated in the Appendix section."
+        appendix_txt = txt_content.split("10. APPENDIX", 1)[1]
+        assert "Skill Version: 1.13.0" in appendix_txt, "skill_version missing from TXT Appendix section"
+        assert "Model: claude-sonnet-5" in appendix_txt, "model missing from TXT Appendix section"
 
         # Artifact names actually rendered, not just IDs (regression check).
         for name in ("Project Schedule", "RAID Log", "Governance Pack"):
@@ -352,6 +372,34 @@ def test_approval_requires_approver_name():
         print("  PASS: 'Human Approved: Yes' without Approved By correctly rejected (E-PARSE-009)")
 
 
+def test_provenance_fallback():
+    """
+    Test 9 (v1.4.0): a Manifest with no Skill Version / Model header fields must
+    NOT be rejected -- provenance is a soft-fallback header field (like
+    charter_version), not a hard gate like Human Approved. Confirms both fields
+    default to the literal string "unknown" rather than crashing, guessing a
+    plausible-looking value, or blocking the audit.
+    """
+    base = REAL_MANIFEST_PATH.read_text(encoding="utf-8")
+    stripped = base.replace("**Skill Version:** 1.13.0\n", "").replace("**Model:** claude-sonnet-5\n", "")
+    assert "Skill Version" not in stripped and "Model" not in stripped, "fixture mutation failed -- test is broken"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        manifest_path = tmp_path / "no_provenance_manifest.md"
+        output_path = tmp_path / "findings.json"
+        manifest_path.write_text(stripped, encoding="utf-8")
+
+        run_script_ok("manifest_to_findings.py", [
+            "--manifest", str(manifest_path), "--output", str(output_path),
+        ])
+        data = json.loads(output_path.read_text(encoding="utf-8"))
+
+        assert data["skill_version"] == "unknown", "missing skill_version must fall back to 'unknown'"
+        assert data["model"] == "unknown", "missing model must fall back to 'unknown'"
+        print("  PASS: missing Skill Version/Model correctly fall back to 'unknown', audit still completes")
+
+
 def test_scope_limitation_render():
     """Test 6: real Halt Condition 6 notice (md) -> HTML, checking real content,
     not just that a file got written."""
@@ -398,6 +446,7 @@ def main():
         ("Duplicate Detection", test_duplicate_detection),
         ("Major Finding Requires Approval", test_major_finding_requires_approval),
         ("Approval Requires Approver Name", test_approval_requires_approver_name),
+        ("Provenance Fallback", test_provenance_fallback),
         ("Scope Limitation Notice Render", test_scope_limitation_render),
     ]
 

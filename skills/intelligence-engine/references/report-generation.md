@@ -37,7 +37,7 @@ Software produces the report in this order:
 | 7   | **Intelligence Indicators + Reporting Integrity Score** | Synthesis Section                           | Your narrative for all 7 dimensions. Software computes the score and places it alongside your text.                                |
 | 8   | **Recommended Actions**                                 | Finding Blocks — `Recommended Action` field | Software extracts all recommended actions and groups them by root origin for prioritization.                                       |
 | 9   | **Roadmap**                                             | Finding Blocks — severity + root origin     | Software generates a remediation roadmap from your severity scores and root origin distribution.                                   |
-| 10  | **Appendix**                                            | Appendix section of Manifest                | Schema version, artifact checksums, file references.                                                                               |
+| 10  | **Appendix**                                            | Appendix section of Manifest                | Schema version, artifact checksums, file references. Software adds Skill Version/Model provenance from the Header Block. |
 
 ---
 

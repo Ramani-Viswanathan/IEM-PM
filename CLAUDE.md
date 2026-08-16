@@ -46,3 +46,8 @@ this tool provides. Scrapped 2026-07-27, not deferred.
   - `registries/` — derived at runtime from the org's standards (local-only, gitignored).
 - `_archive/` — superseded material (old `pmo-data-gap-audit` skill, old blueprint, remit). History only.
 - `stakeholder/` — PMI volunteer copyrighted material. **Never touch, never publish, never build on.**
+
+## Important
+
+Perform /security-review and /code-review before commit
+ensure while doing /code-review no hardcoding in codes and follow industry standard

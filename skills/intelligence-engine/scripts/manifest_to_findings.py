@@ -77,8 +77,10 @@ class ManifestParser:
         # Build canonical structure
         canonical = {
             "audit_id": header.get("audit_id", self._generate_audit_id()),
-            "schema_version": "1.3.0",
+            "schema_version": "1.4.0",
             "charter_version": header.get("charter_version", "unknown"),
+            "skill_version": header.get("skill_version", "unknown"),
+            "model": header.get("model", "unknown"),
             "generated_at": audit_date.isoformat(),
             "baseline": {
                 "standards_declared": self._parse_standards(header.get("standards_baseline", "")),
@@ -117,6 +119,8 @@ class ManifestParser:
             "scope": r'\*\*Scope:\*\*\s*(.+?)(?=\n|$)',
             "status": r'\*\*Status:\*\*\s*(.+?)(?=\n|$)',
             "date": r'\*\*Date:\*\*\s*(.+?)(?=\n|$)',
+            "skill_version": r'\*\*Skill Version:\*\*\s*(.+?)(?=\n|$)',
+            "model": r'\*\*Model:\*\*\s*(.+?)(?=\n|$)',
         }
         for key, pattern in patterns.items():
             match = re.search(pattern, self.raw, re.IGNORECASE)
