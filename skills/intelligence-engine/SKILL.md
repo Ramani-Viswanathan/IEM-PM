@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.14.0
+version: 1.15.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -126,13 +126,16 @@ Never reproduce standards. Reference only: clause · identifier · short paraphr
 
 Never modify delivery data. Write only to the project's own `reports/` folder (sibling of its `evidence/` folder — see §10.6), plus the local registry.
 
-You read artifacts. You read standards. You read the Charter. You write only the Audit Manifest. You do not:
+You read artifacts. You read standards. You read the Charter. You write the Audit Manifest, plus
+one narrow exception: a single timestamp line appended to `timing.log` at the start and end of each
+stage (§6.9) — never judgment content, never findings, never anything the Manifest itself carries.
+You do not:
 
 - Edit, rename, move, or delete source files.
 - Write to `knowledge/` or `registries/`.
 - Update databases or systems of record.
 
-Your only write target is the Audit Manifest.
+Your only write targets are the Audit Manifest and `timing.log`'s append-only timestamp lines.
 
 ## Principle 5 — Separation
 
@@ -436,6 +439,39 @@ safeguard today. Operators should be told plainly: only run an audit against evi
 trust the source of. A malicious or corrupted file could theoretically contain hidden text
 attempting to steer analysis; there is no automated protection against that yet.
 
+## 6.9 Stage Timing Log
+
+Log when every stage starts and ends, so a slow audit can be diagnosed by stage instead of guessed
+at. This exists because there was previously no way to answer "which stage is actually slow" after a
+real audit — see `STATUS.md` fix #41.
+
+**At the start of Stage 0** (before its first Activity), run this exact Bash command, creating the
+file if it doesn't exist:
+
+```bash
+mkdir -p "Audit/<ProjectName>/reports" && printf '=== AUDIT START | %s ===\n[Stage 0 Baseline] ENTRY %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "Audit/<ProjectName>/reports/timing.log"
+```
+
+**At the end of every stage, and the start of the next one** (Stages 0 through 7 — Stages 8 and 9
+log themselves automatically, see below), run:
+
+```bash
+printf '[Stage N Name] EXIT %s\n[Stage N+1 Name] ENTRY %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "Audit/<ProjectName>/reports/timing.log"
+```
+
+Replace `<ProjectName>` with the actual project folder (same one as this audit's `evidence/`),
+`N Name`/`N+1 Name` with the real stage number and name (e.g. `Stage 3 Measure`). This is one Bash
+tool call per stage boundary — 8 total across Stages 0–7, combining exit-then-entry into a single
+call wherever consecutive, as shown above. Do not skip this; it is the only instrumentation this
+skill has.
+
+`manifest_to_findings.py` (Stage 8) and `render.py` (Stage 9) append their own `ENTRY`/`EXIT` lines
+to the same `timing.log` automatically, in code — you do not log those two stages yourself.
+`render.py` also appends the final `=== AUDIT END ===` summary line once Stage 9 completes,
+computing total wall-clock time from the file's own first and last timestamps. `timing.log` is
+append-only across every audit run of a project, so timing trends are visible across repeated
+audits of the same project over time (e.g. whether Stage 2 gets faster once registries are cached).
+
 ---
 
 # 7. Gap Classification
@@ -615,7 +651,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.14.0**
+This skill file version: **1.15.0**
 Schema version: **1.4.0**
 Manifest format version: **1.4.0**
 

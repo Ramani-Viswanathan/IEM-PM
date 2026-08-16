@@ -53,6 +53,20 @@ def run_script_ok(name: str, args: list, cwd: Path = SCRIPTS_DIR) -> subprocess.
     return result
 
 
+def _copy_manifest_to_tmp(tmp_dir: Path, source: Path = None) -> Path:
+    """Copy a manifest into tmp_dir and return the copy's path.
+
+    manifest_to_findings.py (Stage 8) now writes timing.log next to whatever --manifest
+    path it's given (SKILL.md §6.9), unconditionally -- not just next to --output. Passing
+    REAL_MANIFEST_PATH directly as --manifest would append timing.log into this repo's own
+    scripts/ folder on every test run, since the fixture lives there. Every test must use a
+    tempdir copy instead, never the fixture in place.
+    """
+    dest = tmp_dir / "test_manifest.md"
+    dest.write_text((source or REAL_MANIFEST_PATH).read_text(encoding="utf-8"), encoding="utf-8")
+    return dest
+
+
 def _generate_findings(manifest_path: Path, tmp_dir: Path) -> dict:
     """Run manifest_to_findings.py against a manifest and return the parsed JSON."""
     output_path = tmp_dir / "findings.json"
@@ -68,7 +82,8 @@ def _generate_findings(manifest_path: Path, tmp_dir: Path) -> dict:
 def test_manifest_to_findings():
     """Test 1: real fixture Manifest -> Canonical JSON."""
     with tempfile.TemporaryDirectory() as tmp:
-        data = _generate_findings(REAL_MANIFEST_PATH, Path(tmp))
+        tmp_path = Path(tmp)
+        data = _generate_findings(_copy_manifest_to_tmp(tmp_path), tmp_path)
 
         assert data["schema_version"] == "1.4.0"
         assert len(data["findings"]) == 2
@@ -147,7 +162,7 @@ def test_schema_validation():
         tmp_path = Path(tmp)
         output_path = tmp_path / "findings.json"
         run_script_ok("manifest_to_findings.py", [
-            "--manifest", str(REAL_MANIFEST_PATH),
+            "--manifest", str(_copy_manifest_to_tmp(tmp_path)),
             "--output", str(output_path),
         ])
         result = run_script_ok("schema.py", [str(output_path)])
@@ -164,7 +179,7 @@ def test_rendering():
         txt_path = tmp_path / "report.txt"
 
         run_script_ok("manifest_to_findings.py", [
-            "--manifest", str(REAL_MANIFEST_PATH),
+            "--manifest", str(_copy_manifest_to_tmp(tmp_path)),
             "--output", str(findings_path),
         ])
         data = json.loads(findings_path.read_text(encoding="utf-8"))
@@ -216,6 +231,54 @@ def test_rendering():
 
         print(f"  PASS: HTML report: {len(html_content):,} chars, artifact names resolved")
         print(f"  PASS: TXT report: {len(txt_content):,} chars, no phantom truncation")
+
+
+def test_timing_log():
+    """
+    Test: SKILL.md §6.9 -- Stage 8 (manifest_to_findings.py) and Stage 9 (render.py) must
+    each log their own ENTRY/EXIT to timing.log automatically, and render.py must append a
+    final AUDIT END summary once Stage 9 completes. This is the machine-logged half of the
+    timing log (Stages 0-7 are LLM-logged via Bash and can't be exercised by this suite).
+    """
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        findings_path = tmp_path / "findings.json"
+        html_path = tmp_path / "report.html"
+        txt_path = tmp_path / "report.txt"
+
+        run_script_ok("manifest_to_findings.py", [
+            "--manifest", str(_copy_manifest_to_tmp(tmp_path)),
+            "--output", str(findings_path),
+        ])
+        run_script_ok("render.py", [
+            "--canonical", str(findings_path),
+            "--template", str(ASSETS_DIR / "report_template.html"),
+            "--output-html", str(html_path),
+            "--output-txt", str(txt_path),
+        ])
+
+        log_path = tmp_path / "timing.log"
+        assert log_path.exists(), "timing.log was not created"
+        log_content = log_path.read_text(encoding="utf-8")
+
+        for line in (
+            "[Stage 8 Findings JSON] ENTRY",
+            "[Stage 8 Findings JSON] EXIT",
+            "[Stage 9 Render] ENTRY",
+            "[Stage 9 Render] EXIT",
+        ):
+            assert line in log_content, f"{line!r} missing from timing.log"
+
+        assert "=== AUDIT END |" in log_content, "AUDIT END summary missing from timing.log"
+        assert "TOTAL:" in log_content, "AUDIT END summary must state total elapsed time"
+
+        # Entry must come before exit for each stage -- catches an accidental swap.
+        assert log_content.index("[Stage 8 Findings JSON] ENTRY") < log_content.index("[Stage 8 Findings JSON] EXIT")
+        assert log_content.index("[Stage 9 Render] ENTRY") < log_content.index("[Stage 9 Render] EXIT")
+        # AUDIT END must be the last thing written, after both stages finish.
+        assert log_content.index("[Stage 9 Render] EXIT") < log_content.index("=== AUDIT END |")
+
+        print(f"  PASS: timing.log has Stage 8/9 entry+exit and a final AUDIT END summary")
 
 
 def test_default_output_location():
@@ -441,6 +504,7 @@ def main():
         ("Manifest -> JSON", test_manifest_to_findings),
         ("Schema Validation", test_schema_validation),
         ("JSON -> Reports", test_rendering),
+        ("Timing Log", test_timing_log),
         ("Default Output Location", test_default_output_location),
         ("Knowledge Index", test_knowledge_index),
         ("Duplicate Detection", test_duplicate_detection),

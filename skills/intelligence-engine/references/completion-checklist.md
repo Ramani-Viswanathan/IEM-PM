@@ -4,7 +4,7 @@ description: >
   The Final Validation checklist (10 checks), the Output Checklist (exactly one file you write),
   and the exact Handover Message template. Read once, at the very end of an audit, before
   declaring the Audit Manifest complete.
-version: 1.0.0
+version: 1.1.0
 ---
 
 ## Contents
@@ -35,15 +35,19 @@ If any check fails, fix the Manifest before finishing. Do not hand over a broken
 
 ## 12.2 Output Checklist
 
-You produce exactly one file, named per Appendix G, written into the project's own `reports/`
-folder (sibling of its `evidence/` folder):
+You produce exactly one named-per-Appendix-G file, plus append-only timestamp lines in `timing.log`
+(§6.9 — not a named-per-Appendix-G file, since it accumulates across every audit run of this
+project, not just this one), both written into the project's own `reports/` folder (sibling of its
+`evidence/` folder):
 
 | File                                           | You Write | Software Reads |
 | ---------------------------------------------- | --------- | -------------- |
 | `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` | ✓         | ✓              |
+| `<project>/reports/timing.log`                 | ✓ (append)| —              |
 
-That is all. Software produces the matching `.json`, `.html`, and `.txt` files in the same folder,
-using the same name stem:
+That is the extent of your own writes. Software produces the matching `.json`, `.html`, and `.txt`
+files in the same folder, using the same name stem, and also appends its own Stage 8/9 timestamp
+lines to `timing.log`:
 
 - `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json`
 - `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`

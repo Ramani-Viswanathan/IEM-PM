@@ -1257,6 +1257,13 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             </dd>
           </div>
           <div class="faq-item">
+            <dt>A real audit took a while — how do I see which stage actually took the time?</dt>
+            <dd>
+              <p>Every project gets its own <code>timing.log</code> in <code>Audit/&lt;ProjectName&gt;/reports/</code>, appended to automatically on every audit run — nothing to turn on. It records an entry and exit timestamp for all 10 stages (Baseline through Render), plus a final line stating total wall-clock time, so you can see exactly where the minutes went instead of guessing.</p>
+              <p style="margin-top:0.6rem;">It's append-only across every audit run of that project, so you can also watch a trend over time — e.g. whether Stage 2 (deriving checkable criteria from your standards) gets faster on repeat audits once the registry is cached, versus Stage 3 (reading your actual evidence), which scales with how much evidence you hand it every time.</p>
+            </dd>
+          </div>
+          <div class="faq-item">
             <dt>Can a malicious or corrupted evidence file attack the audit itself?</dt>
             <dd>
               <p>This is a disclosed, honestly-unsolved risk, not a hypothetical one. Evidence files (Excel exports, PDFs, status reports) are read directly by the AI model doing the audit. In principle, a file could be crafted to contain hidden text that looks like an instruction — "ignore your previous instructions," a fake system message, a request to skip a validation step — attempting to steer the AI's judgment rather than simply being data for it to evaluate.</p>

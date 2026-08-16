@@ -18,10 +18,12 @@ from typing import Dict, Any, List, Optional, Tuple
 # Import our validator from the same directory
 try:
     from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage, validate_major_finding_approval
+    from timing_log import log_stage
 except ImportError:
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage, validate_major_finding_approval
+    from timing_log import log_stage
 
 
 def _to_utc(dt: datetime) -> datetime:
@@ -496,42 +498,51 @@ def main():
         print(f"[E-PARSE-001] Manifest not found: {args.manifest}")
         exit(1)
 
-    # Parse
-    parser_engine = ManifestParser(args.manifest, args.charter)
-    canonical = parser_engine.parse()
+    # timing.log (SKILL.md §6.9) always lives next to the Manifest itself, regardless of
+    # where --output redirects the JSON -- this is Stage 8's own entry/exit, logged
+    # automatically since this stage has no LLM reasoning to log it by hand. EXIT is in a
+    # finally block so it's still logged even if parsing/validation/writing raises --
+    # otherwise an unhandled exception leaves an orphaned ENTRY with no matching EXIT.
+    reports_dir = args.manifest.resolve().parent
+    log_stage(reports_dir, "Stage 8 Findings JSON", "ENTRY")
+    try:
+        # Parse
+        parser_engine = ManifestParser(args.manifest, args.charter)
+        canonical = parser_engine.parse()
 
-    # Validate
-    is_valid, errors = parser_engine.validate(canonical)
+        # Validate
+        is_valid, errors = parser_engine.validate(canonical)
 
-    # Printed regardless of outcome -- a parse-time warning (e.g. an
-    # unrecognized "Human Approved" value) is often the actual explanation
-    # for a validation error on the same finding, and must not be silently
-    # dropped just because validation also failed.
-    if parser_engine.warnings:
-        print("Warnings:")
-        for w in parser_engine.warnings:
-            print(f"  - {w}")
-        print()
+        # Printed regardless of outcome -- a parse-time warning (e.g. an
+        # unrecognized "Human Approved" value) is often the actual explanation
+        # for a validation error on the same finding, and must not be silently
+        # dropped just because validation also failed.
+        if parser_engine.warnings:
+            print("Warnings:")
+            for w in parser_engine.warnings:
+                print(f"  - {w}")
+            print()
 
-    if not is_valid:
-        print("VALIDATION FAILED:")
-        for e in errors:
-            print(f"  - {e}")
-        exit(1)
+        if not is_valid:
+            print("VALIDATION FAILED:")
+            for e in errors:
+                print(f"  - {e}")
+            exit(1)
 
-    # Write -- explicit --output always wins; otherwise land next to --manifest itself,
-    # i.e. the same project reports/ folder the Manifest was already written into.
-    output_path = args.output
-    if output_path is None:
-        reports_dir = args.manifest.resolve().parent
-        reports_dir.mkdir(parents=True, exist_ok=True)
-        audit_dt = datetime.fromisoformat(canonical["generated_at"])
-        output_path = reports_dir / _iempm_filename(audit_dt, "json")
+        # Write -- explicit --output always wins; otherwise land next to --manifest itself,
+        # i.e. the same project reports/ folder the Manifest was already written into.
+        output_path = args.output
+        if output_path is None:
+            reports_dir.mkdir(parents=True, exist_ok=True)
+            audit_dt = datetime.fromisoformat(canonical["generated_at"])
+            output_path = reports_dir / _iempm_filename(audit_dt, "json")
 
-    output_path.write_text(json.dumps(canonical, indent=2), encoding="utf-8")
-    print(f"Canonical findings written to {output_path}")
-    print(f"Total findings: {len(canonical['findings'])}")
-    print(f"Reporting Integrity Score: {canonical['reporting_integrity_score']['score']}")
+        output_path.write_text(json.dumps(canonical, indent=2), encoding="utf-8")
+        print(f"Canonical findings written to {output_path}")
+        print(f"Total findings: {len(canonical['findings'])}")
+        print(f"Reporting Integrity Score: {canonical['reporting_integrity_score']['score']}")
+    finally:
+        log_stage(reports_dir, "Stage 8 Findings JSON", "EXIT")
 
 
 if __name__ == "__main__":

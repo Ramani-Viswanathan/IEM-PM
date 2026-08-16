@@ -21,9 +21,11 @@ from jinja2 import Template
 
 try:
     from paths import DEFAULT_TEMPLATE
+    from timing_log import log_stage, append_audit_end_summary
 except ImportError:
     sys.path.insert(0, str(Path(__file__).parent))
     from paths import DEFAULT_TEMPLATE
+    from timing_log import log_stage, append_audit_end_summary
 
 
 def _to_utc(dt: datetime) -> datetime:
@@ -240,23 +242,33 @@ def main():
     # Explicit paths always win; otherwise land next to --canonical itself, i.e. the
     # same project reports/ folder Stage 8 already wrote the JSON into.
     reports_dir = args.canonical.resolve().parent
-    output_txt = args.output_txt or (reports_dir / _iempm_filename(audit_dt, "txt"))
-    output_html = args.output_html or (reports_dir / _iempm_filename(audit_dt, "html"))
-    template_path = args.template or DEFAULT_TEMPLATE
+    log_stage(reports_dir, "Stage 9 Render", "ENTRY")
+    try:
+        output_txt = args.output_txt or (reports_dir / _iempm_filename(audit_dt, "txt"))
+        output_html = args.output_html or (reports_dir / _iempm_filename(audit_dt, "html"))
+        template_path = args.template or DEFAULT_TEMPLATE
 
-    if args.output_txt is None or args.output_html is None:
-        reports_dir.mkdir(parents=True, exist_ok=True)
+        if args.output_txt is None or args.output_html is None:
+            reports_dir.mkdir(parents=True, exist_ok=True)
 
-    # TXT
-    txt = render_txt(canonical)
-    output_txt.write_text(txt, encoding="utf-8")
-    print(f"TXT report: {output_txt}")
+        # TXT
+        txt = render_txt(canonical)
+        output_txt.write_text(txt, encoding="utf-8")
+        print(f"TXT report: {output_txt}")
 
-    # HTML
-    template = load_template(template_path)
-    html = render_html(canonical, template)
-    output_html.write_text(html, encoding="utf-8")
-    print(f"HTML report: {output_html}")
+        # HTML
+        template = load_template(template_path)
+        html = render_html(canonical, template)
+        output_html.write_text(html, encoding="utf-8")
+        print(f"HTML report: {output_html}")
+    finally:
+        # Stage 9 is the last stage that logs anything -- close out the audit's own
+        # timing.log with a total-elapsed summary (SKILL.md §6.9). In a finally block so
+        # both the EXIT line and the summary are still written if rendering raised partway
+        # through, rather than leaving timing.log silently incomplete. Stage 10 (console
+        # handover) does no new work, so nothing after this point needs instrumenting.
+        log_stage(reports_dir, "Stage 9 Render", "EXIT")
+        append_audit_end_summary(reports_dir)
 
 
 if __name__ == "__main__":
