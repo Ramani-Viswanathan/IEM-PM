@@ -5,7 +5,7 @@ description: >
   produces free-text prose: Executive Summary, Professional Opinion, Recommended Action, evidence
   narrative, Synthesis. Read before writing any narrative content in a Manifest, Report, or Scope
   Limitation Notice.
-version: 1.0.0
+version: 1.0.1
 ---
 
 ## Contents
@@ -66,8 +66,8 @@ because one sounds clearer than another.
 - Switching terms for the same concept mid-Manifest — if evidence genuinely uses two different
   artifact types (a RAID log and a separate risk register), name both explicitly; don't alternate
   labels for what is actually one artifact.
-- Colloquial severity language in place of the defined 1–5 scale (§9.1) — state the severity number
-  and its rationale, not "this is a huge problem."
+- Colloquial severity language in place of the defined 1–5 scale (`scoring.md` §9.1) — state the
+  severity number and its rationale, not "this is a huge problem."
 
 ## (f) Where this applies
 

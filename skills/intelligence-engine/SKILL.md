@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.13.0
+version: 1.14.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -116,33 +116,11 @@ If no standard is declared, you stop and request the baseline. You do not invent
 
 ## Principle 2 — Evidence First
 
-Every finding must point to evidence: a document, a registry item, a governance rule — or the absence of one.
-
-Every finding must point to evidence.
-
-A finding without evidence is not a finding. Evidence is one of:
-
-- A direct quote from a delivery artifact.
-- A specific field value or absence.
-- A registry item that defines the expected state.
-- An explicit statement that a required artifact, field, or record is missing.
-
-You do not infer gaps from patterns. You observe them. If you suspect a gap but cannot cite evidence, you record it as a **candidate gap** in the Synthesis narrative — not in the Gap Register.
+Every finding must point to evidence: a document, a registry item, a governance rule — or the absence of one. A finding without evidence is not a finding — it's a candidate gap for the Synthesis narrative, never the Gap Register. Full rule, evidence types, and the candidate-gap distinction: §6.1 Evidence Discipline.
 
 ## Principle 3 — Copyright Safe
 
-Never reproduce standards. Reference only: clause · identifier · short paraphrase · citation.
-
-You never reproduce standard text.
-
-When referencing any standard, you provide only:
-
-- **Standard name** (e.g., PMBOK 8th Edition)
-- **Clause or section** (e.g., Section 6.4.2.3)
-- **Identifier** (e.g., Process 6.4, Practice BL-01)
-- **Short paraphrase** in your own words (one sentence maximum)
-
-If you need to quote a requirement, paraphrase it. Never copy blocks from PMI, PMBOK, OPM3, PRINCE2, MSP, or ISO21502 documents.
+Never reproduce standards. Reference only: clause · identifier · short paraphrase · citation — one sentence maximum, never a verbatim block. Full rule and the citation-element table: §6.4 Citation & Copyright Rules.
 
 ## Principle 4 — Read Only
 
@@ -293,23 +271,9 @@ Anti-Mirror Guard). Do NOT propose or ratify a Charter without reading it first.
 
 ## 4.3 Contract 3 — Audit Manifest
 
-This is **your only output**.
-
-You write a single markdown file containing:
-
-- Header block (audit ID, charter version, standards, scope)
-- Per-artifact evidence logs
-- One `### FINDING:` block per gap
-- Synthesis section with narrative intelligence indicators
-
-Format rules:
-
-- Every finding block must include: Gap Type, Root Origin, Standard reference, Description, Severity, Impact, Recommended Action, and at least one evidence bullet.
-- Evidence bullets must reference an artifact declared in the Charter.
-- Gap Type and Root Origin must match the closed taxonomies exactly (case-sensitive).
-- Standard references include only: name, clause, identifier, summary. Never full text.
-
-You write the Manifest. Software parses it.
+This is **your only output** — the LLM↔code boundary between your judgment and deterministic
+software. Full required structure and parser-grade format rules: §10 Manifest Contract. Do NOT write
+it without reading §10.2's template reference first.
 
 ## 4.4 Contract 4 — Canonical Findings JSON
 
@@ -321,15 +285,9 @@ You do not hand-write JSON. You do not edit JSON. You write the Manifest; softwa
 
 ## 4.5 Contract 5 — Schema Validator
 
-This is the **gate**. Software enforces:
-
-- Closed taxonomies: Gap Type and Root Origin must match the seven allowed values exactly.
-- Evidence discipline: Every finding must cite at least one artifact from the Charter.
-- No duplicates: Same gap_type + root_origin + artifact + standard identifier = one finding only.
-- Severity bounds: 1–5 integer only.
-- Schema compliance: All required fields present, correct types, correct formats.
-
-If validation fails, the Manifest is rejected. You may be asked to fix it.
+This is the **gate**. Software enforces the full Validation Rules list — closed taxonomies, evidence
+discipline, the no-duplicate rule, severity bounds, schema compliance, and Human Approval — at §10.3.
+If validation fails, the Manifest is rejected and you may be asked to fix it.
 
 ## 4.6 Outputs
 
@@ -500,92 +458,11 @@ The report fixes causes, not symptoms.
 
 # 9. Scoring
 
-## 9.1 Severity (1–5) — You assign this
-
-Every finding gets a severity rating. This is your judgment. Use the full scale.
-
-| Severity | Label    | Definition                                                                                                  | When to Apply                                                                                                                                                         |
-| -------- | -------- | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1        | Cosmetic | The gap exists but has no material impact on delivery capability or decision quality.                       | A field is inconsistently formatted but the data is readable and usable. A template has a typo in the header.                                                         |
-| 2        | Minor    | The gap causes friction, rework, or confusion but does not threaten delivery outcomes.                      | Status reports lack a required section but the missing data is available elsewhere. A governance pack is late by one day.                                             |
-| 3        | Moderate | The gap degrades a specific process or decision but does not cascade to other processes.                    | Risk register lacks mitigation plans for 20% of risks. Baseline exists but was approved after work began.                                                             |
-| 4        | Major    | The gap threatens delivery outcomes, breaks a critical process, or creates significant compliance exposure. | No earned value measurement on a fixed-price contract. Steering committee has not met in 6 months on a critical program. RAID log is missing all high-severity risks. |
-| 5        | Critical | The gap threatens program/portfolio failure, regulatory breach, or strategic objective collapse.            | No baseline exists for any project in the portfolio. Financial controls are bypassed. Governance packs are fabricated or backdated.                                   |
-
-The three factors behind the calibration rules below — delivery threat, spread, and persistence —
-are formalized into a scored, PMI-cited rubric in `references/severity-matrix.md` (Appendix D).
-Read it for the fully worked-out version of this judgment call. The 1–5 field above stays the one
-the Manifest/schema/RIS actually consume; Appendix D is calibration reference, not a parsed input.
-
-### Severity Calibration Rules
-
-- **Base on delivery threat, not documentation completeness.** A missing signature on a low-value project is not Severity 5. A missing baseline on a strategic program is.
-- **Consider spread.** A gap affecting one project is lower severity than the same gap affecting all projects in a portfolio.
-- **Consider persistence.** A one-time error is lower severity than a gap that has existed across multiple reporting periods.
-- **Never average.** If a gap is sometimes Severity 2 and sometimes Severity 4 depending on context, split it into two findings — one per context.
-
----
-
-## 9.2 Reporting Integrity Score (0–100) — You do NOT calculate this
-
-This score is computed **deterministically by software** from your findings. You do not assign it. You do not estimate it.
-
-Software calculates it from:
-
-- Gap density (findings per artifact)
-- Severity distribution
-- Root cause diversity
-- Missing gap penalties
-
-You will see the score in the rendered report. You do not produce it.
-
----
-
-## 9.3 Intelligence Indicators — Narrative only
-
-In the Synthesis section of your Audit Manifest, provide qualitative diagnostics for seven dimensions:
-
-| Dimension                  | What to Describe                                                                     |
-| -------------------------- | ------------------------------------------------------------------------------------ |
-| **Visibility**             | Can the organization see its delivery state accurately and in time?                  |
-| **Integrity**              | Is the delivery data trustworthy, consistent, and verifiable?                        |
-| **Connectivity**           | Do processes, data, and decisions flow between artifacts and teams?                  |
-| **Governance**             | Are decisions made at the right level, with the right evidence, by the right people? |
-| **Predictability**         | Can the organization forecast outcomes based on current data?                        |
-| **Decision Quality**       | Are decisions supported by evidence, or made despite it?                             |
-| **Continuous Improvement** | Does the organization learn from delivery and adapt its standards?                   |
-
-**Rules:**
-
-- These are **narrative only**. Never assign scores, percentages, grades, or color codes.
-- One paragraph per dimension. Specific observations from your findings.
-- If a dimension has no relevant findings, state: "No significant evidence observed."
-- A positive claim ("X traces consistently," "figures match") needs the same grounding a Finding
-  does — only assert it for what Stage 3's self-consistency check (`audit-stages.md` Stage 3
-  Activity 3) actually verified, not as a general impression of a well-formed artifact.
-
----
-
-## 9.4 Scope Boundary: No Maturity Modeling
-
-IEM-PM measures and traces gaps. It does not model organizational maturity — not PMI's OPM3, not any other maturity scale.
-
-Maturity modeling is a distinct discipline from gap auditing: it requires calibration across many audits and a licensed assessment instrument, neither of which IEM-PM provides. Extrapolating a maturity level from one audit's gap profile would be exactly the kind of unearned inference Principle 2 (Evidence First) forbids — it isn't a finding, it's a guess dressed up as a score.
-
-Your Synthesis section ends at the seven Intelligence Indicators (§9.3). Do not add a maturity statement, an OPM3 position, or any other capability-level claim.
-
----
-
-## 9.5 What You Write vs. What Software Writes
-
-| Element                             | You Write | Software Computes |
-| ----------------------------------- | --------- | ----------------- |
-| Severity per finding                | ✓         |                   |
-| Reporting Integrity Score           |           | ✓                 |
-| Intelligence Indicators narrative   | ✓         |                   |
-| Intelligence Indicators score/grade |           | ✗ (never scored)  |
-| Gap density                         |           | ✓                 |
-| Severity distribution               |           | ✓                 |
+You assign severity per finding. Software calculates the Reporting Integrity Score — you never
+estimate it. Read `references/scoring.md` for the full severity scale (1–5) and calibration rules
+(§9.1), the RIS boundary (§9.2), Intelligence Indicators narrative rules (§9.3), the no-maturity-
+modeling scope boundary (§9.4), and the full You-Write-vs-Software-Computes table (§9.5). Do NOT
+assign severity or write the Synthesis section without reading it first.
 
 ---
 
@@ -668,72 +545,27 @@ audit without reading it first.
 
 # 12. Completion
 
-## 12.1 Final Validation
-
-Before you declare the audit complete, verify your Manifest against these checks:
-
-1. **Every finding has evidence.** At least one evidence bullet per `### FINDING:` block.
-2. **Every evidence bullet points to a Charter artifact.** No orphan references.
-3. **Closed taxonomies are exact.** `Gap Type` and `Root Origin` match the seven allowed values exactly (case-sensitive).
-4. **No duplicate signatures.** No two findings share the same Gap Type + Root Origin + Artifact + Standard Identifier.
-5. **Severity is 1–5 integer.** No blanks, no decimals, no text.
-6. **No standard text reproduced.** Every `Requirement Summary` is one sentence, paraphrased.
-7. **Synthesis is complete.** All seven Intelligence Indicators have a narrative paragraph.
-8. **Header Block is complete.** Audit ID, Charter Version, Standards, Scope, Date, Status, Skill Version, Model.
-9. **No software instructions in Manifest.** No "run Python," no JSON blocks, no HTML.
-10. **Every Severity 4/5 finding has real Human Approval.** You actually asked the human operator
-    and recorded their real answer as `Human Approved`, never fabricated "Yes." If they approved
-    it, `Approved By` (their real name/role) and `Approval Date` are also present — a bare
-    "Approved" with no accountable name attached is rejected.
-
-If any check fails, fix the Manifest before finishing. Do not hand over a broken Manifest to software.
-
-## 12.2 Output Checklist
-
-You produce exactly one file, named per Appendix G, written into the project's own `reports/`
-folder (sibling of its `evidence/` folder):
-
-| File                                           | You Write | Software Reads |
-| ---------------------------------------------- | --------- | -------------- |
-| `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md` | ✓         | ✓              |
-
-That is all. Software produces the matching `.json`, `.html`, and `.txt` files in the same folder,
-using the same name stem:
-
-- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json`
-- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.html`
-- `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt`
-
-You do not touch these.
-
-## 12.3 Handover Message
-
-When your Manifest is complete and validated, print exactly:
-
-> **Audit Manifest complete.**
-> **Findings:** [N]
-> **Severity distribution:** 1=[n] · 2=[n] · 3=[n] · 4=[n] · 5=[n]
-> **Root origin spread:** [List origins found]
-> **Status:** [RATIFIED / PROVISIONAL]
-> **Next:** Run `manifest_to_findings.py` to validate and generate canonical JSON.
-
-Then stop. Your work is done.
+Read `references/completion-checklist.md` before declaring any audit complete: the 10-check Final
+Validation (§12.1), the Output Checklist confirming you wrote exactly one file (§12.2), and the
+exact Handover Message template to print (§12.3). Do not hand over a broken Manifest to software,
+and do not improvise the handover message — print it exactly as specified.
 
 ---
 
 ## 13. Appendices
 
-## 13.1 Core Reference (In This Skill)
+## 13.1 Core Reference (Where Things Actually Live)
 
-Do not look elsewhere for these. They are defined in this file:
+Sections 7, 8, 9, and 12 are pointer stubs in this file — the real content lives in `references/`.
+Do not skip the pointer and guess from the stub alone:
 
-| Topic                                                                    | Section     |
+| Topic                                                                    | Read this   |
 | ------------------------------------------------------------------------ | ----------- |
-| Seven Gap Types — definitions, detection logic, disambiguation           | Section 7   |
-| Seven Root Origins — definitions, detection logic, "earliest point" rule | Section 8   |
-| Severity Scale — 1–5 definitions and calibration rules                   | Section 9.1 |
-| Intelligence Indicators — narrative rules                                | Section 9.3 |
-| Manifest Format — exact parser-grade template                            | Section 10  |
+| Seven Gap Types — definitions, detection logic, disambiguation           | `references/gap-taxonomy.md` (Section 7 points here) |
+| Seven Root Origins — definitions, detection logic, "earliest point" rule | `references/root-origins.md` (Section 8 points here) |
+| Severity Scale, RIS boundary, Intelligence Indicators, scoring rules     | `references/scoring.md` (Section 9 points here) |
+| Final Validation, Output Checklist, Handover Message                    | `references/completion-checklist.md` (Section 12 points here) |
+| Manifest required structure, validation rules, output location          | Section 10 in this file, plus `assets/AUDIT_MANIFEST_template.md` for the exact parser-grade format |
 
 ## 13.2 Knowledge Base Reading Guide
 
@@ -783,7 +615,7 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.13.0**
+This skill file version: **1.14.0**
 Schema version: **1.4.0**
 Manifest format version: **1.4.0**
 

@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.7.0
+version: 1.8.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -688,8 +688,8 @@ Stage 4's zero-gap case, for the same reason.
 Engineer the fix-at-source for every finding and assign its severity, using the four-part
 diagnostic (Evidence · Impact · Why/Who/Scope · Fix-at-source) and the severity rubric (Appendix D).
 The Reporting Integrity Score is **not** computed here — it is computed deterministically by
-software in Stage 8 (§9.2, §9.5); this stage never calculates or estimates it. IEM-PM does not
-model organizational maturity (scrapped, not deferred — see §9.4).
+software in Stage 8 (`scoring.md` §9.2, §9.5); this stage never calculates or estimates it. IEM-PM
+does not model organizational maturity (scrapped, not deferred — see `scoring.md` §9.4).
 
 ### Preconditions
 
@@ -701,7 +701,7 @@ model organizational maturity (scrapped, not deferred — see §9.4).
   understanding, not a file).
 - `references/severity-matrix.md` (Appendix D) — the three-dimension (Decision Impact × Spread ×
   Persistence) rubric for calibrating severity.
-- SKILL.md §9.1's Severity table (1–5, Cosmetic → Critical) — the field the Manifest, schema, and
+- `scoring.md` §9.1's Severity table (1–5, Cosmetic → Critical) — the field the Manifest, schema, and
   RIS actually consume.
 - `assets/AUDIT_MANIFEST_template.md` §10.2.3, the Finding Block Template — the exact fields this
   stage's output must populate: `Impact`, `Severity`, `Recommended Action`, `Intelligence
@@ -737,7 +737,7 @@ Dimensions`.
    when writing the portfolio-wide Synthesis narrative per indicator.
 5. **Never average, never blend severities** — if the same underlying gap would score differently
    depending on context (e.g. Severity 2 in one project, Severity 4 in another), split it into two
-   findings, one per context (SKILL.md §9.1 Severity Calibration Rules).
+   findings, one per context (`scoring.md` §9.1 Severity Calibration Rules).
 
 ### Decision Logic
 
@@ -776,7 +776,7 @@ Stage 7's Manifest remains the first disk-persisted judgment content since Stage
 
 Explicitly **not** an output of this stage: the Reporting Integrity Score. That is Stage 8's job,
 computed deterministically by `manifest_to_findings.py` from the findings Stage 7 writes to the
-Manifest (§9.2, §9.5).
+Manifest (`scoring.md` §9.2, §9.5).
 
 ### Failure Conditions
 
@@ -875,20 +875,21 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
    tested against.
 6. **Write the Appendix** (§10.2.5) — Schema Version, Total Findings, Artifacts Examined, Standards
    Referenced.
-7. **Run Final Validation** — check the completed Manifest against all 10 checks in SKILL.md §12.1
-   before declaring it done.
+7. **Run Final Validation** — check the completed Manifest against all 10 checks in
+   `completion-checklist.md` §12.1 before declaring it done.
 8. **Save the Manifest** — to this project's own `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, a
    sibling of its `evidence/` folder (e.g. `Audit/<ProjectName>/reports/...`; Appendix G,
    `references/file-naming.md`), using this audit's own Date — not wall-clock run time.
-9. **Print the Handover Message** (§12.3) and stop. Do not run scripts, calculate the Reporting
-   Integrity Score, or render reports.
+9. **Print the Handover Message** (`completion-checklist.md` §12.3) and stop. Do not run scripts,
+   calculate the Reporting Integrity Score, or render reports.
 
 ### Decision Logic
 
 - IF any finding is missing a link in the chain (no cited evidence, no gap type, no root origin, or
   no Stage 6 fields) → the working memory was not actually intact, regardless of what state was
-  believed to hold. This is different from a §12.1 Manifest-writing defect — it is evidence that
-  context was lost somewhere in Stages 0–6, before this stage ever started writing.
+  believed to hold. This is different from a `completion-checklist.md` §12.1 Manifest-writing defect
+  — it is evidence that context was lost somewhere in Stages 0–6, before this stage ever started
+  writing.
 - IF chain loss is found → there is no saved intermediate state to recover from (nothing was written
   to disk before this stage). Re-enter the earliest stage whose contribution is missing and redo
   that gap's work from the original evidence. Do not guess, average, or fabricate the missing fields
@@ -901,8 +902,9 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
   progress as you go — the Manifest, once on disk, is the recovery point this stage's name refers to.
 - IF Charter Status is PROVISIONAL → every Finding Block must carry the caveat "(Based on unratified
   Charter interpretation.)" (§10.3 rule 8). Not optional, not skippable, no exceptions.
-- IF Final Validation (§12.1) finds any failure → fix the Manifest before finishing. Do not hand
-  over a broken Manifest to software (§12.1's own rule).
+- IF Final Validation (`completion-checklist.md` §12.1) finds any failure → fix the Manifest before
+  finishing. Do not hand over a broken Manifest to software (`completion-checklist.md` §12.1's own
+  rule).
 - IF a Finding Block is missing any of the 8 required fields (§10.3 rule 6) → the Manifest is
   incomplete. Do not write it as done.
 - IF two Finding Blocks share the same Gap Type + Root Origin + Artifact + Standard Identifier → this
@@ -912,8 +914,8 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
   headings inside a finding, or software-execution notes → do not (§10.4, What Not to Include).
   These are exactly what breaks the regex parser.
 - IF the temptation arises to calculate or estimate the Reporting Integrity Score anywhere in the
-  Manifest → do not (§9.2, §9.5). That field does not exist in this document; it is computed by
-  Stage 8 from what you write here.
+  Manifest → do not (`scoring.md` §9.2, §9.5). That field does not exist in this document; it is
+  computed by Stage 8 from what you write here.
 
 ### Outputs
 
@@ -924,7 +926,7 @@ the first disk-persisted judgment content since Stage 1's Charter:
    `references/file-naming.md`), containing all 5 required sections in order (§10.1): Header Block,
    Per-Artifact Evidence Log, Gap Register, Synthesis, Appendix.
 
-This is the **only** file this stage produces (§12.2's Output Checklist). The matching `.json`,
+This is the **only** file this stage produces (`completion-checklist.md` §12.2's Output Checklist). The matching `.json`,
 `.html`, and `.txt` files, sharing the same name stem, are Stage 8/9's job — never written here.
 
 ### Failure Conditions
@@ -941,8 +943,9 @@ This is the **only** file this stage produces (§12.2's Output Checklist). The m
   > working memory behind it did not survive intact — likely a context interruption between Stage 1
   > and here. Nothing before this stage was ever written to disk, so there is no partial Manifest to
   > salvage. Re-run the audit from Stage 0, keeping delivery evidence accessible throughout the run.
-- IF Final Validation (§12.1) fails on any check, separately from chain-verification, and cannot be
-  corrected in place → do not write an incomplete Manifest and declare the audit done. Fix it, or if
+- IF Final Validation (`completion-checklist.md` §12.1) fails on any check, separately from
+  chain-verification, and cannot be corrected in place → do not write an incomplete Manifest and
+  declare the audit done. Fix it, or if
   genuinely unrecoverable, return to the earliest stage where the missing information should have
   been captured. This is usually a transcription defect in this stage's own writing (Activities
   2–6), not memory loss — corrective, the same posture as Stages 4–6, not automatically
@@ -953,16 +956,16 @@ This is the **only** file this stage produces (§12.2's Output Checklist). The m
 
 ### Completion Criteria
 
-This stage's completion criteria are already fully specified in SKILL.md §12.1's 9-point Final
-Validation checklist — do not restate it here; run the Manifest against it directly. Two additions
-specific to this stage, not covered by §12.1:
+This stage's completion criteria are already fully specified in `completion-checklist.md` §12.1's
+10-point Final Validation checklist — do not restate it here; run the Manifest against it directly.
+Two additions specific to this stage, not covered by §12.1:
 
 - Chain-verification (Activity 1) ran before writing began, and every finding in the Manifest
   carries a complete, unbroken chain from Stages 3–6 — not merely a `SCORED` label trusted at face
   value.
 - The file is written to the correct path and name per Appendix G (`references/file-naming.md`) —
   not an arbitrary filename.
-- The Handover Message (§12.3) has been printed.
+- The Handover Message (`completion-checklist.md` §12.3) has been printed.
 
 ### Transition
 
@@ -998,9 +1001,9 @@ here — this stage is pure software.
 4. **Validate the structure** — `schema.py`'s `validate_canonical` / `validate_no_duplicates` /
    `validate_evidence_coverage` run against the parsed result. Failures surface as `E-VALID-*` codes.
 5. **Compute the Reporting Integrity Score** — deterministically, from the validated findings
-   (Weighted Gap Profile v1.0.0: severity deduction, density deduction, root-cause diversity
-   deduction, Missing-gap deduction — §9.2). This is the **only** place the RIS is calculated,
-   anywhere in the pipeline.
+   (Weighted Gap Profile v1.2.0: severity deduction, density deduction, root-cause diversity
+   deduction, Missing-gap deduction — `scoring.md` §9.2). This is the **only** place the RIS is
+   calculated, anywhere in the pipeline.
 6. **Write on success only** — if every check passes, write the canonical findings JSON next to the
    Manifest, in the same project `reports/` folder:
    `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.json` (Appendix G, same stem as the
@@ -1127,14 +1130,14 @@ Print the TXT summary and the output file pointers; confirm the run checklist (�
 - `<project>/reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.txt` from Stage 9.
 - The 4 output file paths sharing this audit's name stem (Appendix G): `.md` (Stage 7), `.json`
   (Stage 8), `.html` and `.txt` (Stage 9).
-- SKILL.md §12.2's Output Checklist — for the confirmation step.
+- `completion-checklist.md` §12.2's Output Checklist — for the confirmation step.
 
 ### Activities
 
 1. **Print the rendered TXT report** — relay Stage 9's already-deterministic output to the console.
    Nothing here is new judgment; this stage transcribes, it does not interpret.
 2. **List all 4 output file paths** — `.md`, `.json`, `.html`, `.txt`, all sharing one name stem.
-3. **Confirm the run checklist** (§12.2) — exactly one Manifest was written by the LLM (Stage 7);
+3. **Confirm the run checklist** (`completion-checklist.md` §12.2) — exactly one Manifest was written by the LLM (Stage 7);
    exactly one JSON/HTML/TXT triad was produced by software (Stages 8–9), sharing the same stem; no
    extra or missing files.
 4. **Stop.** No further stages exist; the audit run is complete.
@@ -1165,8 +1168,8 @@ new file is written.
 - All 4 files exist at their correct Appendix G paths, sharing one name stem.
 - The TXT report's contents were printed to the console.
 - The 4 file paths were listed.
-- §12.2's Output Checklist is satisfied exactly: one Manifest, one JSON/HTML/TXT triad, nothing
-  extra, nothing missing.
+- `completion-checklist.md` §12.2's Output Checklist is satisfied exactly: one Manifest, one
+  JSON/HTML/TXT triad, nothing extra, nothing missing.
 
 ### Transition
 

@@ -49,5 +49,6 @@ this tool provides. Scrapped 2026-07-27, not deferred.
 
 ## Important
 
-Perform /security-review and /code-review before commit
+Perform /security-review and /code-review before commit (**only if there is major change**)
 ensure while doing /code-review no hardcoding in codes and follow industry standard
+ensure the standards acrss all documents are followed
