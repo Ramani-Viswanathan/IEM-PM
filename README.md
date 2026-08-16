@@ -107,8 +107,10 @@ See [`IEM-PM BLUEPRINT-1.md`](IEM-PM%20BLUEPRINT-1.md) for the full 19-section d
 Not a developer? See the [role-based user guide](Public/IEM-PM-User-Guide.html) for PMs, program
 managers, and PMO leads — no code required to read or act on an audit.
 
-A full worked example — a real pilot audit run against 29 real PMI standards, with planted gaps
-and cited findings — lives in [`examples/pilot-audit/`](examples/pilot-audit/).
+No worked example ships in this repository yet — real pilot audits have been run against real PMI
+standards during development, but their evidence and output are gitignored (`Audit/`), same as any
+real engagement's, and not published here. Building a sanitized worked example is a known open
+item, tracked in `STATUS.md`.
 
 ## Repository structure
 
@@ -118,7 +120,7 @@ and cited findings — lives in [`examples/pilot-audit/`](examples/pilot-audit/)
 - `skills/intelligence-engine/registries/` — criteria derived at runtime from your standards.
   Gitignored, local-only.
 - `Public/` — human-facing documentation (this README's companion guide, an audit playbook).
-- `examples/` — a full worked pilot audit, evidence included.
+- `Audit/` — your own audit projects: evidence in, reports out. Gitignored, local-only.
 - `_archive/`, `stakeholder/` — superseded material and PMI volunteer copyrighted material.
   History only; never built on, never published from.
 
