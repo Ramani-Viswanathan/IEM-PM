@@ -1,0 +1,6 @@
+# Force LF regardless of the committing/checking-out machine's core.autocrlf setting.
+# Real POSIX bash (Linux, macOS) commonly fails on CRLF shell scripts -- a stray \r gets
+# read as part of the last token on each line (e.g. "mkdir -p Audit\r"), or bash reports
+# "$'\r': command not found". setup.sh exists specifically to be run by non-technical users
+# on Mac/Linux, so this can't be left to whatever autocrlf happens to be set on their machine.
+*.sh text eol=lf

@@ -757,14 +757,74 @@
         <h2>Before you start</h2>
         <p class="intro">
           IEM-PM's one rule is <strong>no baseline, no audit</strong> — it will not guess at a
-          standard you haven't given it. Everything below has to exist before you ask for an audit.
+          standard you haven't given it. Two different kinds of "before you start" follow: getting
+          the software running on your computer (once, ever), then getting ready for a specific
+          audit (every time you run one).
         </p>
+
+        <h3 id="get-running" style="margin-top:1.6rem;">Get it running (once per computer)</h3>
+        <p>No coding experience required. About ten minutes the first time, then never again on
+          that computer.</p>
+        <ol style="margin:0.6rem 0 0 1.2rem; padding:0;">
+          <li style="margin-bottom:0.6rem;">
+            <strong>Download this repository.</strong> On the GitHub page, click the green
+            <strong>Code</strong> button, then <strong>Download ZIP</strong>. Unzip it anywhere —
+            your Desktop is fine. No <code>git</code> needed for this.
+          </li>
+          <li style="margin-bottom:0.6rem;">
+            <strong>Run the setup script</strong>, from inside the folder you just unzipped:
+            <ul style="margin:0.4rem 0 0 1.2rem;">
+              <li style="margin-bottom:0.3rem;"><strong>Windows:</strong> right-click
+                <code>setup.ps1</code> and choose "Run with PowerShell." If Windows says running
+                scripts is disabled, open PowerShell in that folder instead and run:
+                <code>powershell -ExecutionPolicy Bypass -File setup.ps1</code></li>
+              <li><strong>Mac/Linux:</strong> open Terminal, type <code>cd</code> followed by a
+                space, then drag the unzipped folder into the Terminal window (this pastes its
+                path — dragging alone does <em>not</em> move you into it, typing <code>cd</code>
+                first is what does that), press Enter, then run: <code>bash setup.sh</code></li>
+            </ul>
+            <p style="margin-top:0.4rem;">It checks for Python, installs what IEM-PM needs, and
+              creates the folders you'll use next — telling you plainly if anything's missing,
+              never failing silently.</p>
+          </li>
+          <li style="margin-bottom:0.6rem;">
+            <strong>Install Claude Code</strong> from
+            <a href="https://claude.com/claude-code">claude.com/claude-code</a> and sign in, if you
+            haven't already. The setup script checks for this too and tells you if it's missing.
+          </li>
+          <li style="margin-bottom:0.6rem;">
+            <strong>Add your standards.</strong> Put your organization's real PM standards (PMBOK,
+            PRINCE2, ISO 21502, or your own methodology — PDF or Word/Markdown) into
+            <code>skills/intelligence-engine/knowledge/</code>, inside what you unzipped. This is
+            the one step nothing can automate for you — see why just below.
+          </li>
+          <li>
+            <strong>Always open Claude Code from inside this exact folder</strong> — not a
+            shortcut, not a different one. That's what makes the skill available; opening Claude
+            Code from anywhere else means it won't find it.
+          </li>
+        </ol>
+        <div class="callout" style="margin-top:1rem;">
+          <p><strong>Why you have to add your own standards.</strong> IEM-PM ships with zero
+            standard text built in, on purpose — PMBOK and standards like it are licensed content
+            that belongs to your organization or your PMI membership, not something this tool can
+            redistribute. It only ever reads the real standard you provide, and never falls back on
+            general knowledge. An empty <code>knowledge/</code> folder makes it stop and tell you,
+            rather than guessing.</p>
+        </div>
+        <p style="margin-top:0.8rem;">There is no separate app or package to install beyond this —
+          the unzipped (or cloned) folder <em>is</em> the install. Both <code>knowledge/</code> and
+          the registries it builds from your standards stay wherever you put that folder and are
+          never touched by a future update — but neither one travels automatically to a new
+          computer either, so each new machine starts from step 1 again with an empty baseline.</p>
+
+        <h3 id="ready-for-audit" style="margin-top:1.8rem;">Ready for a specific audit (every time)</h3>
         <ul class="checklist">
           <li>
             <span class="box"></span>
             <div>
-              <strong>Standards in <code>knowledge/</code></strong>
-              <span class="note">PMBOK, PRINCE2, ISO 21502, or your own internal methodology — whatever your organization actually follows.</span>
+              <strong>The right standards are already in <code>knowledge/</code></strong>
+              <span class="note">Not just any standard — the one this particular audit needs to be measured against.</span>
             </div>
           </li>
           <li>
@@ -781,24 +841,7 @@
               <span class="note">Schedules, RAID logs, status reports, steering packs — whatever you have on hand for the project, program, or portfolio in scope.</span>
             </div>
           </li>
-          <li>
-            <span class="box"></span>
-            <div>
-              <strong>Claude Code, with this skill available</strong>
-              <span class="note">Two ways to get there: open Claude Code inside this cloned repository (works immediately, no install step), or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> once per machine so it's available in every project as <code>/iem-pm:intelligence-engine</code>. Either way, there's no separate app to install — there is no standalone package to download; the cloned repository <em>is</em> the install.</span>
-            </div>
-          </li>
         </ul>
-        <div class="callout" id="new-machine" style="margin-top:1.4rem;">
-          <p><strong>Setting up on a machine that's never run this before?</strong> Everything above assumes these four things already exist — do them once per machine, in order:</p>
-          <ol style="margin:0.5rem 0 0 1.2rem; padding:0;">
-            <li>Access to this repository, then <code>git clone</code> it (or copy the files another way).</li>
-            <li>Python 3.10+, then <code>pip install -r requirements.txt</code> in the repo root.</li>
-            <li>Claude Code, installed and signed in.</li>
-            <li>Your own copy of your organization's real PM standards, dropped into <code>skills/intelligence-engine/knowledge/</code> — this never ships with the repo (copyright), so every new machine starts with an empty baseline until you copy your standards over by hand.</li>
-          </ol>
-          <p style="margin-top:0.6rem;"><code>knowledge/</code> and the derived <code>registries/</code> folder both stay wherever you put them and are never touched by a repo update — but neither one travels with <code>git clone</code> either, so a fresh machine also starts with none of the deeper registry detail a well-used machine has accumulated. It rebuilds automatically as you run audits (see "Does the registry rebuild from scratch..." below) — or copy the <code>registries/</code> folder over by hand (zip, USB, cloud drive — anything except git) if you'd rather not regrow it from zero.</p>
-        </div>
         <div class="callout accent" style="margin-top:1rem;">
           <p><strong>Nothing you hand it gets changed.</strong> IEM-PM only reads your standards, your Charter, and your evidence. The only thing it ever writes is inside your project's own <code>reports/</code> folder, inside <code>Audit/&lt;YourProjectName&gt;/</code> — your source data is never touched.</p>
         </div>
@@ -1090,7 +1133,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
           <div class="faq-item">
             <dt>How do I set this up on a different machine?</dt>
             <dd>
-              <p>See <a href="#new-machine">"Setting up on a machine that's never run this before?"</a> under "Before you start," near the top of this guide — the four one-time steps (Git, Python + <code>pip install</code>, Claude Code, your own standards) live there so there's one place to check, not two.</p>
+              <p>See <a href="#get-running">"Get it running (once per computer)"</a> under "Before you start," near the top of this guide — download the ZIP, run the setup script, install Claude Code, add your standards. Lives there so there's one place to check, not two.</p>
             </dd>
           </div>
           <div class="faq-item">

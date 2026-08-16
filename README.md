@@ -83,6 +83,11 @@ See [`IEM-PM BLUEPRINT-1.md`](IEM-PM%20BLUEPRINT-1.md) for the full 19-section d
 
 ## Quickstart
 
+Not comfortable with a terminal? Use the green **Code** button above → **Download ZIP** (no `git`
+needed), unzip it, then run `setup.ps1` (Windows, right-click → Run with PowerShell) or
+`bash setup.sh` (Mac/Linux) — it installs dependencies and creates the folders below for you. Full
+walkthrough in the [User Guide](Public/IEM-PM-User-Guide.html#get-running). Otherwise, by hand:
+
 1. **Install dependencies:**
    ```
    pip install -r requirements.txt
