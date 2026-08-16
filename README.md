@@ -105,7 +105,9 @@ See [`IEM-PM BLUEPRINT-1.md`](IEM-PM%20BLUEPRINT-1.md) for the full 19-section d
    and HTML/TXT reports.
 
 Not a developer? See the [role-based user guide](Public/IEM-PM-User-Guide.html) for PMs, program
-managers, and PMO leads — no code required to read or act on an audit.
+managers, and PMO leads — no code required to read or act on an audit. Its "Before you start"
+section is the single, authoritative machine-setup walkthrough (this Quickstart summarizes the
+same four steps for a GitHub landing page) — if the two ever disagree, the User Guide is correct.
 
 No worked example ships in this repository yet — real pilot audits have been run against real PMI
 standards during development, but their evidence and output are gitignored (`Audit/`), same as any

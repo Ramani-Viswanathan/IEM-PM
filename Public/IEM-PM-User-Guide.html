@@ -785,11 +785,21 @@
             <span class="box"></span>
             <div>
               <strong>Claude Code, with this skill available</strong>
-              <span class="note">Two ways to get there: open Claude Code inside this cloned repository (works immediately, no install step), or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> once per machine so it's available in every project as <code>/iem-pm:intelligence-engine</code>. Either way, there's no separate app to install.</span>
+              <span class="note">Two ways to get there: open Claude Code inside this cloned repository (works immediately, no install step), or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> once per machine so it's available in every project as <code>/iem-pm:intelligence-engine</code>. Either way, there's no separate app to install — there is no standalone package to download; the cloned repository <em>is</em> the install.</span>
             </div>
           </li>
         </ul>
-        <div class="callout accent" style="margin-top:1.4rem;">
+        <div class="callout" id="new-machine" style="margin-top:1.4rem;">
+          <p><strong>Setting up on a machine that's never run this before?</strong> Everything above assumes these four things already exist — do them once per machine, in order:</p>
+          <ol style="margin:0.5rem 0 0 1.2rem; padding:0;">
+            <li>Access to this repository, then <code>git clone</code> it (or copy the files another way).</li>
+            <li>Python 3.10+, then <code>pip install -r requirements.txt</code> in the repo root.</li>
+            <li>Claude Code, installed and signed in.</li>
+            <li>Your own copy of your organization's real PM standards, dropped into <code>skills/intelligence-engine/knowledge/</code> — this never ships with the repo (copyright), so every new machine starts with an empty baseline until you copy your standards over by hand.</li>
+          </ol>
+          <p style="margin-top:0.6rem;"><code>knowledge/</code> and the derived <code>registries/</code> folder both stay wherever you put them and are never touched by a repo update — but neither one travels with <code>git clone</code> either, so a fresh machine also starts with none of the deeper registry detail a well-used machine has accumulated. It rebuilds automatically as you run audits (see "Does the registry rebuild from scratch..." below) — or copy the <code>registries/</code> folder over by hand (zip, USB, cloud drive — anything except git) if you'd rather not regrow it from zero.</p>
+        </div>
+        <div class="callout accent" style="margin-top:1rem;">
           <p><strong>Nothing you hand it gets changed.</strong> IEM-PM only reads your standards, your Charter, and your evidence. The only thing it ever writes is inside your project's own <code>reports/</code> folder, inside <code>Audit/&lt;YourProjectName&gt;/</code> — your source data is never touched.</p>
         </div>
         <div class="callout" style="margin-top:1rem;">
@@ -1080,15 +1090,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
           <div class="faq-item">
             <dt>How do I set this up on a different machine?</dt>
             <dd>
-              <p>You need, once per machine:</p>
-              <ul>
-                <li>Git, to clone the repository (or copy the files another way).</li>
-                <li>Python 3.10+, then <code>pip install -r requirements.txt</code> in the repo root.</li>
-                <li>Claude Code, installed and signed in.</li>
-                <li>Your own copy of your organization's real PM standards, dropped into <code>skills/intelligence-engine/knowledge/</code> — never shipped with the repo.</li>
-              </ul>
-              <p style="margin-top:0.6rem;">Then either open Claude Code inside the cloned repository and go, or copy/symlink <code>skills/intelligence-engine/</code> to <code>~/.claude/skills/intelligence-engine/</code> to make it available in every project on that machine, invocable directly as <code>/iem-pm:intelligence-engine</code>. Either way <code>knowledge/</code> and <code>registries/</code> stay wherever you put that folder — nothing is copied into a cache, so nothing is at risk when the tool updates.</p>
-              <p style="margin-top:0.6rem;">A fresh clone gives you the engine, not the baseline — <code>knowledge/</code> and <code>registries/</code> are gitignored and never travel with the repo. You start with an empty registry on every new machine unless you copy it over by hand; see the next question for what that means in practice.</p>
+              <p>See <a href="#new-machine">"Setting up on a machine that's never run this before?"</a> under "Before you start," near the top of this guide — the four one-time steps (Git, Python + <code>pip install</code>, Claude Code, your own standards) live there so there's one place to check, not two.</p>
             </dd>
           </div>
           <div class="faq-item">
