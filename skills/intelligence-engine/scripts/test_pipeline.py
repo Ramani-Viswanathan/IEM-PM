@@ -70,11 +70,35 @@ def test_manifest_to_findings():
     with tempfile.TemporaryDirectory() as tmp:
         data = _generate_findings(REAL_MANIFEST_PATH, Path(tmp))
 
-        assert data["schema_version"] == "1.1.0"
+        assert data["schema_version"] == "1.3.0"
         assert len(data["findings"]) == 2
         assert {f["id"] for f in data["findings"]} == {"FIND-0001", "FIND-0002"}
         assert data["reporting_integrity_score"]["score"] > 0
         assert "maturity_assessment" not in data, "OPM3/maturity modeling was scrapped -- must not reappear"
+
+        # v1.2.0: human approval. FIND-0001 is Severity 4 and the fixture
+        # declares "Human Approved: Yes" -- must parse to True, not a string.
+        # FIND-0002 is Severity 3 (below the gate) and declares nothing --
+        # must parse to None, not False (None means "not applicable", not
+        # "explicitly denied").
+        by_id = {f["id"]: f for f in data["findings"]}
+        assert by_id["FIND-0001"]["human_approved"] is True, "Severity-4 finding must record real approval"
+        assert by_id["FIND-0002"]["human_approved"] is None, "Severity-3 finding has no approval requirement"
+
+        # v1.3.0: an approval must name who gave it, not just a bare boolean.
+        assert by_id["FIND-0001"]["human_approved_by"] == "Test Fixture Approver", (
+            "approved finding must record who approved it"
+        )
+        assert by_id["FIND-0001"]["human_approved_at"] == "2026-07-26", (
+            "approved finding must record when it was approved"
+        )
+        assert by_id["FIND-0002"]["human_approved_by"] is None, "unapproved finding has no approver"
+
+        # v1.2.0: RIS components/limitations must be present and non-empty --
+        # this is the transparency disclosure, not decorative metadata.
+        ris = data["reporting_integrity_score"]
+        assert ris["components"]["total_findings"] == 2
+        assert len(ris["limitations"]) > 0, "RIS must disclose its own limitations"
 
         # Artifact Name resolution (regression: used to fall back to the ID)
         names = {a["artifact_id"]: a["artifact_name"] for a in data["baseline"]["artifacts_examined"]}
@@ -152,6 +176,12 @@ def test_rendering():
 
         assert "FIND-0001" in html_content and "FIND-0002" in html_content
         assert "Missing" in html_content and "Underutilized" in html_content
+
+        # v1.3.0: an approved finding's report must show WHO approved it, not
+        # just a bare "Approved" flag (regression: this was the actual bug --
+        # the field was parsed and stored but never rendered anywhere).
+        assert "Test Fixture Approver" in html_content, "approver name missing from HTML report"
+        assert "Test Fixture Approver" in txt_content, "approver name missing from TXT report"
 
         # Artifact names actually rendered, not just IDs (regression check).
         for name in ("Project Schedule", "RAID Log", "Governance Pack"):
@@ -258,6 +288,70 @@ def test_duplicate_detection():
         print("  PASS: duplicate signature (Underutilized/Behavior/ART-002/Process 11.7) correctly rejected")
 
 
+def test_major_finding_requires_approval():
+    """
+    Test 7 (v1.2.0): a Severity 4/5 finding with no "Human Approved" field
+    must be rejected -- both at parse time (fast fail, before validation)
+    and, independently, at schema-validation time if it somehow got past
+    parsing. Mirrors test_duplicate_detection's approach: mutate the real
+    fixture, confirm rejection for the RIGHT reason, not just any failure.
+    """
+    # Strip the "Human Approved: Yes" line this session added to FIND-0001
+    # (Severity 4) -- everything else about the fixture stays real.
+    base = REAL_MANIFEST_PATH.read_text(encoding="utf-8")
+    unapproved = base.replace("**Human Approved:** Yes\n", "", 1)
+    assert "Human Approved" not in unapproved, "fixture mutation failed -- test is broken"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        manifest_path = tmp_path / "unapproved_manifest.md"
+        output_path = tmp_path / "should_not_exist.json"
+        manifest_path.write_text(unapproved, encoding="utf-8")
+
+        result = run_script("manifest_to_findings.py", [
+            "--manifest", str(manifest_path), "--output", str(output_path),
+        ])
+        combined = result.stdout + result.stderr
+
+        assert result.returncode != 0, "Severity-4 finding without Human Approved was NOT rejected"
+        assert "E-PARSE-008" in combined, (
+            f"rejected, but not for the missing-human-approval reason:\n{combined}"
+        )
+        assert not output_path.exists(), "findings.json must not be written on validation failure"
+        print("  PASS: Severity-4 finding without Human Approved correctly rejected (E-PARSE-008)")
+
+
+def test_approval_requires_approver_name():
+    """
+    Test 8 (v1.3.0): a finding with "Human Approved: Yes" but no "Approved By"
+    must be rejected -- a bare approval flag with no accountable name isn't a
+    real approval record. Mirrors test_major_finding_requires_approval's
+    approach: mutate the real fixture, confirm rejection for the RIGHT reason.
+    """
+    base = REAL_MANIFEST_PATH.read_text(encoding="utf-8")
+    unattributed = base.replace("**Approved By:** Test Fixture Approver\n", "", 1)
+    assert "Approved By" not in unattributed, "fixture mutation failed -- test is broken"
+    assert "**Human Approved:** Yes" in unattributed, "fixture mutation removed the wrong line"
+
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        manifest_path = tmp_path / "unattributed_manifest.md"
+        output_path = tmp_path / "should_not_exist.json"
+        manifest_path.write_text(unattributed, encoding="utf-8")
+
+        result = run_script("manifest_to_findings.py", [
+            "--manifest", str(manifest_path), "--output", str(output_path),
+        ])
+        combined = result.stdout + result.stderr
+
+        assert result.returncode != 0, "Yes-approved finding without Approved By was NOT rejected"
+        assert "E-PARSE-009" in combined, (
+            f"rejected, but not for the missing-approver reason:\n{combined}"
+        )
+        assert not output_path.exists(), "findings.json must not be written on validation failure"
+        print("  PASS: 'Human Approved: Yes' without Approved By correctly rejected (E-PARSE-009)")
+
+
 def test_scope_limitation_render():
     """Test 6: real Halt Condition 6 notice (md) -> HTML, checking real content,
     not just that a file got written."""
@@ -302,6 +396,8 @@ def main():
         ("Default Output Location", test_default_output_location),
         ("Knowledge Index", test_knowledge_index),
         ("Duplicate Detection", test_duplicate_detection),
+        ("Major Finding Requires Approval", test_major_finding_requires_approval),
+        ("Approval Requires Approver Name", test_approval_requires_approver_name),
         ("Scope Limitation Notice Render", test_scope_limitation_render),
     ]
 

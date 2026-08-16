@@ -4,7 +4,7 @@ description: >
   How your Audit Manifest becomes the 10-section rendered report — per-section content rules,
   what you must never write, and the pre-handover output checklist. Read before finishing any
   audit (SKILL.md §11).
-version: 1.0.0
+version: 1.1.0
 ---
 
 ## Contents
@@ -32,7 +32,7 @@ Software produces the report in this order:
 | 2   | **Audit Scope**                                         | Header Block + Per-Artifact Evidence Log    | Standards declared, artifacts examined, Charter version, status (ratified/provisional).                                            |
 | 3   | **Delivery Baseline**                                   | Header Block                                | List of governing standards with version/edition references.                                                                       |
 | 4   | **Delivery Evidence**                                   | Per-Artifact Evidence Log                   | For each artifact: ID, path, status, field coverage, and your narrative observations.                                              |
-| 5   | **Gap Register**                                        | Finding Blocks (all `### FINDING:`)         | Every finding with gap type, root origin, severity, evidence, and recommended action. This is the core of the report.              |
+| 5   | **Gap Register**                                        | Finding Blocks (all `### FINDING:`)         | Every finding with gap type, root origin, severity, evidence, and recommended action. Severity 4/5 findings also carry a real Human Approved record. This is the core of the report.              |
 | 6   | **Root Cause Analysis**                                 | Finding Blocks                              | Software aggregates your root origins into a frequency table. You do not write the table — you assign the origins in each finding. |
 | 7   | **Intelligence Indicators + Reporting Integrity Score** | Synthesis Section                           | Your narrative for all 7 dimensions. Software computes the score and places it alongside your text.                                |
 | 8   | **Recommended Actions**                                 | Finding Blocks — `Recommended Action` field | Software extracts all recommended actions and groups them by root origin for prioritization.                                       |
@@ -109,6 +109,7 @@ Before you finish writing, verify your Manifest contains:
 - [ ] Header Block with all fields
 - [ ] Per-Artifact Evidence Log for every artifact in scope
 - [ ] One `### FINDING:` block per gap (minimum one evidence bullet each)
+- [ ] Every Severity 4/5 finding has a real Human Approved record — actually asked, never fabricated — and, if Yes, an Approved By and Approval Date
 - [ ] Synthesis section with all 7 Intelligence Indicators
 - [ ] Appendix with schema version and artifact list
 

@@ -62,6 +62,9 @@ One block per gap. This is the parser's critical section.
 **Requirement Summary:** [One-sentence paraphrase — never full text]
 **Description:** [What you found and why it violates the standard — minimum 20 words]
 **Severity:** [1 | 2 | 3 | 4 | 5]
+**Human Approved:** [Yes | No — required only if Severity is 4 or 5]
+**Approved By:** [Name/role of the human who approved — required only if Human Approved is Yes]
+**Approval Date:** [When they gave that approval, in their own words — required only if Human Approved is Yes]
 **Impact:** [Narrative impact on delivery capability]
 **Recommended Action:** [Specific, actionable remediation addressing the root origin]
 **Intelligence Dimensions:** [Visibility, Integrity, ... comma-separated]
@@ -76,6 +79,17 @@ Rules for Finding Blocks:
 - Every evidence bullet must reference an artifact declared in the Charter.
 - Gap Type and Root Origin must match the closed taxonomies exactly (case-sensitive).
 - Severity must be an integer 1–5.
+- If Severity is 4 or 5, Human Approved is mandatory (v1.2.0). Do not write "Yes" on your own
+  authority — surface the finding to the human operator in plain terms and record their actual
+  response. Writing "Yes" without having actually asked is a fabricated approval, not a
+  shortcut: the whole point of this gate is that a real person, not the model, confirms a
+  Major or Critical finding before it becomes final. A manifest with a Severity 4/5 finding and
+  no Human Approved field is rejected outright (`E-PARSE-008`).
+- If Human Approved is Yes, Approved By and Approval Date are mandatory (v1.3.0). "Human
+  Approved: Yes" with no name attached is a bare flag, not an audit trail — record who actually
+  said yes and when, in their own words (a real timestamp isn't required; "confirmed in-session"
+  is fine). A finding with Human Approved: Yes and no Approved By is rejected outright
+  (`E-PARSE-009`).
 - Requirement Summary is one sentence maximum. Never reproduce standard text.
 - Description must be at least 20 words.
 - Recommended Action must address the root origin, not the symptom.
@@ -92,6 +106,9 @@ Rules for Finding Blocks:
 **Requirement Summary:** A schedule baseline must be established and approved before work begins.
 **Description:** The project schedule file (ART-001) contains task start dates and durations, but no baseline_start or baseline_finish fields are populated. The Charter defines these as required fields for schedule artifacts. Without baseline dates, schedule variance cannot be calculated, and earned value measurement is impossible.
 **Severity:** 4
+**Human Approved:** Yes
+**Approved By:** Ramani Viswanathan, PMO Director
+**Approval Date:** Confirmed in-session, 2026-08-16
 **Impact:** Inability to measure schedule performance exposes the project to undetected delays and prevents accurate forecasting for portfolio reporting.
 **Recommended Action:** Establish and approve a schedule baseline before the next reporting period. Assign Ownership accountability for baseline maintenance (addresses Root Origin: Capture → Ownership).
 **Intelligence Dimensions:** Predictability, Visibility

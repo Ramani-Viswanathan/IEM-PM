@@ -1,8 +1,10 @@
-#!/usr/bin/env python3  
+#!/usr/bin/env python3
 """
 IEM-PM Schema Validator — Contract 5
 Validates canonical findings JSON against findings.schema.json.
-Enforces closed taxonomies, evidence discipline, deduplication, and coverage.
+Enforces closed taxonomies, evidence discipline, deduplication, coverage,
+(v1.2.0) human approval on Major/Critical findings, and (v1.3.0) that every
+recorded approval names an accountable approver.
 """
 
 import json
@@ -77,6 +79,42 @@ def validate_evidence_coverage(findings_json: Dict[str, Any]) -> List[str]:
     return errors
 
 
+def validate_major_finding_approval(findings_json: Dict[str, Any]) -> List[str]:
+    """
+    v1.2.0 -- AI proposes, deterministic controls validate structure, a
+    qualified human validates meaning and materiality for Major findings.
+    Every finding with severity 4 (Major) or 5 (Critical) must carry
+    human_approved == True. This is enforced here, as a Python rule, not in
+    findings.schema.json, because JSON Schema Draft-07 has no clean way to
+    conditionally require one field only when another field crosses a
+    threshold (severity >= 4) -- doing it in the schema would need an
+    if/then/else per severity value, which is more fragile than one explicit
+    check here.
+    """
+    errors: List[str] = []
+    for f in findings_json.get("findings", []):
+        severity = f.get("severity", 0)
+        if severity >= 4 and f.get("human_approved") is not True:
+            errors.append(
+                f"[E-VALID-004] {f.get('id')}: Severity {severity} (Major/Critical) "
+                f"finding lacks human approval (human_approved={f.get('human_approved')}). "
+                f"Major and Critical findings require explicit human approval before "
+                f"they are final."
+            )
+        # v1.3.0 -- a True human_approved with no recorded approver is a bare
+        # flag, not an audit trail. This check is independent of severity: it
+        # fires on ANY finding claiming approval, not just Severity 4/5, since
+        # a fabricated-looking "Approved" with no name attached is wrong at
+        # any severity.
+        if f.get("human_approved") is True and not (f.get("human_approved_by") or "").strip():
+            errors.append(
+                f"[E-VALID-005] {f.get('id')}: human_approved is true but human_approved_by "
+                f"is missing. Record who actually gave the approval -- an approval with no "
+                f"accountable name is not a real approval record."
+            )
+    return errors
+
+
 def validate_provisional_caveat(findings_json: Dict[str, Any]) -> List[str]:
     """
     If Charter status is PROVISIONAL, every finding must carry the caveat.
@@ -97,6 +135,7 @@ def full_validate(findings_json: Dict[str, Any]) -> Tuple[bool, List[str]]:
     all_errors.extend(validate_canonical(findings_json))
     all_errors.extend(validate_no_duplicates(findings_json))
     all_errors.extend(validate_evidence_coverage(findings_json))
+    all_errors.extend(validate_major_finding_approval(findings_json))
 
     is_valid = len(all_errors) == 0
     return is_valid, all_errors

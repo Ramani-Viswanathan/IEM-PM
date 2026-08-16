@@ -982,6 +982,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             <div>
               <h3 id="fix-critical-major">Fix what's Critical or Major</h3>
               <p>Close every Severity 5 and 4 finding first. These are the ones that threaten delivery outcomes, not just tidiness.</p>
+              <p>Every Severity 4 or 5 finding now requires your explicit approval before the report can be generated at all — the engine will ask you to confirm it, record your answer as <code>Human Approved</code>, and refuse to produce a report if that field is missing. This isn't a formality: it means a Major or Critical finding is never final on the AI's judgment alone.</p>
             </div>
           </div>
           <div class="stage">
@@ -1137,7 +1138,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
                 <li><strong>Stage 4 — Classify:</strong> each unmet criterion becomes one of the 7 gap types.</li>
                 <li><strong>Stage 5 — Trace:</strong> each gap is traced to one of the 7 root origins.</li>
                 <li><strong>Stage 6 — Engineer &amp; Score:</strong> four-part diagnostic (Evidence · Impact · Why/Who/Scope · Fix-at-source) plus the Reporting Integrity Score (0–100).</li>
-                <li><strong>Stage 7 — Synthesize:</strong> writes the Audit Manifest — the LLM↔code boundary.</li>
+                <li><strong>Stage 7 — Synthesize:</strong> writes the Audit Manifest — the LLM↔code boundary. Any Severity 4/5 finding is confirmed with you directly and recorded as <code>Human Approved</code> before the Manifest is written; missing this halts the run.</li>
                 <li><strong>Stage 8 — Findings JSON:</strong> <code>manifest_to_findings.py</code> parses and validates the Manifest against the schema.</li>
                 <li><strong>Stage 9 — Render:</strong> <code>render.py</code> produces the HTML/TXT reports, byte-identical from the same JSON.</li>
                 <li><strong>Stage 10 — Final Summary:</strong> a plain-language wrap-up back to you.</li>

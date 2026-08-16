@@ -242,6 +242,14 @@
 
         <p><strong>Root Origin:</strong> <span class="highlight">{{ f.root_origin }}</span></p>
         <p><strong>Impact:</strong> {{ f.impact }}</p>
+        {% if f.human_approved is not none %}
+        <p><strong>Human Approval:</strong>
+            {% if f.human_approved %}<span style="color:#28a745;">Approved by {{ f.human_approved_by or "unrecorded" }}{% if f.human_approved_at %} on {{ f.human_approved_at }}{% endif %}</span>
+            {% else %}<span style="color:#dc3545;">Pending Review</span>{% endif %}
+        </p>
+        {% elif f.severity >= 4 %}
+        <p><strong>Human Approval:</strong> <span style="color:#dc3545;">NOT RECORDED (required for this severity)</span></p>
+        {% endif %}
 
         <h4>Evidence</h4>
         {% for ev in f.evidence %}
@@ -303,6 +311,25 @@
     ({{ audit.reporting_integrity_score.version }})</p>
     <p>This score is computed deterministically from gap density, severity distribution,
     root cause diversity, and Missing gap penalties. It is not subjective.</p>
+
+    {% if ris_components %}
+    <h4>Score Components</h4>
+    <table>
+        <tr><th>Component</th><th>Value</th></tr>
+        {% for key, val in ris_components.items() %}
+        <tr><td>{{ key.replace('_', ' ').title() }}</td><td>{{ val }}</td></tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    {% if ris_limitations %}
+    <h4>Limitations</h4>
+    <ul>
+        {% for lim in ris_limitations %}
+        <li>{{ lim }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
     <h4>Severity Distribution</h4>
     <table>

@@ -17,11 +17,11 @@ from typing import Dict, Any, List, Optional, Tuple
 
 # Import our validator from the same directory
 try:
-    from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage
+    from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage, validate_major_finding_approval
 except ImportError:
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
-    from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage
+    from schema import validate_canonical, validate_no_duplicates, validate_evidence_coverage, validate_major_finding_approval
 
 
 def _to_utc(dt: datetime) -> datetime:
@@ -77,7 +77,7 @@ class ManifestParser:
         # Build canonical structure
         canonical = {
             "audit_id": header.get("audit_id", self._generate_audit_id()),
-            "schema_version": "1.1.0",
+            "schema_version": "1.3.0",
             "charter_version": header.get("charter_version", "unknown"),
             "generated_at": audit_date.isoformat(),
             "baseline": {
@@ -100,6 +100,7 @@ class ManifestParser:
         all_errors.extend(validate_canonical(canonical))
         all_errors.extend(validate_no_duplicates(canonical))
         all_errors.extend(validate_evidence_coverage(canonical))
+        all_errors.extend(validate_major_finding_approval(canonical))
         all_errors.extend(self.errors)
 
         return len(all_errors) == 0, all_errors
@@ -206,6 +207,13 @@ class ManifestParser:
             self.errors.append(f"[E-PARSE-005] {fid}: Invalid severity '{sev_str}'")
             severity = 3
 
+        # v1.2.0: human approval, required for Major (4) and Critical (5) findings
+        human_approved = self._parse_human_approved(block, severity, fid)
+        # v1.3.0: who approved it and when -- required whenever human_approved is True,
+        # regardless of severity, since a bare "Approved" with no accountable name isn't
+        # a real approval record.
+        approved_by, approved_at = self._parse_approval_metadata(block, human_approved, fid)
+
         return {
             "id": fid,
             "gap_type": gap_type,
@@ -219,10 +227,61 @@ class ManifestParser:
                 "summary": self._extract_field(block, "Requirement Summary") or ""
             },
             "severity": severity,
+            "human_approved": human_approved,
+            "human_approved_by": approved_by,
+            "human_approved_at": approved_at,
             "impact": self._extract_field(block, "Impact") or "",
             "recommended_action": self._extract_field(block, "Recommended Action") or "",
             "intelligence_dimensions": dims
         }
+
+    def _parse_human_approved(self, block: str, severity: int, fid: str) -> Optional[bool]:
+        """v1.2.0: parse Human Approved status. Required for Severity 4-5.
+
+        Flagged as a parse-time error (fails fast, before the manifest even
+        reaches schema.py's validate_major_finding_approval) when a Major or
+        Critical finding has no Human Approved field at all -- the same rule
+        is also enforced at validation time as a second, independent check,
+        not because one is redundant, but because a manifest that never even
+        declares the field should be caught here, while a manifest that
+        declares it as e.g. "Pending" should be caught by the validator.
+        """
+        text = self._extract_field(block, "Human Approved")
+        if not text:
+            if severity >= 4:
+                self.errors.append(
+                    f"[E-PARSE-008] {fid}: Severity {severity} (Major/Critical) finding "
+                    f"requires a Human Approved field"
+                )
+            return None
+        val = text.strip().lower()
+        if val in ("yes", "true", "approved"):
+            return True
+        if val in ("no", "false", "pending"):
+            return False
+        self.warnings.append(f"[W-PARSE-008] {fid}: Unrecognized Human Approved value '{text}'; treated as pending")
+        return None
+
+    def _parse_approval_metadata(
+        self, block: str, human_approved: Optional[bool], fid: str
+    ) -> Tuple[Optional[str], Optional[str]]:
+        """v1.3.0: parse who approved and when. Required whenever human_approved is True --
+        a bare "Approved" flag with no accountable name is not an audit trail. Approval Date
+        is kept as free text (not parsed as a machine timestamp): real approvals often happen
+        conversationally ("yes, confirmed in-session"), and forcing a fabricated-looking ISO
+        timestamp onto that would be less honest than recording what was actually said.
+        """
+        approved_by = self._extract_field(block, "Approved By") or None
+        approved_at = self._extract_field(block, "Approval Date") or None
+
+        if human_approved is True and not approved_by:
+            self.errors.append(
+                f"[E-PARSE-009] {fid}: Human Approved is Yes but no Approved By field is "
+                f"present. Record the real name/role of who approved it -- do not leave the "
+                f"approval unattributed."
+            )
+
+        return approved_by, approved_at
 
     def _parse_evidence_bullets(self, block: str) -> List[Dict[str, str]]:
         """Parse '- **Artifact:** ... | **Location:** ... | **Evidence:** ...' bullets."""
@@ -263,7 +322,18 @@ class ManifestParser:
 
     def _compute_ris(self, findings: List[Dict]) -> Dict[str, Any]:
         """
-        Reporting Integrity Score v1.1.0 — deterministic.
+        Reporting Integrity Score v1.2.0 — deterministic. The formula and
+        weights are UNCHANGED from v1.1.0 (see below) -- v1.2.0 only adds
+        `components` and `limitations` to the output, so the score is
+        auditable instead of asserted. This does not add a categorical
+        "band" on top of the raw score: an independent review (Dr. Tony
+        Prensa, TP Global Business Consulting, 2026-08-14) correctly noted
+        the two-decimal score implies unearned calibration -- but bucketing
+        it into a handful of arbitrarily-cut bands doesn't fix that, it just
+        hides the same lack of calibration behind coarser numbers. Disclosing
+        the real components and limitations is the honest fix; inventing new
+        unvalidated cut points is not.
+
         Formula:
         - Base: 100
         - Deduct severity points: sum(severity) capped at 50 (saturates at total
@@ -280,8 +350,27 @@ class ManifestParser:
         between "flawed" and "catastrophic" instead of both reading as the same
         zero.
         """
+        limitations = [
+            "This score has not been calibrated across multiple organizations or decision types.",
+            "Severity is assigned by LLM judgment (Stage 6) and is not empirically derived.",
+            "A score from one audit is not directly comparable to another unless scope, "
+            "standards, and materiality are identical.",
+            "The score describes evidence state at a point in time; it does not predict outcomes."
+        ]
+
         if not findings:
-            return {"score": 100.0, "methodology": "Weighted Gap Profile v1.1.0", "version": "1.1.0"}
+            return {
+                "score": 100.0,
+                "methodology": "Weighted Gap Profile v1.2.0",
+                "version": "1.2.0",
+                "components": {
+                    "severity_deduction": 0, "density_deduction": 0,
+                    "diversity_deduction": 0, "missing_deduction": 0,
+                    "total_findings": 0, "total_artifacts": max(len(self._parse_artifacts()), 1),
+                    "unique_origins": 0
+                },
+                "limitations": limitations
+            }
 
         total_severity = sum(f["severity"] for f in findings)
         severity_deduction = min(total_severity, 50)
@@ -301,8 +390,18 @@ class ManifestParser:
 
         return {
             "score": round(score, 2),
-            "methodology": "Weighted Gap Profile v1.1.0",
-            "version": "1.1.0"
+            "methodology": "Weighted Gap Profile v1.2.0",
+            "version": "1.2.0",
+            "components": {
+                "severity_deduction": severity_deduction,
+                "density_deduction": round(density_deduction, 2),
+                "diversity_deduction": diversity_deduction,
+                "missing_deduction": missing_deduction,
+                "total_findings": len(findings),
+                "total_artifacts": art_count,
+                "unique_origins": len(origins)
+            },
+            "limitations": limitations
         }
 
     def _compute_evidence_summary(self, artifacts: List[Dict]) -> Dict[str, Any]:
@@ -400,6 +499,16 @@ def main():
     # Validate
     is_valid, errors = parser_engine.validate(canonical)
 
+    # Printed regardless of outcome -- a parse-time warning (e.g. an
+    # unrecognized "Human Approved" value) is often the actual explanation
+    # for a validation error on the same finding, and must not be silently
+    # dropped just because validation also failed.
+    if parser_engine.warnings:
+        print("Warnings:")
+        for w in parser_engine.warnings:
+            print(f"  - {w}")
+        print()
+
     if not is_valid:
         print("VALIDATION FAILED:")
         for e in errors:
@@ -419,11 +528,6 @@ def main():
     print(f"Canonical findings written to {output_path}")
     print(f"Total findings: {len(canonical['findings'])}")
     print(f"Reporting Integrity Score: {canonical['reporting_integrity_score']['score']}")
-
-    if parser_engine.warnings:
-        print("\nWarnings:")
-        for w in parser_engine.warnings:
-            print(f"  - {w}")
 
 
 if __name__ == "__main__":

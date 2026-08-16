@@ -3,6 +3,11 @@
 IEM-PM Renderer — Contract 5 / Stage 9
 Reads canonical findings JSON and produces HTML + TXT reports.
 Deterministic: same JSON in → byte-identical out.
+
+v1.2.0: renders the RIS score's components/limitations breakdown and each
+finding's human-approval status, both new in schema v1.2.0.
+v1.3.0: an approved finding now renders who approved it and when, not just
+a bare "Approved" flag.
 """
 
 import json
@@ -43,6 +48,7 @@ def load_template(template_path: Path) -> Template:
 
 def render_html(canonical: dict, template: Template) -> str:
     findings = canonical.get("findings", [])
+    ris = canonical.get("reporting_integrity_score", {})
     return template.render(
         audit=canonical,
         generated_at=_format_timestamp(canonical.get("generated_at", "")),
@@ -50,7 +56,9 @@ def render_html(canonical: dict, template: Template) -> str:
         severity_counts=_count_by(findings, "severity"),
         gap_counts=_count_by(findings, "gap_type"),
         origin_counts=_count_by(findings, "root_origin"),
-        artifact_count=len(canonical.get("baseline", {}).get("artifacts_examined", []))
+        artifact_count=len(canonical.get("baseline", {}).get("artifacts_examined", [])),
+        ris_components=ris.get("components", {}),
+        ris_limitations=ris.get("limitations", [])
     )
 
 
@@ -89,6 +97,17 @@ def render_txt(canonical: dict) -> str:
             "",
             f"  {f['id']} | {f['gap_type']} | Severity: {f['severity']}/5",
             f"  Origin: {f['root_origin']}",
+        ])
+        if f.get("human_approved") is True:
+            by = f.get("human_approved_by") or "unrecorded"
+            at = f.get("human_approved_at")
+            when = f" on {at}" if at else ""
+            lines.append(f"  Human Approval: Approved by {by}{when}")
+        elif f.get("human_approved") is False:
+            lines.append("  Human Approval: Pending Review")
+        elif f["severity"] >= 4:
+            lines.append("  Human Approval: NOT RECORDED (required for this severity)")
+        lines.extend([
             f"  Standard: {f['standard_reference']['standard']} {f['standard_reference']['identifier']}",
             f"  {f['description']}",
             "  Evidence:",
@@ -120,11 +139,27 @@ def render_txt(canonical: dict) -> str:
         lines.append(f"    {text[:180]}{suffix}")
         lines.append("")
 
+    ris = canonical.get("reporting_integrity_score", {})
     lines.extend([
         "7. REPORTING INTEGRITY SCORE",
         "-" * 40,
-        f"  Score: {canonical['reporting_integrity_score']['score']}/100",
-        f"  Methodology: {canonical['reporting_integrity_score']['methodology']}",
+        f"  Score: {ris.get('score')}/100",
+        f"  Methodology: {ris.get('methodology')}",
+    ])
+    components = ris.get("components", {})
+    if components:
+        lines.append("")
+        lines.append("  Score Components:")
+        for key, val in components.items():
+            lines.append(f"    {key.replace('_', ' ').title()}: {val}")
+    limitations = ris.get("limitations", [])
+    if limitations:
+        lines.append("")
+        lines.append("  Limitations:")
+        for i, lim in enumerate(limitations, 1):
+            lines.append(f"    {i}. {lim}")
+
+    lines.extend([
         "",
         "8. RECOMMENDED ACTIONS",
         "-" * 40,

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "IEM-PM Canonical Findings v1.1.0",
+  "title": "IEM-PM Canonical Findings v1.3.0",
   "description": "Machine-readable single source of truth for PMO Data Gap Audit",
   "type": "object",
   "required": [
@@ -22,7 +22,7 @@
     },
     "schema_version": {
       "type": "string",
-      "enum": ["1.1.0"]
+      "enum": ["1.3.0"]
     },
     "charter_version": {
       "type": "string",
@@ -187,6 +187,18 @@
             "maximum": 5,
             "description": "1=Cosmetic, 5=Critical delivery threat"
           },
+          "human_approved": {
+            "type": ["boolean", "null"],
+            "description": "v1.2.0: required True for Severity 4 (Major) and 5 (Critical) findings -- enforced by schema.py's validate_major_finding_approval(), not by this JSON-schema field alone, since jsonschema has no clean way to conditionally require a field only when another field crosses a threshold. Null/absent is valid for Severity 1-3."
+          },
+          "human_approved_by": {
+            "type": ["string", "null"],
+            "description": "v1.3.0: name/role of the human who gave the approval recorded in human_approved. Required whenever human_approved is true -- enforced by schema.py's validate_major_finding_approval(), same reasoning as human_approved itself. A bare 'Approved' boolean with no accountable name is a flag, not an audit trail."
+          },
+          "human_approved_at": {
+            "type": ["string", "null"],
+            "description": "v1.3.0: when the approval in human_approved was given, as stated by the approver (free text -- not required to be a machine-parseable timestamp, since approvals often happen conversationally, not against a clock). Required whenever human_approved is true."
+          },
           "impact": {
             "type": "string",
             "description": "Narrative impact on delivery capability"
@@ -246,7 +258,25 @@
           "description": "Deterministic score based on gap profile"
         },
         "methodology": { "type": "string" },
-        "version": { "type": "string" }
+        "version": { "type": "string" },
+        "components": {
+          "type": "object",
+          "description": "v1.2.0: transparent breakdown of every deduction that produced the score -- added so the number is auditable, not just asserted.",
+          "properties": {
+            "severity_deduction": { "type": "number" },
+            "density_deduction": { "type": "number" },
+            "diversity_deduction": { "type": "number" },
+            "missing_deduction": { "type": "number" },
+            "total_findings": { "type": "integer" },
+            "total_artifacts": { "type": "integer" },
+            "unique_origins": { "type": "integer" }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "v1.2.0: explicit, standing caveats about what this score does and does not establish -- rendered into every report, not left implicit."
+        }
       }
     }
   }

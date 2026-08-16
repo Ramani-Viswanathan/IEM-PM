@@ -18,7 +18,7 @@ description: >
   files) and asks for analysis, review, assessment, or gap identification.
   If the user asks "where is our data breaking down," "are we following our
   methodology," or "audit our PMO," use this skill.
-version: 1.11.0
+version: 1.12.0
 allowed-tools: [Read, Glob, Grep, Write]
 compatibility: Requires Python 3.10+ for scripts/ (validator, renderer).
 ---
@@ -598,6 +598,7 @@ Software will reject your Manifest if:
 6. Missing Required Field — Any finding block is missing one of: Gap Type, Root Origin, Standard, Identifier, Description, Severity, Impact, Recommended Action.
 7. Copyright Violation — Requirement Summary exceeds one sentence or contains verbatim standard text.
 8. Unratified Charter — If Status is PROVISIONAL, every finding must carry the caveat: (Based on unratified Charter interpretation.)
+9. Missing Human Approval — A Severity 4 (Major) or 5 (Critical) finding with no Human Approved field, or with a value software doesn't recognize as Yes/No, is rejected. If Human Approved is Yes, a missing Approved By is also rejected — an approval with no accountable name attached isn't a real approval record.
 
 Write to pass these rules. Do not make software guess.
 
@@ -650,6 +651,10 @@ Before you declare the audit complete, verify your Manifest against these checks
 7. **Synthesis is complete.** All seven Intelligence Indicators have a narrative paragraph.
 8. **Header Block is complete.** Audit ID, Charter Version, Standards, Scope, Date, Status.
 9. **No software instructions in Manifest.** No "run Python," no JSON blocks, no HTML.
+10. **Every Severity 4/5 finding has real Human Approval.** You actually asked the human operator
+    and recorded their real answer as `Human Approved`, never fabricated "Yes." If they approved
+    it, `Approved By` (their real name/role) and `Approval Date` are also present — a bare
+    "Approved" with no accountable name attached is rejected.
 
 If any check fails, fix the Manifest before finishing. Do not hand over a broken Manifest to software.
 
@@ -748,8 +753,8 @@ above compresses. Read the Stage matching your current Phase; do not skip it to 
 
 ## 13.4 Version
 
-This skill file version: **1.11.0**
-Schema version: **1.1.0**
-Manifest format version: **1.1.0**
+This skill file version: **1.12.0**
+Schema version: **1.3.0**
+Manifest format version: **1.3.0**
 
 Full change history: `STATUS.md`. This section states the current version only.

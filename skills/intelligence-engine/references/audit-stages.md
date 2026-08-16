@@ -2,7 +2,7 @@
 Name: Audit State Machine
 description: >
   Full stage-by-stage specification (Stage 0-10) of the audit state machine — purpose, preconditions, inputs, activities, decision logic, outputs, failure conditions, and transitions for every stage. Reference for human developers; SKILL.md §5's Thinking Phases is the operational summary the LLM actually follows.
-version: 1.5.0
+version: 1.6.0
 ---
 
 # Audit State Machine — Full Stage Specifications
@@ -859,7 +859,10 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
 4. **Write the Gap Register** (§10.2.3) — one `### FINDING:` block per engineered finding from
    Stage 6, in the exact format: Gap Type, Root Origin, Standard, Clause, Identifier, Requirement
    Summary, Description (minimum 20 words), Severity, Impact, Recommended Action, Intelligence
-   Dimensions, plus at least one evidence bullet.
+   Dimensions, plus at least one evidence bullet. If Severity is 4 or 5, this is also where you
+   actually surface the finding to the human operator and record their real answer as Human
+   Approved — never write "Yes" on your own authority (§10.3 rule 9). If they approve it, record
+   Approved By and Approval Date too; an "Approved" with no accountable name attached is rejected.
 5. **Write the Synthesis section** (§10.2.4) — narrative diagnostics for all 7 Intelligence
    Indicators, drawing on the Intelligence Dimensions tags assigned in Stage 6. Qualitative only,
    never scored or graded. A *positive* claim about an artifact (data "traces consistently," figures
@@ -870,7 +873,7 @@ since Stage 1, which is exactly why it is the compaction-survival gate.)
    tested against.
 6. **Write the Appendix** (§10.2.5) — Schema Version, Total Findings, Artifacts Examined, Standards
    Referenced.
-7. **Run Final Validation** — check the completed Manifest against all 9 checks in SKILL.md §12.1
+7. **Run Final Validation** — check the completed Manifest against all 10 checks in SKILL.md §12.1
    before declaring it done.
 8. **Save the Manifest** — to this project's own `reports/IEMPM_AuditGap_Report_DDMMYY_HHMM.md`, a
    sibling of its `evidence/` folder (e.g. `Audit/<ProjectName>/reports/...`; Appendix G,
