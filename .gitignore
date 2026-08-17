@@ -32,6 +32,9 @@ examples/pilot-audit/
 examples/pilot-audit-4/
 Public/WHITEPAPER.md
 
+# build_release.py output -- a build artifact, rebuilt on demand, not something to commit
+dist/
+
 # Common
 reports/
 .vs/
