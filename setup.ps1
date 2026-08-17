@@ -1,8 +1,10 @@
 # IEM-PM Setup -- run this once per Windows computer.
 #
-# How to run it: right-click this file in File Explorer and choose "Run with PowerShell".
-# If Windows blocks it ("running scripts is disabled on this system"), open PowerShell in
-# this folder instead and run:  powershell -ExecutionPolicy Bypass -File setup.ps1
+# How to run it: double-click setup.bat in this same folder (recommended -- right-click
+# "Run with PowerShell" on THIS file often fails silently after downloading the ZIP from
+# GitHub, since Windows blocks scripts it considers downloaded from the internet regardless
+# of execution policy). If you're running this file directly anyway and it's blocked, open
+# PowerShell in this folder instead and run:  powershell -ExecutionPolicy Bypass -File setup.ps1
 
 $ErrorActionPreference = "Stop"
 
@@ -12,6 +14,7 @@ Set-Location -Path $PSScriptRoot
 
 Write-Host ""
 Write-Host "=== IEM-PM Setup ===" -ForegroundColor Cyan
+Write-Host "Working folder: $PSScriptRoot"
 Write-Host ""
 
 # 1. Check Python. Get-Command alone isn't enough: on a stock Windows machine with no real
@@ -95,3 +98,9 @@ Write-Host ""
 Write-Host "Full step-by-step guide (open in any web browser):"
 Write-Host "  Public\IEM-PM-User-Guide.html"
 Write-Host ""
+
+# Open this exact folder in File Explorer so there's no ambiguity about where it landed --
+# best-effort only, never fails the script if it doesn't work (e.g. no desktop session).
+try {
+    Start-Process explorer.exe -ArgumentList $PSScriptRoot -ErrorAction SilentlyContinue
+} catch {}

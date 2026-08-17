@@ -774,10 +774,12 @@
           <li style="margin-bottom:0.6rem;">
             <strong>Run the setup script</strong>, from inside the folder you just unzipped:
             <ul style="margin:0.4rem 0 0 1.2rem;">
-              <li style="margin-bottom:0.3rem;"><strong>Windows:</strong> right-click
-                <code>setup.ps1</code> and choose "Run with PowerShell." If Windows says running
-                scripts is disabled, open PowerShell in that folder instead and run:
-                <code>powershell -ExecutionPolicy Bypass -File setup.ps1</code></li>
+              <li style="margin-bottom:0.3rem;"><strong>Windows:</strong> double-click
+                <code>setup.bat</code>. (Not <code>setup.ps1</code> directly — right-clicking
+                that and choosing "Run with PowerShell" commonly fails silently right after a
+                ZIP download, since Windows blocks scripts it considers downloaded from the
+                internet regardless of execution policy; <code>setup.bat</code> exists
+                specifically to avoid that.)</li>
               <li><strong>Mac/Linux:</strong> open Terminal, type <code>cd</code> followed by a
                 space, then drag the unzipped folder into the Terminal window (this pastes its
                 path — dragging alone does <em>not</em> move you into it, typing <code>cd</code>

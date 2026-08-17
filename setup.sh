@@ -12,6 +12,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 echo ""
 echo "=== IEM-PM Setup ==="
+echo "Working folder: $(pwd)"
 echo ""
 
 # 1. Check Python. command -v only confirms something named python3 is on PATH, not that it
@@ -93,3 +94,11 @@ echo ""
 echo "Full step-by-step guide (open in any web browser):"
 echo "  Public/IEM-PM-User-Guide.html"
 echo ""
+
+# Open this exact folder in Finder/file manager so there's no ambiguity about where it
+# landed -- best-effort only, never fails the script if neither tool is available.
+if command -v open &> /dev/null; then
+    open . 2>/dev/null || true
+elif command -v xdg-open &> /dev/null; then
+    xdg-open . 2>/dev/null || true
+fi
