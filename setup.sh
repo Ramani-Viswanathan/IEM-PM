@@ -23,6 +23,17 @@ if ! command -v python3 &> /dev/null; then
     echo "Install it from https://python.org/downloads, then run this script again."
     exit 1
 fi
+
+# Prefer the graphical wizard if this Python has tkinter (ships with the official
+# python.org installer; not always present on a Linux distro's system Python) -- fall
+# through to the rest of this console script only if it isn't available.
+if python3 -c "import tkinter" &> /dev/null; then
+    echo "Starting IEM-PM setup (graphical wizard)..."
+    python3 "$(dirname "${BASH_SOURCE[0]}")/setup_gui.pyw"
+    exit 0
+fi
+echo "Graphical wizard unavailable on this Python (no tkinter) -- continuing in this terminal."
+echo ""
 echo "If a window just popped up asking to install 'Command Line Developer Tools' or"
 echo "similar, that's expected on a Mac that's never run Python before -- click Install,"
 echo "wait for it to finish, then run this script again."

@@ -772,7 +772,7 @@
             your Desktop is fine. No <code>git</code> needed for this.
           </li>
           <li style="margin-bottom:0.6rem;">
-            <strong>Run the setup script</strong>, from inside the folder you just unzipped:
+            <strong>Run the setup wizard</strong>:
             <ul style="margin:0.4rem 0 0 1.2rem;">
               <li style="margin-bottom:0.3rem;"><strong>Windows:</strong> double-click
                 <code>setup.bat</code>. (Not <code>setup.ps1</code> directly — right-clicking
@@ -785,24 +785,19 @@
                 path — dragging alone does <em>not</em> move you into it, typing <code>cd</code>
                 first is what does that), press Enter, then run: <code>bash setup.sh</code></li>
             </ul>
-            <p style="margin-top:0.4rem;">It checks for Python, installs what IEM-PM needs, and
-              creates the folders you'll use next — telling you plainly if anything's missing,
-              never failing silently.</p>
-          </li>
-          <li style="margin-bottom:0.6rem;">
-            <strong>Install Claude Code</strong> from
-            <a href="https://claude.com/claude-code">claude.com/claude-code</a> and sign in, if you
-            haven't already. The setup script checks for this too and tells you if it's missing.
-          </li>
-          <li style="margin-bottom:0.6rem;">
-            <strong>Add your standards.</strong> Put your organization's real PM standards (PMBOK,
-            PRINCE2, ISO 21502, or your own methodology — PDF or Word/Markdown) into
-            <code>skills/intelligence-engine/knowledge/</code>, inside what you unzipped. This is
-            the one step nothing can automate for you — see why just below.
+            <p style="margin-top:0.4rem;">A window opens — no terminal reading required from here.
+              It walks you through, in order: <strong>choosing where IEM-PM should actually live</strong>
+              (not necessarily wherever you unzipped it — pick any folder, and everything gets
+              copied there for you, nothing at the destination is ever overwritten), installing
+              what it needs, checking for Claude Code, and letting you add your standards and a
+              first project's evidence with file-picker buttons instead of typing paths. (If this
+              Python doesn't have the graphical toolkit available — rare, mainly older Linux
+              systems — it automatically falls back to the same steps in plain text instead.)</p>
           </li>
           <li>
-            <strong>Always open Claude Code from inside this exact folder</strong> — not a
-            shortcut, not a different one. That's what makes the skill available; opening Claude
+            <strong>Always open Claude Code from inside wherever you chose for IEM-PM to live</strong>
+            — the wizard's last screen shows you that exact folder and can open it for you. Not a
+            shortcut, not a different folder. That's what makes the skill available; opening Claude
             Code from anywhere else means it won't find it.
           </li>
         </ol>
