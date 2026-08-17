@@ -30,6 +30,33 @@ from tkinter import filedialog, messagebox, ttk
 SOURCE_ROOT = Path(__file__).resolve().parent
 DEFAULT_INSTALL_SUGGESTION = Path.home() / "Documents" / "IEM-PM"
 
+# Branding always loads from SOURCE_ROOT, never app.install_root -- the logo has to render on
+# the very first screen, before LocationPage has copied anything anywhere. logo.png is a
+# pre-sized, pre-converted derivative of the source logo.jpg (tkinter's built-in PhotoImage
+# reads GIF/PPM/PNG, not JPEG, without adding a Pillow dependency just for one image) --
+# regenerate it if logo.jpg is ever replaced.
+LOGO_PATH = SOURCE_ROOT / "skills" / "intelligence-engine" / "assets" / "logo.png"
+SUBTITLE = "Intelligence Engineering Methodology - Project management"
+
+
+def read_skill_version() -> str:
+    """The version shown in branding is read from SKILL.md's own frontmatter, not
+    hardcoded here -- a second, separately-maintained version string would inevitably drift
+    from the one this repo's own fix-log discipline already tracks on every real change."""
+    skill_md = SOURCE_ROOT / "skills" / "intelligence-engine" / "SKILL.md"
+    try:
+        for line in skill_md.read_text(encoding="utf-8").splitlines():
+            if line.startswith("version:"):
+                return line.split(":", 1)[1].strip()
+    except OSError:
+        pass
+    return "unknown"
+
+
+BRAND_LINE = f"Free & open-source  ·  v{read_skill_version()}"
+
+
+
 FONT_TITLE = ("Segoe UI", 16, "bold")
 FONT_BODY = ("Segoe UI", 10)
 FONT_SMALL = ("Segoe UI", 9)
@@ -470,8 +497,8 @@ class App:
     def __init__(self, master):
         self.master = master
         master.title("IEM-PM Setup")
-        master.geometry("600x580")
-        master.minsize(560, 540)
+        master.geometry("600x640")
+        master.minsize(560, 560)
 
         # Defaults to a real suggested home, not silently wherever the ZIP was extracted --
         # LocationPage is what actually lets the user confirm or change this. Every other
@@ -479,11 +506,38 @@ class App:
         # so relocating mid-wizard (LocationPage's job) is the only place that has to know.
         self.install_root = DEFAULT_INSTALL_SUGGESTION
 
+        self._build_header(master)
+
         self.container = ttk.Frame(master)
         self.container.pack(fill="both", expand=True)
         self.current_frame = None
 
         self.show("WelcomePage")
+
+    def _build_header(self, master):
+        header = ttk.Frame(master, padding=(PAD, 14, PAD, 10))
+        header.pack(fill="x")
+
+        # Logo top-left, then subtitle, then the small italic free/version line -- all
+        # stacked in one left-aligned column, per the requested layout, ending in a
+        # horizontal rule that visually closes off the branding block from the page content.
+        self.logo_image = None
+        if LOGO_PATH.exists():
+            try:
+                # Keep a strong reference on self -- Tkinter doesn't hold one itself, and a
+                # PhotoImage with no surviving Python reference gets garbage-collected out
+                # from under the label it's displayed in, silently going blank.
+                self.logo_image = tk.PhotoImage(file=str(LOGO_PATH))
+                ttk.Label(header, image=self.logo_image).pack(anchor="w")
+            except tk.TclError:
+                pass  # Missing/corrupt logo file must never block setup from running.
+
+        ttk.Label(header, text=SUBTITLE, font=FONT_BODY).pack(anchor="w", pady=(6, 0))
+        ttk.Label(
+            header, text=BRAND_LINE, font=("Segoe UI", 8, "italic"), foreground="#666"
+        ).pack(anchor="w", pady=(2, 0))
+
+        ttk.Separator(master, orient="horizontal").pack(fill="x")
 
     @property
     def knowledge_dir(self) -> Path:
