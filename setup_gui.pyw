@@ -561,11 +561,18 @@ class App:
         # ttk theme combination that produced real visual bleed-through (a previous page's
         # content stayed partially rendered even though its show() was never called again),
         # confirmed via traceback logging before switching to this approach.
-        if self.current_frame is not None:
-            self.current_frame.destroy()
+        #
+        # Build and pack the new frame BEFORE destroying the old one, not after: destroying
+        # first leaves the container briefly empty while the new frame's widgets are still
+        # being constructed (more noticeable on heavier pages like CheckPage), which showed
+        # up as a real, visible blank flash between pages -- caught by direct testing, not
+        # apparent from reading the code.
+        old_frame = self.current_frame
         frame = self.PAGE_CLASSES[name](self.container, self)
         frame.pack(fill="both", expand=True)
         self.current_frame = frame
+        if old_frame is not None:
+            old_frame.destroy()
         if hasattr(frame, "on_show"):
             frame.on_show()
 
