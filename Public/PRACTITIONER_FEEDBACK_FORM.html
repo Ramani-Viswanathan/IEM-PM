@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IEM-PM — Practitioner Feedback</title>
+<style>
+  :root {
+    --paper: #f8f4f3;
+    --paper-raised: #ffffff;
+    --ink: #221e1d;
+    --muted: #746a67;
+    --line: #e4dad8;
+    --accent: #c41e3a;
+    --accent-ink: #8f1728;
+    --accent-tint: #f5dee0;
+    --gold: #8a6d1d;
+    --gold-tint: #f1e7cb;
+    --shadow: 0 1px 2px rgba(34, 30, 29, 0.06), 0 8px 24px rgba(34, 30, 29, 0.05);
+
+    --font-display: "Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #18130f;
+      --paper-raised: #241e1a;
+      --ink: #f3ece9;
+      --muted: #b9ada9;
+      --line: #3a322e;
+      --accent: #e8556c;
+      --accent-ink: #f4a3af;
+      --accent-tint: #3a1b20;
+      --gold: #d9b65b;
+      --gold-tint: #362b13;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #18130f;
+    --paper-raised: #241e1a;
+    --ink: #f3ece9;
+    --muted: #b9ada9;
+    --line: #3a322e;
+    --accent: #e8556c;
+    --accent-ink: #f4a3af;
+    --accent-tint: #3a1b20;
+    --gold: #d9b65b;
+    --gold-tint: #362b13;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--paper-raised);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0.9rem 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .topbar-brand {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .topbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+  }
+  .topbar-nav a {
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-decoration: none;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid transparent;
+  }
+  .topbar-nav a.active {
+    color: var(--accent);
+    font-weight: 700;
+    border-bottom-color: var(--accent);
+  }
+  .topbar-nav a:hover { color: var(--ink); }
+
+  main {
+    display: block;
+    padding: 2.5rem 1.25rem 5rem;
+  }
+
+  .sheet {
+    max-width: 640px;
+    margin: 0 auto;
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .sheet-head {
+    padding: 2rem 2.25rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    margin: 0 0 0.5rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 600;
+    margin: 0 0 0.6rem;
+    text-wrap: balance;
+  }
+
+  .sheet-head p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 46ch;
+  }
+
+  form {
+    padding: 1.75rem 2.25rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 480px) {
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  label {
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  label .opt {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .hint {
+    color: var(--muted);
+    font-size: 0.84rem;
+    margin: -0.15rem 0 0;
+  }
+
+  input, textarea {
+    font-family: var(--font-body);
+    font-size: 0.96rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    width: 100%;
+  }
+
+  input:focus, textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  input[type="date"] { font-variant-numeric: tabular-nums; }
+
+  textarea { resize: vertical; min-height: 4.5rem; }
+
+  .essence {
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .essence .field label { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; }
+
+  .step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--accent-tint);
+    color: var(--accent-ink);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    margin-right: 0.5rem;
+  }
+
+  .optional-heading {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .attach-note {
+    background: var(--gold-tint);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    font-size: 0.86rem;
+    color: var(--ink);
+  }
+  .attach-note strong { color: var(--accent-ink); }
+
+  .stars {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 0.2rem;
+    width: fit-content;
+  }
+  .stars input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .stars label {
+    font-size: 1.7rem;
+    line-height: 1;
+    color: var(--line);
+    cursor: pointer;
+    font-weight: 400;
+    user-select: none;
+  }
+  .stars input:checked ~ label,
+  .stars label:hover,
+  .stars label:hover ~ label {
+    color: var(--gold);
+  }
+  .stars input:focus-visible + label {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  button {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    padding: 0.85rem 1.5rem;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+  button:hover { background: var(--accent-ink); }
+  button:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+  .foot {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    button { transition: background 0.15s ease; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-brand" href="#">IEM-PM</a>
+      <nav class="topbar-nav">
+        <a href="IEM-PM-User-Guide.html">User Guide</a>
+        <a href="PMO-Data-Charter-Guide.html">PMO Data Charter Guide</a>
+        <a class="active" href="PRACTITIONER_FEEDBACK_FORM.html">Give Feedback</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+  <div class="sheet">
+    <div class="sheet-head">
+      <p class="eyebrow">IEM-PM — Practitioner Feedback</p>
+      <h1>Tell us what the audit got right, and what it missed</h1>
+      <p>Three things only — no ratings, no opinion survey. Fill this out after running one real (or realistic) IEM-PM audit, then hit Send: it opens your own email client with everything filled in.</p>
+    </div>
+
+    <form id="feedback-form">
+      <div class="field-row">
+        <div class="field">
+          <label for="name">Your name</label>
+          <input type="text" id="name" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="date">Date</label>
+          <input type="date" id="date" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="linkedin">LinkedIn URL <span class="opt">(optional)</span></label>
+        <input type="url" id="linkedin" placeholder="https://www.linkedin.com/in/…">
+      </div>
+
+      <div class="field">
+        <label for="context">The project you audited, and the baseline you tested against</label>
+        <p class="hint">A couple of sentences: what kind of project, and which standard(s) you loaded into <code>knowledge/</code> (PMBOK, PRINCE2, your own methodology, etc.).</p>
+        <textarea id="context" required></textarea>
+      </div>
+
+      <div class="essence">
+        <div class="field">
+          <label><span class="step">1</span>What did this miss?</label>
+          <textarea id="missed" required></textarea>
+        </div>
+
+        <div class="field">
+          <label><span class="step">2</span>What did this catch that you didn't expect?</label>
+          <textarea id="caught" required></textarea>
+        </div>
+      </div>
+
+      <div class="essence">
+        <p class="optional-heading">Optional — only if you're comfortable sharing</p>
+
+        <div class="attach-note">
+          Audit Manifests can contain real project data — client names, figures, personnel. Only
+          attach it if you're comfortable, and redact anything sensitive first. A <code>mailto</code>
+          link can prefill this form's text but can't attach files for you — attach the file to the
+          email yourself, after it opens.
+        </div>
+
+        <div class="field">
+          <label for="manifest-ref">The generated Audit Manifest <span class="opt">(optional)</span></label>
+          <p class="hint">If you attach it, note here which file it is. Leave blank to skip — the two questions above are what matters most.</p>
+          <input type="text" id="manifest-ref" placeholder="e.g. IEMPM_AuditGap_Report_190826_1400.md (attached, redacted)">
+        </div>
+
+        <div class="field">
+          <label>How much did you trust the audit's findings? <span class="opt">(optional)</span></label>
+          <div class="stars" role="radiogroup" aria-label="Trust rating, 1 to 5 stars">
+            <input type="radio" name="rating" id="star5" value="5"><label for="star5" title="5 stars">★</label>
+            <input type="radio" name="rating" id="star4" value="4"><label for="star4" title="4 stars">★</label>
+            <input type="radio" name="rating" id="star3" value="3"><label for="star3" title="3 stars">★</label>
+            <input type="radio" name="rating" id="star2" value="2"><label for="star2" title="2 stars">★</label>
+            <input type="radio" name="rating" id="star1" value="1"><label for="star1" title="1 star">★</label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit">Send feedback</button>
+      <p class="foot">Opens your default email app addressed to the IEM-PM maintainer. Nothing is sent from this page directly — you'll see the email before it goes anywhere.</p>
+    </form>
+  </div>
+  </main>
+
+  <script>
+    document.getElementById('date').valueAsDate = new Date();
+
+    document.getElementById('feedback-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var name = document.getElementById('name').value.trim();
+      var date = document.getElementById('date').value;
+      var linkedin = document.getElementById('linkedin').value.trim();
+      var context = document.getElementById('context').value.trim();
+      var manifestRef = document.getElementById('manifest-ref').value.trim();
+      var missed = document.getElementById('missed').value.trim();
+      var caught = document.getElementById('caught').value.trim();
+      var ratingEl = document.querySelector('input[name="rating"]:checked');
+      var rating = ratingEl ? ratingEl.value + ' / 5' : '(not provided)';
+
+      var lines = [
+        'Tester: ' + name,
+        'Date: ' + date,
+        'LinkedIn: ' + (linkedin || '(not provided)'),
+        '',
+        'Project / baseline tested:',
+        context,
+        '',
+        '1) What did this miss?',
+        missed,
+        '',
+        '2) What did this catch that you didn\'t expect?',
+        caught,
+        '',
+        '--- Optional ---',
+        'Audit Manifest: ' + (manifestRef || '(not shared)'),
+        'Trust in findings: ' + rating
+      ];
+
+      var subject = 'IEM-PM Practitioner Feedback — ' + (name || 'Untitled');
+      var body = lines.join('\n');
+      var mailto = 'mailto:ramaniv74@gmail.com'
+        + '?subject=' + encodeURIComponent(subject)
+        + '&body=' + encodeURIComponent(body);
+
+      window.location.href = mailto;
+    });
+  </script>
+</body>
+</html>

@@ -674,6 +674,7 @@
     <nav class="topbar-nav">
       <a class="active" href="IEM-PM-User-Guide.html">User Guide</a>
       <a href="PMO-Data-Charter-Guide.html">PMO Data Charter Guide</a>
+      <a href="PRACTITIONER_FEEDBACK_FORM.html">Give Feedback</a>
     </nav>
   </div>
 </header>
@@ -1190,6 +1191,7 @@ python render.py --canonical ../../../Audit/&lt;YourProjectName&gt;/reports/IEMP
             <dd>
               <p>One root origin per finding is enforced by design (a closed, single-value field — the validator rejects anything else) so every finding maps to one ownable fix: who fixes this, and where. In practice, some gaps genuinely have more than one contributing cause. The current version doesn't model that — there's no secondary or contributing-cause field — so you'll be asked to trace back to the single earliest structural point that produced the gap (per <code>root-origins.md</code>'s trace order), even when a second cause clearly played a part.</p>
               <p style="margin-top:0.6rem;">This is a deliberate, still-open design question, not an oversight — flagged for a future version once there's real audit evidence on how often it actually matters.</p>
+              <p style="margin-top:0.6rem;">Gap Type and Root Origin are each a single best-fit classification made by AI model judgment; a finding may plausibly fit more than one category at its boundary — read the finding's description, evidence, and recommended action for the intended meaning, not the label alone.</p>
             </dd>
           </div>
           <div class="faq-item">
